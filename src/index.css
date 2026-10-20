@@ -1954,3 +1954,294 @@ input[type='range'] {
   color: #654398;
   padding: 0 6px;
 }
+
+/* Project workspace */
+.editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #fffefb;
+  border-bottom: 1px solid var(--line);
+}
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.project-name-input {
+  min-width: 80px;
+  width: 220px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px;
+  font-weight: 600;
+}
+.project-name-input:focus {
+  border-color: var(--primary);
+}
+.toolbar-save {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-right: auto;
+}
+.toolbar-save.error,
+.toolbar-save.blocked {
+  color: #ac354a;
+}
+.toolbar-history {
+  display: flex;
+  gap: 4px;
+}
+.file-menu {
+  position: relative;
+}
+.file-menu summary {
+  cursor: pointer;
+  padding: 8px;
+}
+.file-menu-items {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px #30204018;
+  display: grid;
+  z-index: 35;
+}
+.file-menu-items button,
+.file-menu-items a {
+  border: 0;
+  background: transparent;
+  padding: 12px;
+  text-align: left;
+  border-radius: 8px;
+  color: inherit;
+}
+.file-menu-items button:hover,
+.file-menu-items a:hover {
+  background: #f1eafb;
+}
+.editor-steps {
+  margin: 0 0 24px;
+}
+.desktop-step-list {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 10px;
+}
+.desktop-step-list button {
+  flex: 1;
+  min-width: max-content;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 10px 13px;
+  background: white;
+  color: var(--muted);
+  font-size: 12px;
+}
+.desktop-step-list button[aria-current] {
+  background: #efe6ff;
+  color: #7547bd;
+  border-color: #c5a7f1;
+}
+.desktop-step-list button span {
+  font-size: 11px;
+}
+.mobile-step-picker {
+  display: none;
+}
+.editor-workspace.wizard-grid {
+  grid-template-columns: minmax(0, 1fr) 350px;
+}
+.editor-workspace.wizard-grid > .expandable-preview {
+  top: 88px;
+  max-height: calc(100dvh - 104px);
+}
+.studio:has(.editor-steps) {
+  padding-top: 24px;
+}
+.share-dialog {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  max-width: 480px;
+  width: calc(100% - 32px);
+  padding: 28px;
+  color: var(--text);
+}
+.share-dialog::backdrop {
+  background: #251b3e66;
+}
+.projects-page {
+  padding-top: 40px;
+  padding-bottom: 70px;
+}
+.project-tabs {
+  display: flex;
+  gap: 12px;
+  margin: 25px 0;
+}
+.project-tabs button {
+  padding: 10px 16px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: white;
+}
+.project-tabs button[aria-pressed='true'] {
+  background: #efe6ff;
+  color: #7547bd;
+}
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.project-tile {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: white;
+  overflow: hidden;
+}
+.project-thumbnail {
+  height: 220px;
+  overflow: hidden;
+  background: #efedf1;
+  position: relative;
+  pointer-events: none;
+}
+.project-thumbnail > div {
+  width: 600px;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.44);
+  transform-origin: top center;
+}
+.project-tile-body {
+  padding: 20px;
+}
+.project-tile h2 {
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.project-tile-body > p {
+  font-size: 11px;
+}
+.project-tile-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+@media (max-width: 1000px) {
+  .toolbar-save {
+    max-width: 150px;
+  }
+  .project-name-input {
+    width: 160px;
+  }
+  .editor-workspace.wizard-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .editor-toolbar {
+    position: relative;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+  .project-name-input {
+    flex: 1;
+    width: 120px;
+  }
+  .toolbar-save {
+    order: 5;
+    flex: 1;
+    max-width: none;
+  }
+  .toolbar-history {
+    order: 6;
+  }
+  .editor-toolbar > .button {
+    padding: 10px;
+    font-size: 12px;
+  }
+  .editor-toolbar > .button.secondary span {
+    display: none;
+  }
+  .desktop-step-list {
+    display: none;
+  }
+  .mobile-step-picker {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 12px;
+  }
+  .mobile-step-picker select {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: white;
+  }
+  .editor-workspace.wizard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editor-workspace.wizard-grid > .expandable-preview {
+    top: 8px;
+    max-height: 38svh;
+  }
+  .projects-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .project-tabs {
+    flex-wrap: wrap;
+  }
+}
+.card-tool-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.card-tool-tabs button {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 12px;
+}
+.card-tool-tabs button[aria-pressed='true'] {
+  background: #efe6ff;
+  color: #7547bd;
+  border-color: #c5a7f1;
+}

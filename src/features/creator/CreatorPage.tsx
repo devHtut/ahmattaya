@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Eye } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import type { CardConfig } from '../../shared/models/card'
 import { occasionSchema } from '../../shared/models/card'
 import { changeOccasion, occasions } from '../../shared/templates/templates'
@@ -18,41 +17,30 @@ import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
 
 const steps = [
-  { id: 'occasion', title: 'အခမ်းအနား', description: 'အထူးနေ့လေးကို ရွေးပါ' },
   {
     id: 'opening',
     title: 'အဖွင့်ဖိတ်စာ',
-    description: 'လက်ခံသူ ပထမဆုံးမြင်မယ့် ဖိတ်စာလေး',
+    description: 'ပထမဆုံးမြင်ရမယ့် ဖိတ်စာလေး',
   },
   {
-    id: 'words',
-    title: 'စကားလေးများ',
-    description: 'ရင်ထဲက စာသားလေးတွေ ရေးပါ',
-  },
-  {
-    id: 'style',
-    title: 'အရောင်နဲ့ စာလုံး',
-    description: 'သင့်စိတ်ကြိုက် ပုံစံပြင်ပါ',
+    id: 'card',
+    title: 'ကတ်',
+    description: 'အခမ်းအနား၊ စကားလေးတွေနဲ့ ပုံစံကို ပြင်ပါ',
   },
   {
     id: 'pages',
-    title: 'ပုံနဲ့ စာမျက်နှာများ',
+    title: 'စာမျက်နှာများ',
     description: 'အမှတ်တရပုံနဲ့ စာမျက်နှာလေးတွေ ထည့်ပါ',
+  },
+  {
+    id: 'music',
+    title: 'သီချင်း',
+    description: 'အမှတ်တရကို သံစဉ်လေးနဲ့ ဖြည့်ပါ',
   },
   {
     id: 'cake',
     title: 'Cake Studio',
     description: 'ကိုယ်ပိုင် cake design လေး ဖန်တီးပါ',
-  },
-  {
-    id: 'music',
-    title: 'သံစဉ်လေး',
-    description: 'အမှတ်တရကို သံစဉ်လေးနဲ့ ဖြည့်ပါ',
-  },
-  {
-    id: 'review',
-    title: 'နမူနာကြည့်မယ်',
-    description: 'မပို့ခင် ပြန်စစ်ကြည့်ပါ',
   },
 ] as const
 type CreatorStep = (typeof steps)[number]['id']
@@ -67,7 +55,8 @@ export function CreatorPage({
   saveStatus: 'idle' | 'saved' | 'error' | 'blocked'
   onRetrySave: () => void
 }) {
-  const [step, setStep] = useState<CreatorStep>('occasion')
+  const [step, setStep] = useState<CreatorStep>('opening')
+  const [cardTab, setCardTab] = useState('words')
   const cakeEditor = useCakeEditor(card.cake, (cake) =>
     onChange({ ...card, cake }),
   )
@@ -86,35 +75,38 @@ export function CreatorPage({
   }, [step])
   return (
     <main id="main-content" className="studio page-width">
-      <div className="studio-heading">
-        <div>
-          <span className="eyebrow">CREATOR STUDIO</span>
-          <h1>သင့်အမှတ်တရလေး ဖန်တီးပါ</h1>
-          <p className="muted">
-            တစ်ဆင့်ချင်း ဖန်တီးပါ။ ပြင်သမျှကို ဒီ browser ထဲမှာ သိမ်းပေးပါတယ်။
-          </p>
-        </div>
-        <Link className="button secondary" to="/preview">
-          <Eye size={17} /> နမူနာကြည့်မယ်
-        </Link>
-      </div>
-      <DraftStatus status={saveStatus} onRetry={onRetrySave} />
-      <div className="studio-grid wizard-grid">
-        <nav
-          className="studio-tools wizard-steps"
-          aria-label="ဖန်တီးမှု အဆင့်များ"
-        >
+      {['error', 'blocked'].includes(saveStatus) && (
+        <DraftStatus status={saveStatus} onRetry={onRetrySave} />
+      )}
+      <nav className="editor-steps" aria-label="ဖန်တီးမှု အဆင့်များ">
+        <label className="mobile-step-picker">
+          အဆင့် {stepIndex + 1} / {steps.length}
+          <select
+            aria-label="ဖန်တီးမှုအဆင့် ရွေးရန်"
+            value={step}
+            onChange={(e) => setStep(e.target.value as CreatorStep)}
+          >
+            {steps.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="desktop-step-list">
           {steps.map((item, index) => (
             <button
-              key={item.title}
+              key={item.id}
               aria-current={step === item.id ? 'step' : undefined}
               onClick={() => setStep(item.id)}
             >
-              <span className="step-number">{index + 1}</span>
-              <span>{item.title}</span>
+              <span>{index + 1}</span>
+              {item.title}
             </button>
           ))}
-        </nav>
+        </div>
+      </nav>
+      <div className="studio-grid wizard-grid editor-workspace">
         <details className="preview-panel expandable-preview" open>
           <summary>
             LIVE PREVIEW <span>ဖွင့် / ပိတ် ကြည့်နိုင်ပါတယ်</span>
@@ -175,7 +167,28 @@ export function CreatorPage({
             {steps[stepIndex].title}
           </h2>
           <p className="step-description">{steps[stepIndex].description}</p>
-          {step === 'occasion' && (
+          {step === 'card' && (
+            <div
+              className="card-tool-tabs"
+              role="group"
+              aria-label="ကတ်ပြင်ဆင်စရာများ"
+            >
+              {[
+                { id: 'words', label: 'စာသား' },
+                { id: 'style', label: 'အရောင်နဲ့ စာလုံး' },
+                { id: 'occasion', label: 'အခမ်းအနား' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  aria-pressed={cardTab === tab.id}
+                  onClick={() => setCardTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {step === 'card' && cardTab === 'occasion' && (
             <div className="fields">
               <label>
                 အခမ်းအနား
@@ -206,8 +219,12 @@ export function CreatorPage({
           {step === 'opening' && (
             <OpeningFields card={card} onChange={onChange} />
           )}
-          {step === 'words' && <WordsFields card={card} onChange={onChange} />}
-          {step === 'style' && <StyleFields card={card} onChange={onChange} />}
+          {step === 'card' && cardTab === 'words' && (
+            <WordsFields card={card} onChange={onChange} />
+          )}
+          {step === 'card' && cardTab === 'style' && (
+            <StyleFields card={card} onChange={onChange} />
+          )}
           {step === 'pages' && (
             <PagesFields
               card={card}
@@ -229,25 +246,10 @@ export function CreatorPage({
             />
           )}
           {step === 'music' && <MusicFields card={card} onChange={onChange} />}
-          {step === 'review' && (
-            <div className="review-panel">
-              <p>
-                အမည်၊ ဆုတောင်းစာနဲ့ စာလုံးပုံစံတွေကို နမူနာမှာ ပြန်စစ်ကြည့်ပါ။
-                နောက်ပြန်သွားပြီး ပြန်ပြင်နိုင်ပါတယ်။
-              </p>
-              <Link className="button primary" to="/preview">
-                <Eye size={17} /> နမူနာ အပြည့်ကြည့်မယ်
-              </Link>
-              <p className="editor-note">
-                ဒီကတ်ကို Publish မလုပ်ရသေးပါ။ သီးသန့် Cake Studio နဲ့ sharing
-                တို့ကို နောက်အဆင့်တွေမှာ ဆက်ထည့်ပါမယ်။
-              </p>
-            </div>
-          )}
           <div className="wizard-actions">
             <button
               className="button secondary"
-              disabled={step === 'occasion'}
+              disabled={stepIndex === 0}
               onClick={() => setStep(steps[stepIndex - 1].id)}
             >
               <ArrowLeft size={16} /> နောက်ပြန်

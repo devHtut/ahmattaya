@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/cake-decoration`, branched from the Cake Studio foundation milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/editor-projects`, branched from the Cake decoration milestone.
 
 ## Development
 
@@ -17,13 +17,13 @@ npm run build
 ## Current scope
 
 - Burmese-first Home page and four occasion entry points.
-- Guided Creator Studio with Next/Back: occasion, opening invitation, words, appearance, photos/pages, Cake Studio, music and review.
+- Guided Creator Studio with five horizontal stages: opening, card (words/appearance/occasion), pages, music and Cake Studio; Next/Back remains available.
 - Six coordinated palettes, four custom color pickers, and independent heading/message font, size, bold, italic and alignment.
 - Expandable sticky live preview and keyboard-accessible step navigation.
 - Browser photo selection/drop, compression, captions, drag reorder and accessible move controls.
 - Up to eight additional blank/lined pages, page ordering/deletion and full multi-page preview.
 - Validated browser-local draft recovery and live/static receiver preview.
-- React Router routes: `/`, `/create`, `/preview`, and not-found.
+- React Router routes: `/`, `/projects`, `/create`, `/preview`, and not-found.
 - Versioned Zod card schema (v8), v1–v7 draft migration, TypeScript strict mode, shared design tokens.
 
 Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, interactive candles and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
@@ -59,7 +59,7 @@ The wizard currently covers implemented features only. Cake Studio includes reci
 
 ## Responsive editor preview
 
-Laptop/desktop previews stay sticky while the properties panel scrolls with the page. At tablet widths (761–1100px), steps form a full-width row above a two-column editor. On phones, a compact, collapsible preview stays above the controls, capped at 38% of the viewport; long cards scroll inside that preview. The standalone receiver preview retains the full card layout. Verified in the browser at laptop width and in 390px/834px iframe viewports; real-device keyboard and touch testing remains outstanding.
+Laptop/desktop previews stay sticky while the properties panel scrolls with the page. On desktop and tablets, five horizontal stages sit above a two-column editor. On phones, a stage picker replaces the horizontal buttons, and a compact, collapsible preview stays above the controls, capped at 38% of the viewport; long cards scroll inside that preview. The standalone receiver preview retains the full card layout. Verified in the browser at laptop width and in 390px/834px iframe viewports; real-device keyboard and touch testing remains outstanding.
 
 ## Photos and pages
 
@@ -110,3 +110,11 @@ Creator-only modes separate Orbit, Cream and Candles. Draw on the topmost cake s
 Candles support classic, spiral, heart, star and seven-segment digits 0–9. Tap to add, drag an existing candle to move, or select it from the list to change design/color/digit/location/delete. Keyboard-accessible center-add and position sliders offer an alternative to pointer placement. Up to 12 candles are allowed. Candle/cream positions are validated inside an inset circle, protecting the cake edge. The selected candle has an editor-only ring. Receiver rendering uses the same saved recipe without editing controls. Flame visuals are static in this stage.
 
 V7 base cakes migrate with empty decoration arrays while preserving all existing settings. No model uploads are stored: cream paths and candle records are bounded JSON. Rendered geometry and temporary stroke previews are disposed on replacement/cancel/unmount. Geometry tests cover every candle style and digit, dot/path cream, limits and migrations. Browser-tested: 3D drawing, Undo/Redo, top-pad drawing, adding/moving a candle without duplication, and number candles. Real touch/pointer-cancel/hardware fallback testing is still outstanding.
+
+## Project workspace
+
+Branch `codex/editor-projects` adds a top File/name/local-save/Undo/Redo/Preview/Share toolbar, a horizontal five-stage navigator, and a compact stage picker on phones. Undo/Redo retains the last ten card edits in this session; Cake cream tools also retain their own stroke history. Share explains that public links are not yet available.
+
+`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, background images, custom music and a template library remain separate milestones.
+
+Verified: legacy recovery, project duplication, card edit/Undo, recoverable trash/restore, Share explanation and project persistence after reload. Browser-storage tests cover migration, multiple projects, active selection, invalid/future data, duplicate IDs and quota failures.
