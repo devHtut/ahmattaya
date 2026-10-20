@@ -14,7 +14,7 @@ test('every occasion starts with a valid independent draft', () => {
 test('rejects unsupported schema versions, occasions and oversized content', () => {
   const draft = createCard('birthday')
   for (const change of [
-    { schemaVersion: 5 },
+    { schemaVersion: 6 },
     { occasion: 'unknown' },
     { message: 'a'.repeat(2001) },
     { receiverName: 'a'.repeat(81) },

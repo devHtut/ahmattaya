@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { musicSchema } from './music.ts'
 
 export const occasionSchema = z.enum([
   'birthday',
@@ -106,26 +107,33 @@ const v3CardFields = v2CardSchema.extend({
   photos: z.array(v3PhotoSchema).max(MAX_PHOTOS),
 })
 export const v3CardSchema = v3CardFields
-export const cardSchema = v2CardSchema
-  .extend({
-    schemaVersion: z.literal(4),
-    pages: z.array(pageSchema).max(MAX_PAGES),
-    photos: z.array(photoSchema).max(MAX_PHOTOS),
-  })
-  .superRefine((card, ctx) => {
-    const pageIds = new Set(card.pages.map((page) => page.id))
-    if (
-      pageIds.size !== card.pages.length ||
-      new Set(card.photos.map((photo) => photo.id)).size !== card.photos.length
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Duplicate page or photo identity',
-      })
-    }
-    for (const photo of card.photos) {
-      if (photo.pageId !== 'cover' && !pageIds.has(photo.pageId))
-        ctx.addIssue({ code: 'custom', message: 'Photo page is missing' })
-    }
-  })
+const v4CardFields = v2CardSchema.extend({
+  schemaVersion: z.literal(4),
+  pages: z.array(pageSchema).max(MAX_PAGES),
+  photos: z.array(photoSchema).max(MAX_PHOTOS),
+})
+
+function validateCardReferences(
+  card: Pick<z.infer<typeof v4CardFields>, 'pages' | 'photos'>,
+  ctx: z.RefinementCtx,
+) {
+  const pageIds = new Set(card.pages.map((page) => page.id))
+  if (
+    pageIds.size !== card.pages.length ||
+    new Set(card.photos.map((photo) => photo.id)).size !== card.photos.length
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Duplicate page or photo identity',
+    })
+  }
+  for (const photo of card.photos) {
+    if (photo.pageId !== 'cover' && !pageIds.has(photo.pageId))
+      ctx.addIssue({ code: 'custom', message: 'Photo page is missing' })
+  }
+}
+export const v4CardSchema = v4CardFields.superRefine(validateCardReferences)
+export const cardSchema = v4CardFields
+  .extend({ schemaVersion: z.literal(5), music: musicSchema })
+  .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>

@@ -9,6 +9,7 @@ import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
+import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
 
 const steps = [
@@ -19,6 +20,7 @@ const steps = [
     title: 'ပုံနဲ့ စာမျက်နှာများ',
     description: 'အမှတ်တရပုံနဲ့ စာမျက်နှာလေးတွေ ထည့်ပါ',
   },
+  { title: 'သံစဉ်လေး', description: 'အမှတ်တရကို သံစဉ်လေးနဲ့ ဖြည့်ပါ' },
   { title: 'နမူနာကြည့်မယ်', description: 'မပို့ခင် ပြန်စစ်ကြည့်ပါ' },
 ]
 export function CreatorPage({
@@ -169,7 +171,8 @@ export function CreatorPage({
               onSelectPhoto={setSelectedPhotoId}
             />
           )}
-          {step === 4 && (
+          {step === 4 && <MusicFields card={card} onChange={onChange} />}
+          {step === 5 && (
             <div className="review-panel">
               <p>
                 အမည်၊ ဆုတောင်းစာနဲ့ စာလုံးပုံစံတွေကို နမူနာမှာ ပြန်စစ်ကြည့်ပါ။
@@ -179,8 +182,8 @@ export function CreatorPage({
                 <Eye size={17} /> နမူနာ အပြည့်ကြည့်မယ်
               </Link>
               <p className="editor-note">
-                ဒီကတ်ကို Publish မလုပ်ရသေးပါ။ သီးသန့် Cake Studio၊ music နဲ့
-                sharing တို့ကို နောက်အဆင့်တွေမှာ ဆက်ထည့်ပါမယ်။
+                ဒီကတ်ကို Publish မလုပ်ရသေးပါ။ သီးသန့် Cake Studio နဲ့ sharing
+                တို့ကို နောက်အဆင့်တွေမှာ ဆက်ထည့်ပါမယ်။
               </p>
             </div>
           )}

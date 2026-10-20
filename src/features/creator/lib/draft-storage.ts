@@ -4,18 +4,26 @@ import {
   legacyCardSchema,
   v2CardSchema,
   v3CardSchema,
+  v4CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
+import { createMusic } from '../../../shared/models/music.ts'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry.ts'
 import { createAppearance } from '../../../shared/templates/card-styles.ts'
 
 const storedCardSchema = z.union([
   cardSchema,
+  v4CardSchema.transform((card) => ({
+    ...card,
+    schemaVersion: 5 as const,
+    music: createMusic(),
+  })),
   v3CardSchema
     .transform((card) => ({
       ...card,
-      schemaVersion: 4 as const,
+      schemaVersion: 5 as const,
+      music: createMusic(),
       photos: card.photos.map((photo, index) => ({
         ...photo,
         frame: defaultPhotoFrame(index),
@@ -24,13 +32,15 @@ const storedCardSchema = z.union([
     .pipe(cardSchema),
   v2CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 4 as const,
+    schemaVersion: 5 as const,
+    music: createMusic(),
     pages: [],
     photos: [],
   })),
   legacyCardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 4 as const,
+    schemaVersion: 5 as const,
+    music: createMusic(),
     pages: [],
     photos: [],
     appearance: createAppearance(card.theme),
