@@ -3,15 +3,19 @@ import { Link } from 'react-router-dom'
 import { Eye, Palette, Type } from 'lucide-react'
 import type { CardConfig } from '../../shared/models/card'
 import { occasionSchema } from '../../shared/models/card'
-import { createCard, occasions } from '../../shared/templates/templates'
+import { changeOccasion, occasions } from '../../shared/templates/templates'
 import { CardPreview } from '../../shared/ui/CardPreview'
 
 export function CreatorPage({
   card,
   onChange,
+  saveStatus,
+  onRetrySave,
 }: {
   card: CardConfig
   onChange: (card: CardConfig) => void
+  saveStatus: 'idle' | 'saved' | 'error' | 'blocked'
+  onRetrySave: () => void
 }) {
   const [step, setStep] = useState<'words' | 'style'>('words')
   const activeCard = card
@@ -24,13 +28,34 @@ export function CreatorPage({
           <span className="eyebrow">CREATOR STUDIO</span>
           <h1>သင့်အမှတ်တရလေး ဖန်တီးပါ</h1>
           <p className="muted">
-            ဒီအဆင့်မှာ နမူနာကို စမ်းသပ်နိုင်ပါတယ်။ Refresh လုပ်ရင် draft
-            ပျောက်ပါမယ်။
+            Draft ကို ဒီ browser ထဲမှာ အလိုအလျောက် သိမ်းပေးပါတယ်။ Publish
+            မလုပ်ရသေးပါ။
           </p>
         </div>
         <Link className="button secondary" to="/preview">
           <Eye size={17} /> နမူနာကြည့်မယ်
         </Link>
+      </div>
+      <div className="draft-status" role="status" aria-live="polite">
+        <p>
+          {saveStatus === 'saved'
+            ? '✓ ဒီ browser ထဲမှာ draft သိမ်းပြီးပါပြီ။'
+            : saveStatus === 'error'
+              ? 'Draft သိမ်းမရသေးပါ။ Browser storage ကို စစ်ဆေးပါ။ ဒီစာမျက်နှာကနေ ထွက်ရင် ပြင်ထားတာတွေ ပျောက်နိုင်ပါတယ်။'
+              : saveStatus === 'blocked'
+                ? 'သိမ်းထားတဲ့ draft ကို ဒီ version နဲ့ ဖွင့်မရပါ။ အဟောင်းကို မပြောင်းထားပါ။ ဒီမှာ ဆက်ပြင်နိုင်ပေမယ့် အလိုအလျောက် မသိမ်းသေးပါ။'
+                : 'စပြင်လိုက်တာနဲ့ draft ကို ဒီ browser ထဲမှာ သိမ်းပေးပါမယ်။'}
+        </p>
+        {saveStatus === 'error' && (
+          <button className="button secondary" onClick={onRetrySave}>
+            ပြန်သိမ်းမယ်
+          </button>
+        )}
+        {saveStatus === 'blocked' && (
+          <button className="button secondary" onClick={onRetrySave}>
+            သိမ်းထားတဲ့ draft အစား လက်ရှိ draft ကို သိမ်းမယ်
+          </button>
+        )}
       </div>
       <div className="studio-grid">
         <nav className="studio-tools" aria-label="ပြင်ဆင်ရန် ကိရိယာများ">
@@ -65,11 +90,7 @@ export function CreatorPage({
                   value={activeCard.occasion}
                   onChange={(e) => {
                     const occasion = occasionSchema.parse(e.target.value)
-                    onChange({
-                      ...activeCard,
-                      occasion,
-                      title: createCard(occasion).title,
-                    })
+                    onChange(changeOccasion(activeCard, occasion))
                   }}
                 >
                   {occasions.map((item) => (
@@ -132,8 +153,7 @@ export function CreatorPage({
             </div>
           )}
           <p className="editor-note">
-            Photo၊ music၊ သိမ်းဆည်းခြင်းနဲ့ publishing ကို နောက်အဆင့်တွေမှာ
-            ထည့်သွင်းပါမယ်။
+            Photo၊ music နဲ့ publishing ကို နောက်အဆင့်တွေမှာ ထည့်သွင်းပါမယ်။
           </p>
         </section>
       </div>

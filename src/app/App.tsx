@@ -1,13 +1,13 @@
-import { useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import { Sparkles } from 'lucide-react'
 import { HomePage } from '../features/home/HomePage'
 import { CreatorPage } from '../features/creator/CreatorPage'
 import { PreviewPage } from '../features/receiver/PreviewPage'
-import { createCard } from '../shared/templates/templates'
+import { changeOccasion } from '../shared/templates/templates'
+import { useCreatorDraft } from '../features/creator/hooks/useCreatorDraft'
 
 export default function App() {
-  const [card, setCard] = useState(() => createCard('birthday'))
+  const { card, onChange, saveStatus, retrySave } = useCreatorDraft()
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -35,12 +35,21 @@ export default function App() {
         <Route
           path="/"
           element={
-            <HomePage onSelect={(occasion) => setCard(createCard(occasion))} />
+            <HomePage
+              onSelect={(occasion) => onChange(changeOccasion(card, occasion))}
+            />
           }
         />
         <Route
           path="/create"
-          element={<CreatorPage card={card} onChange={setCard} />}
+          element={
+            <CreatorPage
+              card={card}
+              onChange={onChange}
+              saveStatus={saveStatus}
+              onRetrySave={retrySave}
+            />
+          }
         />
         <Route path="/preview" element={<PreviewPage card={card} />} />
         <Route

@@ -1,0 +1,62 @@
+import { z } from 'zod'
+import { cardSchema, type CardConfig } from '../../../shared/models/card.ts'
+
+export const DRAFT_STORAGE_KEY = 'ahmattaya.creator-draft'
+const draftEnvelopeSchema = z.object({
+  storageVersion: z.literal(1),
+  savedAt: z.iso.datetime(),
+  card: cardSchema,
+})
+export interface DraftStorage {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+}
+export type LoadDraftResult =
+  | { status: 'empty' }
+  | { status: 'restored'; card: CardConfig; savedAt: string }
+  | { status: 'invalid' | 'unavailable' }
+
+export function loadDraft(storage: DraftStorage): LoadDraftResult {
+  let raw: string | null
+  try {
+    raw = storage.getItem(DRAFT_STORAGE_KEY)
+  } catch {
+    return { status: 'unavailable' }
+  }
+  if (raw === null) return { status: 'empty' }
+  try {
+    const result = draftEnvelopeSchema.safeParse(JSON.parse(raw))
+    if (!result.success) return { status: 'invalid' }
+    return {
+      status: 'restored',
+      card: result.data.card,
+      savedAt: result.data.savedAt,
+    }
+  } catch {
+    return { status: 'invalid' }
+  }
+}
+
+export function saveDraft(storage: DraftStorage, card: CardConfig): boolean {
+  const validated = cardSchema.safeParse(card)
+  if (!validated.success) return false
+  try {
+    storage.setItem(
+      DRAFT_STORAGE_KEY,
+      JSON.stringify({
+        storageVersion: 1,
+        savedAt: new Date().toISOString(),
+        card: validated.data,
+      }),
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
+// Accessing localStorage itself can throw in restricted browser environments.
+export const browserDraftStorage: DraftStorage = {
+  getItem: (key) => window.localStorage.getItem(key),
+  setItem: (key, value) => window.localStorage.setItem(key, value),
+}

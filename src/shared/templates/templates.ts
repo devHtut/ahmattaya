@@ -48,3 +48,16 @@ export function createCard(occasion: Occasion): CardConfig {
     theme: 'lavender',
   }
 }
+
+// Preserve personal content when switching occasions. Only replace an untouched
+// default title; a creator's custom title belongs to their draft.
+export function changeOccasion(
+  card: CardConfig,
+  occasion: Occasion,
+): CardConfig {
+  return {
+    ...card,
+    occasion,
+    title: card.title === titles[card.occasion] ? titles[occasion] : card.title,
+  }
+}

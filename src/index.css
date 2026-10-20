@@ -587,3 +587,23 @@ textarea {
     scroll-behavior: auto !important;
   }
 }
+
+.draft-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  background: #f0eafd;
+  border: 1px solid #e6dafa;
+  border-radius: 12px;
+  color: #654398;
+}
+.draft-status p {
+  flex: 1 1 260px;
+  font-size: 11px;
+}
+.draft-status .button {
+  font-size: 11px;
+}
