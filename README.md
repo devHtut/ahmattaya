@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/custom-music`, branched from the page backgrounds milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/template-library`, branched from the custom music milestone.
 
 ## Development
 
@@ -23,7 +23,7 @@ npm run build
 - Browser photo selection/drop, compression, captions, drag reorder and accessible move controls.
 - Up to eight additional blank/lined pages, page ordering/deletion and full multi-page preview.
 - Validated browser-local draft recovery and live/static receiver preview.
-- React Router routes: `/`, `/projects`, `/create`, `/preview`, and not-found.
+- React Router routes: `/`, `/templates`, `/projects`, `/create`, `/preview`, and not-found.
 - Versioned Zod card schema (v8), v1–v7 draft migration, TypeScript strict mode, shared design tokens.
 
 Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, interactive candles and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
@@ -115,7 +115,7 @@ V7 base cakes migrate with empty decoration arrays while preserving all existing
 
 Branch `codex/editor-projects` adds a top File/name/local-save/Undo/Redo/Preview/Share toolbar, a horizontal five-stage navigator, and a compact stage picker on phones. Undo/Redo retains the last ten card edits in this session; Cake cream tools also retain their own stroke history. Share explains that public links are not yet available.
 
-`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, a template library remains a separate milestone.
+`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, public sharing and collaboration remain separate milestones.
 
 Verified: legacy recovery, project duplication, card edit/Undo, recoverable trash/restore, Share explanation and project persistence after reload. Browser-storage tests cover migration, multiple projects, active selection, invalid/future data, duplicate IDs and quota failures.
 
@@ -138,3 +138,11 @@ Custom bytes live as immutable SHA-256-addressed Blobs in IndexedDB (`ahmattaya.
 Card schema v10 migrates v1–v9 cards and project libraries without writing on load, preserving presets, background images, volume and loop. Receivers restore the custom file silently; opening can play it synchronously from the click gesture, with a silent-opening checkbox and manual Play fallback. Replay pauses and rewinds. Loading/missing-file states leave the card readable. Object URLs and audio elements are cleaned up on replacement/unmount; a new upload revision allows retrying the same asset after a missing-file read.
 
 Verified in-browser with a local WAV: import/duration, actual playback progression, failed malformed-WAV replacement preserving the previous file, preset/custom switching, volume/loop, Remove/Undo, reload restoration and opening playback. Unit tests cover limits/metadata validation, supported file checks, v9 migration and shared IDs across project copies. Real-device mobile volume/audio-codec compatibility and long-file playback still need testing. Public upload/sharing and trimming are not implemented.
+
+## Template library
+
+`/templates` offers six editable starters across birthday, anniversary, wedding invitation and wedding wish. Each combines authored Burmese copy, typography/palette, an opening, optional extra blank/lined pages, a preset soundtrack and optional cake recipe. Birthday cakes include editable starter candles. Starters have no private names, external assets or device-local file references. The same CardPreview renders gallery thumbnails, modal previews and actual projects. Cake previews use the lightweight 2D illustration; the 3D renderer remains lazy in the editor.
+
+Occasion filters live in the URL (`?occasion=anniversary` etc.). A native dialog previews the opening, cover, each included page and cake, without playing music or creating a project. Selecting a starter creates a fresh named project, preserving the previous library and keeping storage errors visible. Every factory call produces independent editable objects. A blank-project option remains available and follows the selected occasion. Home occasion links, the main navigation, Projects → New and the editor File → New all lead to the gallery; merely browsing/filtering/previewing does not create drafts.
+
+Tests validate every starter, occasion coverage, identity/reference constraints, independence across edits, unknown IDs and multi-project storage roundtrips. Browser verification covers preview switching/Escape, filters, creating a named template project, reload persistence and retaining earlier projects. Gallery layouts were checked in 390px and 834px iframe viewports; real-device touch and mobile modal testing remain outstanding. Templates are bundled code definitions; template uploads, user-saved templates and a remote marketplace are not part of this stage.

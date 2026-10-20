@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import {
+  createTemplateCard,
+  templateCatalog,
+} from '../../../shared/templates/catalog'
+import {
   cardSchema,
   type CardConfig,
   type Occasion,
@@ -115,6 +119,22 @@ export function useCreatorDraft() {
         [],
         [],
       )
+    },
+    createFromTemplate: (id: string) => {
+      const card = createTemplateCard(id)
+      const template = templateCatalog.find((item) => item.id === id)
+      if (!card || !template) return false
+      const project = makeProject(card, template.name)
+      persist(
+        {
+          ...state.library,
+          activeId: project.id,
+          projects: [...state.library.projects, project],
+        },
+        [],
+        [],
+      )
+      return true
     },
     open: (id: string) => {
       if (state.library.projects.some((p) => p.id === id && !p.deleted))

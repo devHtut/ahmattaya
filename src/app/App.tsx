@@ -1,5 +1,6 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { Sparkles } from 'lucide-react'
+import { TemplatesPage } from '../features/templates/TemplatesPage'
 import { HomePage } from '../features/home/HomePage'
 import { CreatorPage } from '../features/creator/CreatorPage'
 import { PreviewPage } from '../features/receiver/PreviewPage'
@@ -30,7 +31,8 @@ export default function App() {
             <nav aria-label="အဓိက စာမျက်နှာများ">
               <Link to="/">ပင်မစာမျက်နှာ</Link>
               <Link to="/projects">Project များ</Link>
-              <Link className="button primary" to="/create">
+              <Link to="/templates">Templates</Link>
+              <Link className="button primary" to="/templates">
                 စဖန်တီးမယ် <span aria-hidden="true">↗</span>
               </Link>
             </nav>
@@ -41,7 +43,11 @@ export default function App() {
         <EditorToolbar key={workspace.project.id} workspace={workspace} />
       )}
       <Routes>
-        <Route path="/" element={<HomePage onSelect={workspace.create} />} />
+        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/templates"
+          element={<TemplatesPage workspace={workspace} />}
+        />
         <Route
           path="/create"
           element={

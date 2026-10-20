@@ -2333,3 +2333,227 @@ input[type='range'] {
 .audio-dropzone .field-hint {
   margin: 0;
 }
+/* Template library uses the same card renderer as the editable project. */
+.templates-page {
+  padding-block: 40px 70px;
+}
+.template-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 26px 0 14px;
+}
+.template-filters button {
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--muted);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 12px;
+}
+.template-filters button[aria-pressed='true'] {
+  background: #efe6ff;
+  color: #7547bd;
+  border-color: #c5a7f1;
+}
+.template-count {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 24px;
+}
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.template-tile {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.template-thumbnail {
+  height: 340px;
+  display: grid;
+  place-items: center;
+  background: #efedf1;
+  padding: 12px;
+  pointer-events: none;
+  overflow: hidden;
+}
+.template-thumbnail > .card-page-frame {
+  width: 235px;
+  max-width: 100%;
+  box-shadow: 0 8px 22px #30204018;
+  border-radius: 12px;
+}
+.template-tile-body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.template-tile-body > .eyebrow {
+  font-size: 10px;
+  color: var(--primary);
+}
+.template-tile h2 {
+  font-size: 19px;
+  margin-block: 10px;
+}
+.template-tile-body > p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+  margin: 0 0 16px;
+}
+.template-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+.template-badges span {
+  padding: 5px 8px;
+  background: #f7f4fc;
+  color: #706181;
+  border-radius: 8px;
+  font-size: 10px;
+}
+.template-tile-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.template-tile-actions .button {
+  padding: 12px;
+  font-size: 11px;
+}
+.template-dialog {
+  width: min(960px, calc(100% - 32px));
+  max-height: 90svh;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  color: var(--text);
+  background: #fffdf9;
+}
+.template-dialog::backdrop {
+  background: #251b3e77;
+}
+.template-dialog-heading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.template-dialog-heading h2 {
+  font-size: 23px;
+  margin: 8px 0 0;
+}
+.template-dialog-heading .eyebrow {
+  font-size: 10px;
+  color: var(--primary);
+}
+.template-dialog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 24px;
+  align-items: start;
+}
+.template-preview-stage {
+  background: #efedf1;
+  border-radius: 18px;
+  padding: 20px;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+.template-preview-stage > .card-page-frame {
+  width: min(100%, 370px);
+}
+.template-preview-stage > .opening-invitation {
+  width: 100%;
+}
+.template-preview-stage .cake-illustration {
+  max-height: 450px;
+}
+.template-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.template-preview-info > p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 2;
+}
+.template-preview-info label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+}
+.template-preview-info select {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-width: 0;
+  width: 100%;
+  background: white;
+}
+.template-includes {
+  padding-left: 20px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2.4;
+}
+@media (max-width: 1000px) {
+  .template-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .template-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .template-dialog-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .template-dialog {
+    padding: 18px;
+  }
+  .template-dialog-heading h2 {
+    font-size: 19px;
+  }
+  .template-preview-stage {
+    max-height: 50svh;
+    overflow: auto;
+    display: block;
+  }
+  .template-preview-stage > .card-page-frame {
+    width: min(100%, 300px);
+    margin-inline: auto;
+  }
+  .template-preview-stage .cake-illustration {
+    width: 100%;
+  }
+  .header-inner {
+    flex-wrap: wrap;
+    padding-block: 14px;
+    gap: 10px;
+  }
+  .header-inner nav {
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+  }
+}
+.template-dialog {
+  margin: auto;
+}

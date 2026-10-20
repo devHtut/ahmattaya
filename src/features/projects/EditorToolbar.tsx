@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   ArrowLeft,
   Check,
@@ -15,7 +15,6 @@ export function EditorToolbar({
 }: {
   workspace: ProjectWorkspace
 }) {
-  const navigate = useNavigate()
   const [name, setName] = useState(w.project.name)
   const shareDialog = useRef<HTMLDialogElement>(null)
   return (
@@ -30,14 +29,7 @@ export function EditorToolbar({
       <details className="file-menu">
         <summary>File</summary>
         <div className="file-menu-items">
-          <button
-            onClick={() => {
-              w.create()
-              navigate('/create')
-            }}
-          >
-            Project အသစ်
-          </button>
+          <Link to="/templates">Project အသစ်</Link>
           <button onClick={() => w.duplicate()}>မိတ္တူပွားမယ်</button>
           <Link to="/projects">Project များ ကြည့်မယ်</Link>
         </div>

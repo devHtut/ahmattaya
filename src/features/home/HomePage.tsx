@@ -1,14 +1,9 @@
-import type { Occasion } from '../../shared/models/card'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Sparkles } from 'lucide-react'
 import { occasions, createCard } from '../../shared/templates/templates'
 import { CardPreview } from '../../shared/ui/CardPreview'
 
-export function HomePage({
-  onSelect,
-}: {
-  onSelect: (occasion: Occasion) => void
-}) {
+export function HomePage() {
   return (
     <main id="main-content">
       <section className="hero page-width">
@@ -25,7 +20,7 @@ export function HomePage({
             ချစ်ရသူတွေအတွက် မွေးနေ့ဆုတောင်း၊ မင်္ဂလာဖိတ်စာနဲ့
             အထူးအခိုက်အတန့်လေးတွေကို ကိုယ်ပိုင်ပုံစံနဲ့ ဖန်တီးလိုက်ပါ။
           </p>
-          <Link className="button primary" to="/create">
+          <Link className="button primary" to="/templates">
             အမှတ်တရ စဖန်တီးမယ် <ArrowUpRight size={18} />
           </Link>
           <p className="small-note">
@@ -53,8 +48,7 @@ export function HomePage({
           {occasions.map((item) => (
             <Link
               key={item.id}
-              to="/create"
-              onClick={() => onSelect(item.id)}
+              to={`/templates?occasion=${item.id}`}
               className="occasion-card"
             >
               <span className="occasion-icon">{item.icon}</span>

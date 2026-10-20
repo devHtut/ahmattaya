@@ -25,15 +25,9 @@ export function ProjectsPage({
             မချိတ်ဆက်ရသေးပါ။
           </p>
         </div>
-        <button
-          className="button primary"
-          onClick={() => {
-            w.create()
-            navigate('/create')
-          }}
-        >
+        <Link className="button primary" to="/templates">
           <Plus size={18} /> အသစ်ဖန်တီးမယ်
-        </button>
+        </Link>
       </div>
       {['error', 'blocked'].includes(w.saveStatus) && (
         <DraftStatus status={w.saveStatus} onRetry={w.retrySave} />
