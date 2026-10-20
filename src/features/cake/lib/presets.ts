@@ -17,6 +17,8 @@ export const cakePresets: {
     name: 'Chocolate Joy',
     description: 'Chocolate တစ်ထပ်နဲ့ berry အလှဆင်',
     recipe: {
+      strokes: [],
+      candles: [],
       enabled: true,
       flavor: 'chocolate',
       tiers: 1,
@@ -30,6 +32,8 @@ export const cakePresets: {
     name: 'Strawberry Blush',
     description: 'Strawberry သုံးထပ်နဲ့ ပန်းရောင် cream',
     recipe: {
+      strokes: [],
+      candles: [],
       enabled: true,
       flavor: 'strawberry',
       tiers: 3,
@@ -42,6 +46,6 @@ export const cakePresets: {
 export function cakeFromPreset(id: string): CakeRecipe {
   const preset = cakePresets.find((item) => item.id === id)
   return preset
-    ? { ...preset.recipe }
+    ? structuredClone(preset.recipe)
     : { ...createCake(), enabled: true, tiers: 1, decoration: 'plain' }
 }

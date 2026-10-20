@@ -7,6 +7,7 @@ import {
   v4CardSchema,
   v5CardSchema,
   v6CardSchema,
+  v7CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
@@ -18,20 +19,25 @@ import { createAppearance } from '../../../shared/templates/card-styles.ts'
 
 const storedCardSchema = z.union([
   cardSchema,
+  v7CardSchema.transform((card) => ({
+    ...card,
+    schemaVersion: 8 as const,
+    cake: { ...card.cake, strokes: [], candles: [] },
+  })),
   v6CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 7 as const,
+    schemaVersion: 8 as const,
     cake: createCake(),
   })),
   v5CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 7 as const,
+    schemaVersion: 8 as const,
     cake: createCake(),
     opening: createOpening(),
   })),
   v4CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 7 as const,
+    schemaVersion: 8 as const,
     cake: createCake(),
     opening: createOpening(),
     music: createMusic(),
@@ -39,7 +45,7 @@ const storedCardSchema = z.union([
   v3CardSchema
     .transform((card) => ({
       ...card,
-      schemaVersion: 7 as const,
+      schemaVersion: 8 as const,
       cake: createCake(),
       opening: createOpening(),
       music: createMusic(),
@@ -51,7 +57,7 @@ const storedCardSchema = z.union([
     .pipe(cardSchema),
   v2CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 7 as const,
+    schemaVersion: 8 as const,
     cake: createCake(),
     opening: createOpening(),
     music: createMusic(),
@@ -60,7 +66,7 @@ const storedCardSchema = z.union([
   })),
   legacyCardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 7 as const,
+    schemaVersion: 8 as const,
     cake: createCake(),
     opening: createOpening(),
     music: createMusic(),

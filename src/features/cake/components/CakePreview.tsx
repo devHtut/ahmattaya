@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { CakeRecipe } from '../../../shared/models/cake'
+import type { CakeEditorSession } from '../lib/useCakeEditor'
 import { CakeIllustration } from './CakeIllustration'
 
 const CakeScene = lazy(() => import('./CakeScene'))
@@ -25,7 +26,13 @@ class SceneBoundary extends Component<
     return this.state.failed ? null : this.props.children
   }
 }
-export function CakePreview({ recipe }: { recipe: CakeRecipe }) {
+export function CakePreview({
+  recipe,
+  editor,
+}: {
+  recipe: CakeRecipe
+  editor?: CakeEditorSession
+}) {
   const [failed, setFailed] = useState(false)
   const onFailure = useCallback(() => setFailed(true), [])
   if (!recipe.enabled)
@@ -65,14 +72,17 @@ export function CakePreview({ recipe }: { recipe: CakeRecipe }) {
               </>
             }
           >
-            <CakeScene recipe={recipe} onFailure={onFailure} />
+            <CakeScene recipe={recipe} onFailure={onFailure} editor={editor} />
           </Suspense>
         </SceneBoundary>
       )}
       {!failed && (
         <p className="field-hint">
-          Cake ပေါ်မှာ ဆွဲပြီး လှည့်ကြည့်ပါ။ Mouse wheel / လက်နှစ်ချောင်းနဲ့
-          အနီးအဝေး ချိန်နိုင်ပါတယ်။
+          {editor?.tools.mode === 'cream'
+            ? 'အပေါ်ဆုံး cake မျက်နှာပြင်ပေါ်မှာ Cream ဆွဲပါ။ လက်လွှတ်မှ သိမ်းပေးပါတယ်။'
+            : editor?.tools.mode === 'candles'
+              ? 'မျက်နှာပြင်ကို နှိပ်ပြီး Candle စိုက်ပါ။ Candle ကို ဆွဲရွှေ့နိုင်ပါတယ်။'
+              : 'Cake ပေါ်မှာ ဆွဲပြီး လှည့်ကြည့်ပါ။ Mouse wheel / လက်နှစ်ချောင်းနဲ့ အနီးအဝေး ချိန်နိုင်ပါတယ်။'}
         </p>
       )}
     </div>

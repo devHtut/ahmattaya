@@ -101,7 +101,7 @@ test('v6 migration preserves content and introduces a disabled cake; recipes rou
   const loaded = loadDraft(storage)
   assert.equal(loaded.status, 'restored')
   assert.equal(loaded.card.cake.enabled, false)
-  assert.equal(loaded.card.schemaVersion, 7)
+  assert.equal(loaded.card.schemaVersion, 8)
   assert.equal(raw, original)
   loaded.card.cake = {
     ...cakeFromPreset('strawberry-blush'),

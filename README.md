@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/cake-studio-foundation`, branched from the opening invitation milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/cake-decoration`, branched from the Cake Studio foundation milestone.
 
 ## Development
 
@@ -24,7 +24,7 @@ npm run build
 - Up to eight additional blank/lined pages, page ordering/deletion and full multi-page preview.
 - Validated browser-local draft recovery and live/static receiver preview.
 - React Router routes: `/`, `/create`, `/preview`, and not-found.
-- Versioned Zod card schema (v7), v1–v6 draft migration, TypeScript strict mode, shared design tokens.
+- Versioned Zod card schema (v8), v1–v7 draft migration, TypeScript strict mode, shared design tokens.
 
 Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, interactive candles and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
 
@@ -41,7 +41,7 @@ The host must serve `index.html` for unknown application routes (SPA fallback), 
 ## Next stages
 
 1. Occasion-specific fields and template selection.
-2. Cream drawing and candle designs/placement inside Cake Studio.
+2. Receiver candle blowing with tap fallback, then microphone and AR as separate stages.
 3. Supabase migrations/RLS, hybrid authentication, media and publishing.
 4. Receiver interactions, followed by 3D/AR as separate milestones.
 
@@ -55,7 +55,7 @@ Create a `codex/` feature branch for each independently reviewable feature; choo
 
 The current card model stores four hex colors and separate heading/body typography. V1 text-only drafts load with theme-matched appearance defaults. Loading does not rewrite stored data; the next edit saves the upgraded current-version draft. Future versions or malformed drafts stay protected from automatic replacement. Font choices include Burmese fallbacks; italic can be synthesized for fonts without an italic face.
 
-The wizard currently covers implemented features only. Cake Studio currently covers recipe foundations; cream drawing and candles come next. Steps can be revisited freely, and unfinished drafts do not require publish-time fields.
+The wizard currently covers implemented features only. Cake Studio includes recipe foundations, top-surface cream drawing and candle placement. Steps can be revisited freely, and unfinished drafts do not require publish-time fields.
 
 ## Responsive editor preview
 
@@ -99,6 +99,14 @@ Optional JSON cake recipes include vanilla/chocolate/strawberry sponge, one/two/
 
 The procedural Three.js renderer and OrbitControls load only when an enabled cake is displayed. Creator and receiver share that renderer/recipe. Geometry is replaced and disposed when the recipe changes while the canvas/camera remain stable. Rendering occurs only on changes or resize, with capped pixel ratio, instanced pearls and no perpetual animation loop. WebGL/context/loading failures show a recipe-matched SVG fallback. Geometry, materials, controls, shadow resources, ResizeObserver and canvas are cleaned up on unmount.
 
-This stage has no freehand cream drawing, candles, microphone or AR. Flavor is represented visually by sponge color. Browser-tested: actual WebGL rendering, 3-tier preset, custom cream color, orbit drag, saved recipe restoration and receiver rendering after the invitation opens; no browser console errors observed. Real-device touch, hardware fallback and performance tests remain outstanding.
+Receiver candle blowing, microphone and AR remain future stages. Flavor is represented visually by sponge color. Browser-tested: actual WebGL rendering, 3-tier preset, custom cream color, orbit drag, saved recipe restoration and receiver rendering after the invitation opens; no browser console errors observed. Real-device touch, hardware fallback and performance tests remain outstanding.
 
-The separately loaded CakeScene bundle is currently about 562 KB minified / 140 KB gzip; the build reports its size warning. It does not load for Home, a disabled cake or a sealed receiver preview. Further mobile delivery optimization is reserved for performance testing.
+The separately loaded CakeScene bundle is currently about 598 KB minified / 151 KB gzip; the build reports its size warning. It does not load for Home, a disabled cake or a sealed receiver preview. Further mobile delivery optimization is reserved for performance testing.
+
+## Cake decoration
+
+Creator-only modes separate Orbit, Cream and Candles. Draw on the topmost cake surface in 3D, or use the shared normalized top-view SVG pad. Brush color/width are selectable; cream Undo/Redo is session-local and a new stroke clears redo. Gesture completion saves once; cancelled strokes are discarded. Drawing samples are capped at 160 points per stroke and 60 strokes per recipe. The current tool decorates only the topmost tier, with proportions retained when tier count changes.
+
+Candles support classic, spiral, heart, star and seven-segment digits 0–9. Tap to add, drag an existing candle to move, or select it from the list to change design/color/digit/location/delete. Keyboard-accessible center-add and position sliders offer an alternative to pointer placement. Up to 12 candles are allowed. Candle/cream positions are validated inside an inset circle, protecting the cake edge. The selected candle has an editor-only ring. Receiver rendering uses the same saved recipe without editing controls. Flame visuals are static in this stage.
+
+V7 base cakes migrate with empty decoration arrays while preserving all existing settings. No model uploads are stored: cream paths and candle records are bounded JSON. Rendered geometry and temporary stroke previews are disposed on replacement/cancel/unmount. Geometry tests cover every candle style and digit, dot/path cream, limits and migrations. Browser-tested: 3D drawing, Undo/Redo, top-pad drawing, adding/moving a candle without duplication, and number candles. Real touch/pointer-cancel/hardware fallback testing is still outstanding.

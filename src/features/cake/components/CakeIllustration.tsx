@@ -57,6 +57,64 @@ export function CakeIllustration({ recipe }: { recipe: CakeRecipe }) {
           </g>
         )
       })}
+      {recipe.strokes.map((stroke) => {
+        const radius = [118, 88, 58][recipe.tiers - 1]
+        const y = 204 - (recipe.tiers - 1) * 58
+        if (stroke.points.length === 1) {
+          const point = stroke.points[0]
+          return (
+            <circle
+              key={stroke.id}
+              cx={180 + point.x * radius}
+              cy={y + point.z * 14}
+              r={Math.max(1.2, stroke.width * radius) / 2}
+              fill={stroke.color}
+            />
+          )
+        }
+        return (
+          <polyline
+            key={stroke.id}
+            points={stroke.points
+              .map((point) => `${180 + point.x * radius},${y + point.z * 14}`)
+              .join(' ')}
+            fill="none"
+            stroke={stroke.color}
+            strokeWidth={Math.max(1.2, stroke.width * radius)}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        )
+      })}
+      {recipe.candles.map((candle) => {
+        const radius = [118, 88, 58][recipe.tiers - 1]
+        const x = 180 + candle.position.x * radius,
+          y = 204 - (recipe.tiers - 1) * 58 + candle.position.z * 14
+        return (
+          <g key={candle.id}>
+            <path d={`M${x} ${y} v-28`} stroke={candle.color} strokeWidth="5" />
+            <ellipse cx={x} cy={y - 33} rx="3" ry="5" fill="#ffc66b" />
+            {['number', 'heart', 'star'].includes(candle.design) && (
+              <text
+                x={x}
+                y={y - 13}
+                textAnchor="middle"
+                fill={candle.color}
+                stroke="#fff"
+                strokeWidth=".3"
+                fontSize="16"
+                fontWeight="bold"
+              >
+                {candle.design === 'number'
+                  ? candle.digit
+                  : candle.design === 'heart'
+                    ? '♥'
+                    : '★'}
+              </text>
+            )}
+          </g>
+        )
+      })}
     </svg>
   )
 }

@@ -1896,3 +1896,61 @@ input[type='range'] {
     font-size: 9px;
   }
 }
+
+.cake-decoration-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+.cake-decoration-fields h3 {
+  font-size: 14px;
+  line-height: 1.9;
+}
+.cake-mode-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.cake-mode-buttons button {
+  min-width: 0;
+  padding: 10px 6px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 10px;
+  line-height: 1.9;
+}
+.cake-mode-buttons button[aria-pressed='true'] {
+  background: #eee5fc;
+  color: #654398;
+  border-color: var(--primary);
+}
+.cake-top-pad {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbf9fd;
+}
+.cake-top-pad svg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+}
+.selected-candle {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #cdb7ef;
+  border-radius: 12px;
+  margin: 0;
+}
+.selected-candle legend {
+  font-size: 11px;
+  color: #654398;
+  padding: 0 6px;
+}

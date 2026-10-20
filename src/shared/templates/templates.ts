@@ -43,7 +43,7 @@ const titles: Record<Occasion, string> = {
 }
 export function createCard(occasion: Occasion): CardConfig {
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     occasion,
     senderName: '',
     receiverName: '',

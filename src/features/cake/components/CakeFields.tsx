@@ -1,14 +1,18 @@
 import type { CardConfig } from '../../../shared/models/card'
 import { cakeFlavors, type CakeRecipe } from '../../../shared/models/cake'
 import { cakeFromPreset, cakePresets } from '../lib/presets'
+import type { CakeEditorSession } from '../lib/useCakeEditor'
+import { CakeDecorationFields } from './CakeDecorationFields'
 import { CakeIllustration } from './CakeIllustration'
 
 export function CakeFields({
   card,
   onChange,
+  editor,
 }: {
   card: CardConfig
   onChange: (card: CardConfig) => void
+  editor: CakeEditorSession
 }) {
   const update = (change: Partial<CakeRecipe>) =>
     onChange({ ...card, cake: { ...card.cake, ...change } })
@@ -130,10 +134,7 @@ export function CakeFields({
               </select>
             </label>
           </div>
-          <p className="editor-note">
-            Cream ကိုယ်တိုင်ဆွဲခြင်းနဲ့ Candle design / နေရာချခြင်းကို
-            နောက်အဆင့်မှာ ထည့်ပါမယ်။
-          </p>
+          <CakeDecorationFields recipe={card.cake} editor={editor} />
         </>
       )}
     </div>

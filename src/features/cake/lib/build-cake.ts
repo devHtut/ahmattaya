@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { buildCreamStroke, buildCandle } from './build-decorations.ts'
 import { flavorColors, type CakeRecipe } from '../../../shared/models/cake.ts'
 
 export function disposeCake(group: THREE.Object3D) {
@@ -117,5 +118,8 @@ export function buildCake(recipe: CakeRecipe): THREE.Group {
       group.add(berry)
     }
   }
+  for (const stroke of recipe.strokes)
+    group.add(buildCreamStroke(stroke, recipe))
+  for (const candle of recipe.candles) group.add(buildCandle(candle, recipe))
   return group
 }

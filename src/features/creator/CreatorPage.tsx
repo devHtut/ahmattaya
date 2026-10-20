@@ -9,6 +9,7 @@ import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
+import { useCakeEditor } from '../cake/lib/useCakeEditor'
 import { CakeFields } from '../cake/components/CakeFields'
 import { CakePreview } from '../cake/components/CakePreview'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
@@ -67,6 +68,9 @@ export function CreatorPage({
   onRetrySave: () => void
 }) {
   const [step, setStep] = useState<CreatorStep>('occasion')
+  const cakeEditor = useCakeEditor(card.cake, (cake) =>
+    onChange({ ...card, cake }),
+  )
   const stepIndex = steps.findIndex((item) => item.id === step)
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
@@ -138,7 +142,7 @@ export function CreatorPage({
               senderName={card.senderName}
             />
           ) : step === 'cake' ? (
-            <CakePreview recipe={card.cake} />
+            <CakePreview recipe={card.cake} editor={cakeEditor} />
           ) : (
             <CardPreview
               key={previewPageId}
@@ -217,7 +221,13 @@ export function CreatorPage({
               onSelectPhoto={setSelectedPhotoId}
             />
           )}
-          {step === 'cake' && <CakeFields card={card} onChange={onChange} />}
+          {step === 'cake' && (
+            <CakeFields
+              card={card}
+              onChange={(next) => cakeEditor.changeRecipe(next.cake)}
+              editor={cakeEditor}
+            />
+          )}
           {step === 'music' && <MusicFields card={card} onChange={onChange} />}
           {step === 'review' && (
             <div className="review-panel">
