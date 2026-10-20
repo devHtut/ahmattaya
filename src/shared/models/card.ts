@@ -49,10 +49,67 @@ export const appearanceSchema = z.object({
   }),
 })
 export type CardAppearance = z.infer<typeof appearanceSchema>
-export const cardSchema = z.object({
+export const v2CardSchema = z.object({
   ...baseFields,
   schemaVersion: z.literal(2),
   theme: z.enum(['lavender', 'rose', 'gold', 'mint', 'ocean', 'peach']),
   appearance: appearanceSchema,
 })
+export const MAX_PHOTOS = 5
+export const MAX_PAGES = 8
+export const MAX_PHOTO_BYTES = 200 * 1024
+const imageDataSchema = z
+  .string()
+  .max(Math.ceil(MAX_PHOTO_BYTES / 3) * 4 + 40)
+  .regex(
+    /^data:image\/(webp|jpeg|png);base64,(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/,
+  )
+  .refine((value) => {
+    const encoded = value.split(',')[1] ?? ''
+    const padding = encoded.endsWith('==') ? 2 : encoded.endsWith('=') ? 1 : 0
+    return (
+      encoded.length > 0 &&
+      (encoded.length / 4) * 3 - padding <= MAX_PHOTO_BYTES
+    )
+  }, 'Photo exceeds 200 KB')
+export const pageSchema = z.object({
+  id: z
+    .string()
+    .min(1)
+    .max(80)
+    .refine((id) => id !== 'cover'),
+  title: z.string().max(160),
+  message: z.string().max(2000),
+  paper: z.enum(['blank', 'lined']),
+})
+export type CardPage = z.infer<typeof pageSchema>
+export const photoSchema = z.object({
+  id: z.string().min(1).max(80),
+  pageId: z.string().min(1).max(80),
+  src: imageDataSchema,
+  caption: z.string().max(120),
+})
+export type CardPhoto = z.infer<typeof photoSchema>
+export const cardSchema = v2CardSchema
+  .extend({
+    schemaVersion: z.literal(3),
+    pages: z.array(pageSchema).max(MAX_PAGES),
+    photos: z.array(photoSchema).max(MAX_PHOTOS),
+  })
+  .superRefine((card, ctx) => {
+    const pageIds = new Set(card.pages.map((page) => page.id))
+    if (
+      pageIds.size !== card.pages.length ||
+      new Set(card.photos.map((photo) => photo.id)).size !== card.photos.length
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Duplicate page or photo identity',
+      })
+    }
+    for (const photo of card.photos) {
+      if (photo.pageId !== 'cover' && !pageIds.has(photo.pageId))
+        ctx.addIssue({ code: 'custom', message: 'Photo page is missing' })
+    }
+  })
 export type CardConfig = z.infer<typeof cardSchema>

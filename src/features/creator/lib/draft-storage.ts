@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   cardSchema,
   legacyCardSchema,
+  v2CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
@@ -9,9 +10,17 @@ import { createAppearance } from '../../../shared/templates/card-styles.ts'
 
 const storedCardSchema = z.union([
   cardSchema,
+  v2CardSchema.transform((card) => ({
+    ...card,
+    schemaVersion: 3 as const,
+    pages: [],
+    photos: [],
+  })),
   legacyCardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 2 as const,
+    schemaVersion: 3 as const,
+    pages: [],
+    photos: [],
     appearance: createAppearance(card.theme),
   })),
 ])

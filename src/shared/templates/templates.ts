@@ -40,12 +40,14 @@ const titles: Record<Occasion, string> = {
 }
 export function createCard(occasion: Occasion): CardConfig {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     occasion,
     senderName: '',
     receiverName: '',
     title: titles[occasion],
     message: '',
+    pages: [],
+    photos: [],
     theme: 'lavender',
     appearance: createAppearance('lavender'),
   }

@@ -29,8 +29,8 @@ export function useCreatorDraft() {
   const onChange = (card: CardConfig) => {
     const validated = cardSchema.safeParse(card)
     if (!validated.success) return
-    // Small text-only drafts save synchronously in the edit event. A quick
-    // reload cannot discard the last keystroke waiting in a debounce timer.
+    // Bounded local drafts save in the edit event so a quick reload cannot
+    // discard the last change waiting in a debounce timer.
     const saveStatus =
       draft.saveStatus === 'blocked'
         ? 'blocked'

@@ -8,11 +8,16 @@ import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
+import { PagesFields } from './components/PagesFields'
 
 const steps = [
   { title: 'အခမ်းအနား', description: 'အထူးနေ့လေးကို ရွေးပါ' },
   { title: 'စကားလေးများ', description: 'ရင်ထဲက စာသားလေးတွေ ရေးပါ' },
   { title: 'အရောင်နဲ့ စာလုံး', description: 'သင့်စိတ်ကြိုက် ပုံစံပြင်ပါ' },
+  {
+    title: 'ပုံနဲ့ စာမျက်နှာများ',
+    description: 'အမှတ်တရပုံနဲ့ စာမျက်နှာလေးတွေ ထည့်ပါ',
+  },
   { title: 'နမူနာကြည့်မယ်', description: 'မပို့ခင် ပြန်စစ်ကြည့်ပါ' },
 ]
 export function CreatorPage({
@@ -27,6 +32,11 @@ export function CreatorPage({
   onRetrySave: () => void
 }) {
   const [step, setStep] = useState(0)
+  const [selectedPageId, setSelectedPageId] = useState('cover')
+  const previewPageId =
+    step === 3 && card.pages.some((page) => page.id === selectedPageId)
+      ? selectedPageId
+      : 'cover'
   const headingRef = useRef<HTMLHeadingElement>(null)
   const previousStep = useRef(step)
   useEffect(() => {
@@ -68,7 +78,7 @@ export function CreatorPage({
           <summary>
             LIVE PREVIEW <span>ဖွင့် / ပိတ် ကြည့်နိုင်ပါတယ်</span>
           </summary>
-          <CardPreview card={card} />
+          <CardPreview card={card} pageId={previewPageId} />
         </details>
         <section
           className="properties wizard-properties"
@@ -112,6 +122,14 @@ export function CreatorPage({
           {step === 1 && <WordsFields card={card} onChange={onChange} />}
           {step === 2 && <StyleFields card={card} onChange={onChange} />}
           {step === 3 && (
+            <PagesFields
+              card={card}
+              onChange={onChange}
+              pageId={previewPageId}
+              onSelectPage={setSelectedPageId}
+            />
+          )}
+          {step === 4 && (
             <div className="review-panel">
               <p>
                 အမည်၊ ဆုတောင်းစာနဲ့ စာလုံးပုံစံတွေကို နမူနာမှာ ပြန်စစ်ကြည့်ပါ။
@@ -121,9 +139,8 @@ export function CreatorPage({
                 <Eye size={17} /> နမူနာ အပြည့်ကြည့်မယ်
               </Link>
               <p className="editor-note">
-                ဒီကတ်ကို Publish မလုပ်ရသေးပါ။ Photo နဲ့ စာမျက်နှာများ၊ သီးသန့်
-                Cake Studio၊ music နဲ့ sharing တို့ကို နောက်အဆင့်တွေမှာ
-                ဆက်ထည့်ပါမယ်။
+                ဒီကတ်ကို Publish မလုပ်ရသေးပါ။ သီးသန့် Cake Studio၊ music နဲ့
+                sharing တို့ကို နောက်အဆင့်တွေမှာ ဆက်ထည့်ပါမယ်။
               </p>
             </div>
           )}

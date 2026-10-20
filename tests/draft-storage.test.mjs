@@ -51,7 +51,7 @@ test('rejects damaged data and future versions without modifying storage', () =>
     JSON.stringify({
       storageVersion: 1,
       savedAt: new Date().toISOString(),
-      card: { ...card, schemaVersion: 3 },
+      card: { ...card, schemaVersion: 4 },
     }),
     JSON.stringify({ storageVersion: 1, savedAt: 'invalid', card }),
   ]) {
@@ -125,7 +125,7 @@ test('legacy v1 drafts migrate without losing text or the chosen theme', () => {
   )
   const restored = loadDraft(storage)
   assert.equal(restored.status, 'restored')
-  assert.equal(restored.card.schemaVersion, 2)
+  assert.equal(restored.card.schemaVersion, 3)
   assert.equal(restored.card.message, card.message)
   assert.equal(restored.card.theme, 'rose')
   assert.equal(restored.card.appearance.colors.background, '#fce5ed')
@@ -151,4 +151,45 @@ test('custom appearance survives storage and occasion changes', () => {
     changeOccasion(recovered.card, 'anniversary').appearance,
     card.appearance,
   )
+})
+
+test('v2 drafts migrate to v3 while preserving custom appearance', () => {
+  const { pages: _pages, photos: _photos, ...current } = createCard('birthday')
+  const card = { ...current, schemaVersion: 2 }
+  card.appearance.heading.font = 'Padauk'
+  const raw = JSON.stringify({
+    storageVersion: 1,
+    savedAt: '2026-10-20T00:00:00.000Z',
+    card,
+  })
+  const storage = memoryStorage(raw)
+  const loaded = loadDraft(storage)
+  assert.equal(loaded.status, 'restored')
+  assert.deepEqual(loaded.card.pages, [])
+  assert.deepEqual(loaded.card.photos, [])
+  assert.deepEqual(loaded.card.appearance, card.appearance)
+  assert.equal(storage.getItem(DRAFT_STORAGE_KEY), raw)
+})
+
+test('multi-page drafts and compressed images round-trip through storage', () => {
+  const card = createCard('anniversary')
+  card.pages = [
+    {
+      id: 'memory',
+      title: 'အမှတ်တရ',
+      message: 'တွေ့ဆုံခဲ့တဲ့ နေ့လေး',
+      paper: 'lined',
+    },
+  ]
+  card.photos = [
+    {
+      id: 'photo',
+      pageId: 'memory',
+      src: 'data:image/webp;base64,YWJj',
+      caption: 'အတူတူ',
+    },
+  ]
+  const storage = memoryStorage()
+  assert.equal(saveDraft(storage, card), true)
+  assert.deepEqual(loadDraft(storage).card, card)
 })
