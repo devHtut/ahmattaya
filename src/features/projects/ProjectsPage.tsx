@@ -4,6 +4,7 @@ import { Copy, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from '../creator/components/DraftStatus'
+
 export function ProjectsPage({
   workspace: w,
 }: {
@@ -14,30 +15,37 @@ export function ProjectsPage({
   const items = w.projects
     .filter((p) => p.deleted === trash)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+
   return (
     <main id="main-content" className="page-width projects-page">
       <div className="studio-heading">
         <div>
-          <span className="eyebrow">YOUR LITTLE MOMENTS</span>
-          <h1>ကျွန်တော့် Project များ</h1>
+          <span className="eyebrow">PROJECTS LIBRARY</span>
+          <h1>My Projects</h1>
           <p className="muted">
-            ဒီ browser မှာ သိမ်းထားတဲ့ အမှတ်တရလေးတွေ။ တခြားစက်နဲ့တော့
-            မချိတ်ဆက်ရသေးပါ။
+            Saved locally in this browser · ဒီ browser တွင် သိမ်းဆည်းထားသော
+            အမှတ်တရများ
           </p>
         </div>
-        <Link className="button primary" to="/templates">
-          <Plus size={18} /> အသစ်ဖန်တီးမယ်
-        </Link>
+        <button
+          className="button primary"
+          onClick={() => {
+            w.create('birthday')
+            navigate('/create')
+          }}
+        >
+          <Plus size={18} /> New Project
+        </button>
       </div>
       {['error', 'blocked'].includes(w.saveStatus) && (
         <DraftStatus status={w.saveStatus} onRetry={w.retrySave} />
       )}
       <div className="project-tabs">
         <button aria-pressed={!trash} onClick={() => setTrash(false)}>
-          Drafts ({w.projects.filter((p) => !p.deleted).length})
+          Active Projects ({w.projects.filter((p) => !p.deleted).length})
         </button>
         <button aria-pressed={trash} onClick={() => setTrash(true)}>
-          ဖယ်ထားသော Project များ
+          Trash ({w.projects.filter((p) => p.deleted).length})
         </button>
       </div>
       <div className="projects-grid">
@@ -51,8 +59,7 @@ export function ProjectsPage({
             <div className="project-tile-body">
               <h2>{project.name}</h2>
               <p className="muted">
-                နောက်ဆုံးပြင်ချိန်{' '}
-                {new Date(project.updatedAt).toLocaleString()}
+                Last edited: {new Date(project.updatedAt).toLocaleString()}
               </p>
               <div className="project-tile-actions">
                 {trash ? (
@@ -60,7 +67,7 @@ export function ProjectsPage({
                     className="button secondary"
                     onClick={() => w.trash(project.id, false)}
                   >
-                    <RotateCcw size={16} /> ပြန်ယူမယ်
+                    <RotateCcw size={16} /> Restore
                   </button>
                 ) : (
                   <>
@@ -69,11 +76,12 @@ export function ProjectsPage({
                       to="/create"
                       onClick={() => w.open(project.id)}
                     >
-                      ဆက်ပြင်မယ်
+                      Open Project
                     </Link>
                     <button
                       className="icon-button"
-                      aria-label={`${project.name} မိတ္တူပွားမယ်`}
+                      aria-label="Duplicate"
+                      title="Duplicate"
                       onClick={() => {
                         w.duplicate(project.id)
                         navigate('/create')
@@ -83,7 +91,8 @@ export function ProjectsPage({
                     </button>
                     <button
                       className="icon-button"
-                      aria-label={`${project.name} ဖယ်ထားမယ်`}
+                      aria-label="Move to Trash"
+                      title="Move to Trash"
                       onClick={() => w.trash(project.id, true)}
                     >
                       <Trash2 size={17} />
@@ -96,7 +105,7 @@ export function ProjectsPage({
         ))}
       </div>
       {items.length === 0 && (
-        <p className="empty-page">ဒီနေရာမှာ Project မရှိသေးပါ။</p>
+        <p className="empty-page">ဒီနေရာတွင် Project မရှိသေးပါ။</p>
       )}
     </main>
   )

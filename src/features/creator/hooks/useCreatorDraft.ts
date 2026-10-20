@@ -20,7 +20,7 @@ import {
 type SaveStatus = 'idle' | 'saved' | 'error' | 'blocked'
 function makeProject(
   card = createCard('birthday'),
-  name = 'အမှတ်တရ အသစ်',
+  name = 'Untitled Project',
 ): Project {
   return {
     id: crypto.randomUUID(),
@@ -145,7 +145,7 @@ export function useCreatorDraft() {
       if (!source) return
       const copy = makeProject(
         structuredClone(source.card),
-        `${source.name.slice(0, 90)} · မိတ္တူ`,
+        `${source.name.slice(0, 90)} (Copy)`,
       )
       persist(
         {

@@ -138,11 +138,10 @@ export function TemplatesPage({
     <main id="main-content" className="page-width templates-page">
       <div className="studio-heading">
         <div>
-          <span className="eyebrow">A LITTLE START, A PERSONAL TOUCH</span>
-          <h1>ဘယ်ပုံစံလေးနဲ့ စချင်လဲ?</h1>
+          <span className="eyebrow">TEMPLATE GALLERY</span>
+          <h1>Choose a Template</h1>
           <p className="muted">
-            အသင့်ပြင်ထားတဲ့ ပုံစံကို ရွေးပြီး ကိုယ့်စာသား၊ ပုံလေးတွေနဲ့ အမှတ်တရ
-            ဖန်တီးပါ။
+            အသင့်ပြင်ထားသော ပုံစံကို ရွေးချယ်ပြီး စိတ်ကြိုက် ပြင်ဆင်ဖန်တီးပါ။
           </p>
         </div>
         <button
@@ -152,7 +151,7 @@ export function TemplatesPage({
             navigate('/create')
           }}
         >
-          <Plus size={17} /> အလွတ်ကနေ စမယ်
+          <Plus size={17} /> Blank Project
         </button>
       </div>
       {['error', 'blocked'].includes(w.saveStatus) && (
@@ -161,10 +160,10 @@ export function TemplatesPage({
       <div
         className="template-filters"
         role="group"
-        aria-label="Template အခမ်းအနား ရွေးရန်"
+        aria-label="Filter templates by occasion"
       >
         <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
-          အားလုံး
+          All
         </button>
         {occasions.map((item) => (
           <button
@@ -177,7 +176,7 @@ export function TemplatesPage({
         ))}
       </div>
       <p className="template-count" role="status">
-        ပုံစံ {templates.length} ခု · စိတ်ကြိုက် ပြန်ပြင်နိုင်ပါတယ်
+        Templates: {templates.length} ခု
       </p>
       <div className="template-grid">
         {templates.map((template) => {
@@ -197,24 +196,24 @@ export function TemplatesPage({
                 <h2>{template.name}</h2>
                 <p>{template.description}</p>
                 <div className="template-badges">
-                  <span>စာမျက်နှာ {card.pages.length + 1}</span>
-                  {card.cake.enabled && <span>🎂 Cake ပါ</span>}
-                  {card.music.trackId !== 'none' && <span>♫ သံစဉ်ပါ</span>}
+                  <span>{card.pages.length + 1} Pages</span>
+                  {card.cake.enabled && <span>🎂 Cake</span>}
+                  {card.music.trackId !== 'none' && <span>🎵 Music</span>}
                 </div>
                 <div className="template-tile-actions">
                   <button
                     className="button secondary"
-                    aria-label={`${template.name} နမူနာကြည့်မယ်`}
+                    aria-label={`Preview ${template.name}`}
                     onClick={() => setSelected(template.id)}
                   >
-                    <Eye size={15} /> နမူနာ
+                    <Eye size={15} /> Preview
                   </button>
                   <button
                     className="button primary"
-                    aria-label={`${template.name} နဲ့ စမယ်`}
+                    aria-label={`Use ${template.name}`}
                     onClick={() => startTemplate(template.id)}
                   >
-                    ဒီပုံစံနဲ့ စမယ် <ArrowRight size={15} />
+                    Use Template <ArrowRight size={15} />
                   </button>
                 </div>
               </div>
