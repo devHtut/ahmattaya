@@ -54,3 +54,7 @@ Create a `codex/` feature branch for each independently reviewable feature; choo
 The v2 card model stores four hex colors and separate heading/body typography. V1 text-only drafts load with theme-matched appearance defaults. Loading does not rewrite stored data; the next edit saves the upgraded v2 draft. Future versions or malformed drafts stay protected from automatic replacement. Font choices include Burmese fallbacks; italic can be synthesized for fonts without an italic face.
 
 The wizard currently covers implemented features only. Photo/pages, music and the separate Cake Studio step will be added incrementally. Steps can be revisited freely, and unfinished drafts do not require publish-time fields.
+
+## Responsive editor preview
+
+Laptop/desktop previews stay sticky while the properties panel scrolls with the page. At tablet widths (761–1100px), steps form a full-width row above a two-column editor. On phones, a compact, collapsible preview stays above the controls, capped at 38% of the viewport; long cards scroll inside that preview. The standalone receiver preview retains the full card layout. Verified in the browser at laptop width and in 390px/834px iframe viewports; real-device keyboard and touch testing remains outstanding.
