@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { CardConfig } from '../../shared/models/card'
-import { findMusicTrack } from '../../shared/audio/tracks'
+import { useMusicTrack } from '../../shared/audio/useMusicTrack'
 import { MusicPlayer } from '../../shared/audio/MusicPlayer'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { CakePreview } from '../cake/components/CakePreview'
@@ -16,7 +16,11 @@ export function PreviewPage({ card }: { card: CardConfig }) {
   const replayRequested = useRef(false)
   const contentsHeading = useRef<HTMLHeadingElement>(null)
   const alive = useRef(false)
-  const track = findMusicTrack(card.music.trackId)
+  const {
+    track,
+    failed: audioMissing,
+    loading: audioLoading,
+  } = useMusicTrack(card.music)
   useEffect(() => {
     alive.current = true
     return () => {
@@ -72,6 +76,13 @@ export function PreviewPage({ card }: { card: CardConfig }) {
           onActivate={activate}
           onOpened={() => setOpened(true)}
         />
+      )}
+      {(audioMissing || audioLoading) && (
+        <p role="status" className="music-start-hint">
+          {audioMissing
+            ? 'သီချင်းဖိုင်ကို ဖွင့်မရပါ။ ကတ်ကို ဆက်ဖတ်နိုင်ပါတယ်။'
+            : 'သီချင်းဖိုင်ကို ပြင်ဆင်နေပါတယ်။ ဖွင့်ပြီးနောက် Play ကို နှိပ်နိုင်ပါတယ်။'}
+        </p>
       )}
       {track && (
         <section

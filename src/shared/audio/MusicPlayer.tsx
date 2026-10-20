@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import type { MusicConfig } from '../models/music'
-import type { MusicTrack } from './tracks'
+import type { PlayableTrack } from './useMusicTrack'
 
 // Key this component by track ID so switching tracks stops the previous player.
 export function MusicPlayer({
@@ -9,7 +9,7 @@ export function MusicPlayer({
   onVolumeChange,
   audioRef,
 }: {
-  track: MusicTrack
+  track: PlayableTrack
   music: MusicConfig
   onVolumeChange?: (volume: number) => void
   audioRef?: RefObject<HTMLAudioElement | null>
@@ -49,7 +49,8 @@ export function MusicPlayer({
       />
       {failed && (
         <p role="alert" className="music-error">
-          သီချင်း ဖွင့်မရပါ။ Connection ကို စစ်ပြီး Play ကို ထပ်နှိပ်ကြည့်ပါ။
+          သီချင်း ဖွင့်မရပါ။ Play ကို ထပ်နှိပ်ကြည့်ပါ။ မရသေးရင် ဖန်တီးသူဘက်မှာ
+          သီချင်းဖိုင် ပြန်ရွေးပေးပါ။
         </p>
       )}
       <p className="field-hint">

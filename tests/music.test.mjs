@@ -10,7 +10,12 @@ import {
 } from '../src/features/creator/lib/draft-storage.ts'
 
 test('music is opt-in and rejects arbitrary URLs, invalid volume and loop values', () => {
-  assert.deepEqual(createMusic(), { trackId: 'none', volume: 0.35, loop: true })
+  assert.deepEqual(createMusic(), {
+    trackId: 'none',
+    volume: 0.35,
+    loop: true,
+    custom: null,
+  })
   for (const change of [
     { trackId: 'https://example.com/song.mp3' },
     { volume: -1 },
@@ -66,7 +71,12 @@ test('music choices survive storage and v4 drafts safely migrate to silent defau
     },
   }
   const card = createCard('anniversary')
-  card.music = { trackId: 'memory-evening', volume: 0.45, loop: false }
+  card.music = {
+    trackId: 'memory-evening',
+    volume: 0.45,
+    loop: false,
+    custom: null,
+  }
   assert.equal(saveDraft(storage, card), true)
   assert.deepEqual(loadDraft(storage).card.music, card.music)
   const { music: _music, ...legacy } = card
@@ -79,6 +89,6 @@ test('music choices survive storage and v4 drafts safely migrate to silent defau
   const loaded = loadDraft(storage)
   assert.equal(loaded.status, 'restored')
   assert.deepEqual(loaded.card.music, createMusic())
-  assert.equal(loaded.card.schemaVersion, 9)
+  assert.equal(loaded.card.schemaVersion, 10)
   assert.equal(raw, original)
 })

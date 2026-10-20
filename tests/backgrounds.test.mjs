@@ -83,7 +83,7 @@ test('v8 project libraries acquire empty backgrounds without overwriting origina
   storage.setItem(PROJECTS_KEY, raw)
   const loaded = loadProjects(storage)
   assert.equal(loaded.status, 'restored')
-  assert.equal(loaded.library.projects[0].card.schemaVersion, 9)
+  assert.equal(loaded.library.projects[0].card.schemaVersion, 10)
   assert.equal(loaded.library.projects[0].card.background, null)
   assert.equal(loaded.library.projects[0].card.pages[0].background, null)
   assert.equal(storage.getItem(PROJECTS_KEY), raw)

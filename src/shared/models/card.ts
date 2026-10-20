@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { cakeSchema, legacyCakeSchema } from './cake.ts'
 import { openingSchema } from './opening.ts'
-import { musicSchema } from './music.ts'
+import { musicSchema, legacyMusicSchema } from './music.ts'
 import { backgroundSchema } from './background.ts'
 
 export const occasionSchema = z.enum([
@@ -139,7 +139,7 @@ function validateCardReferences(
 export const v4CardSchema = v4CardFields.superRefine(validateCardReferences)
 const v5CardFields = v4CardFields.extend({
   schemaVersion: z.literal(5),
-  music: musicSchema,
+  music: legacyMusicSchema,
 })
 export const v5CardSchema = v5CardFields.superRefine(validateCardReferences)
 const v6CardFields = v5CardFields.extend({
@@ -153,11 +153,19 @@ export const v7CardSchema = v6CardFields
 export const v8CardSchema = v6CardFields
   .extend({ schemaVersion: z.literal(8), cake: cakeSchema })
   .superRefine(validateCardReferences)
-export const cardSchema = v6CardFields
+export const v9CardSchema = v6CardFields
   .extend({
     schemaVersion: z.literal(9),
     cake: cakeSchema,
     background: backgroundSchema.nullable().default(null),
+  })
+  .superRefine(validateCardReferences)
+export const cardSchema = v6CardFields
+  .extend({
+    schemaVersion: z.literal(10),
+    cake: cakeSchema,
+    background: backgroundSchema.nullable().default(null),
+    music: musicSchema,
   })
   .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>

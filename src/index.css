@@ -2306,3 +2306,30 @@ input[type='range'] {
 .background-dropzone .field-hint {
   margin: 0;
 }
+.custom-music-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.custom-music-fields .track-choice span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.audio-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #faf8ff;
+  border: 1px dashed #d5c5ee;
+  border-radius: 12px;
+}
+.audio-dropzone.is-over {
+  background: #eee4ff;
+  border-color: #8b5cf6;
+}
+.audio-dropzone .field-hint {
+  margin: 0;
+}

@@ -52,7 +52,7 @@ test('rejects damaged data and future versions without modifying storage', () =>
     JSON.stringify({
       storageVersion: 1,
       savedAt: new Date().toISOString(),
-      card: { ...card, schemaVersion: 10 },
+      card: { ...card, schemaVersion: 11 },
     }),
     JSON.stringify({ storageVersion: 1, savedAt: 'invalid', card }),
   ]) {
@@ -126,7 +126,7 @@ test('legacy v1 drafts migrate without losing text or the chosen theme', () => {
   )
   const restored = loadDraft(storage)
   assert.equal(restored.status, 'restored')
-  assert.equal(restored.card.schemaVersion, 9)
+  assert.equal(restored.card.schemaVersion, 10)
   assert.equal(restored.card.message, card.message)
   assert.equal(restored.card.theme, 'rose')
   assert.equal(restored.card.appearance.colors.background, '#fce5ed')
@@ -214,7 +214,7 @@ test('v3 photos migrate into independent positioned frames without changing stor
   const storage = memoryStorage(raw)
   const loaded = loadDraft(storage)
   assert.equal(loaded.status, 'restored')
-  assert.equal(loaded.card.schemaVersion, 9)
+  assert.equal(loaded.card.schemaVersion, 10)
   assert.deepEqual(loaded.card.photos[0], {
     ...photo,
     frame: defaultPhotoFrame(0),

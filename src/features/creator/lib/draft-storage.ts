@@ -9,6 +9,7 @@ import {
   v6CardSchema,
   v7CardSchema,
   v8CardSchema,
+  v9CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
@@ -21,37 +22,38 @@ import { createAppearance } from '../../../shared/templates/card-styles.ts'
 export const storedCardSchema = z
   .union([
     cardSchema,
+    v9CardSchema.transform((card) => ({ ...card, schemaVersion: 10 as const })),
     v8CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       background: null,
     })),
     v7CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: { ...card.cake, strokes: [], candles: [] },
     })),
     v6CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: createCake(),
     })),
     v5CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: createCake(),
       opening: createOpening(),
     })),
     v4CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: createCake(),
       opening: createOpening(),
       music: createMusic(),
     })),
     v3CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: createCake(),
       opening: createOpening(),
       music: createMusic(),
@@ -62,7 +64,7 @@ export const storedCardSchema = z
     })),
     v2CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: createCake(),
       opening: createOpening(),
       music: createMusic(),
@@ -71,7 +73,7 @@ export const storedCardSchema = z
     })),
     legacyCardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 9 as const,
+      schemaVersion: 10 as const,
       cake: createCake(),
       opening: createOpening(),
       music: createMusic(),

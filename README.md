@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/page-backgrounds`, branched from the Editor projects milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/custom-music`, branched from the page backgrounds milestone.
 
 ## Development
 
@@ -81,7 +81,7 @@ V3 gallery photos get scrapbook placements during in-memory migration. Previous 
 
 The music step offers three original, project-generated instrumental sketches plus “no music”. No commercial tracks or third-party recordings are bundled. The procedural source and CC0 dedication are in `scripts/generate-music.py` and `public/music/README.md`. WAV assets total about 3.1 MB, load only on Play (`preload="none"`), and are kept outside the JS bundle and saved card payload.
 
-Cards save only an allowlisted track ID, initial volume and repeat preference. Older drafts migrate to no music. The shared native player never autoplays, stops on track changes/unmount, supports native pause/seek controls, and reports media errors. Receiver preview keeps one player across the page stack; reload restores the configuration but requires a new opening/Play action. Mobile devices may use system volume controls.
+Cards save an allowlisted preset ID or a local custom audio asset reference, initial volume and repeat preference. Older drafts migrate to no music. The shared native player never autoplays, stops on track changes/unmount, supports native pause/seek controls, and reports media errors. Receiver preview keeps one player across the page stack; reload restores the configuration but requires a new opening/Play action. Mobile devices may use system volume controls.
 
 Verified in-browser: actual playback progression without media errors, switching tracks, silent receiver reload, and saved track/volume/repeat settings. Tests also check every bundled asset for valid PCM, audible signal levels, duration and size. Real-device mobile playback and subjective listening review remain outstanding.
 
@@ -115,7 +115,7 @@ V7 base cakes migrate with empty decoration arrays while preserving all existing
 
 Branch `codex/editor-projects` adds a top File/name/local-save/Undo/Redo/Preview/Share toolbar, a horizontal five-stage navigator, and a compact stage picker on phones. Undo/Redo retains the last ten card edits in this session; Cake cream tools also retain their own stroke history. Share explains that public links are not yet available.
 
-`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, custom music and a template library remain separate milestones.
+`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, a template library remains a separate milestone.
 
 Verified: legacy recovery, project duplication, card edit/Undo, recoverable trash/restore, Share explanation and project persistence after reload. Browser-storage tests cover migration, multiple projects, active selection, invalid/future data, duplicate IDs and quota failures.
 
@@ -128,3 +128,13 @@ Card schema v9 adds nullable cover/page backgrounds. V1–v8 drafts and v8 proje
 Removed/replaced background assets are retained to protect Undo and copied/trashed projects; automatic garbage collection and storage management remain future work. Clearing browser site data removes both projects and media; these are local drafts, not cloud backups. Missing assets show a readable fallback plus an editor replacement option. Native phone file picking/touch and storage eviction still need real-device testing.
 
 Tests cover schema bounds, independent page settings, v8 library migration, shared asset IDs, metadata roundtrip and unsupported/oversized uploads. Browser checks cover image upload/compression, cover/page isolation, position/zoom/overlay edits, remove/Undo and receiver persistence after a full reload.
+
+## Custom music
+
+The Music stage supports one creator-supplied audio file alongside the three preset loops. Pick/drop MP3, M4A, WAV, OGG or WebM (up to 20 MB and 15 minutes); actual format/codec support depends on the browser. File type/size and finite audio duration are checked before storage. Metadata reading has a 15-second timeout and cleans up the temporary audio element/object URL. No audio starts during upload.
+
+Custom bytes live as immutable SHA-256-addressed Blobs in IndexedDB (`ahmattaya.audio`), separate from small project metadata. Files are stored without transcoding; duplicates and Undo share the stored asset. Successful transaction completion precedes updating the project. A failed import preserves the existing selection. Preset/none selections retain the uploaded custom option for reuse; Remove clears the reference and is undoable. Removed/replaced files are retained to protect copied/trashed projects and Undo; garbage collection/storage management remain future work. Clearing browser data removes these local assets.
+
+Card schema v10 migrates v1–v9 cards and project libraries without writing on load, preserving presets, background images, volume and loop. Receivers restore the custom file silently; opening can play it synchronously from the click gesture, with a silent-opening checkbox and manual Play fallback. Replay pauses and rewinds. Loading/missing-file states leave the card readable. Object URLs and audio elements are cleaned up on replacement/unmount; a new upload revision allows retrying the same asset after a missing-file read.
+
+Verified in-browser with a local WAV: import/duration, actual playback progression, failed malformed-WAV replacement preserving the previous file, preset/custom switching, volume/loop, Remove/Undo, reload restoration and opening playback. Unit tests cover limits/metadata validation, supported file checks, v9 migration and shared IDs across project copies. Real-device mobile volume/audio-codec compatibility and long-file playback still need testing. Public upload/sharing and trimming are not implemented.
