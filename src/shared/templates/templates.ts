@@ -1,4 +1,5 @@
 import type { CardConfig, Occasion } from '../models/card'
+import { createOpening } from '../models/opening.ts'
 import { createMusic } from '../models/music.ts'
 import { createAppearance } from './card-styles.ts'
 
@@ -41,12 +42,13 @@ const titles: Record<Occasion, string> = {
 }
 export function createCard(occasion: Occasion): CardConfig {
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     occasion,
     senderName: '',
     receiverName: '',
     title: titles[occasion],
     message: '',
+    opening: createOpening(),
     music: createMusic(),
     pages: [],
     photos: [],

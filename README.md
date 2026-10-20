@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/preset-music`, branched from the freeform photo canvas milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/opening-invitation`, branched from the preset music milestone.
 
 ## Development
 
@@ -17,14 +17,14 @@ npm run build
 ## Current scope
 
 - Burmese-first Home page and four occasion entry points.
-- Guided Creator Studio with Next/Back: occasion, words, appearance, photos/pages, music and review.
+- Guided Creator Studio with Next/Back: occasion, opening invitation, words, appearance, photos/pages, music and review.
 - Six coordinated palettes, four custom color pickers, and independent heading/message font, size, bold, italic and alignment.
 - Expandable sticky live preview and keyboard-accessible step navigation.
 - Browser photo selection/drop, compression, captions, drag reorder and accessible move controls.
 - Up to eight additional blank/lined pages, page ordering/deletion and full multi-page preview.
 - Validated browser-local draft recovery and live/static receiver preview.
 - React Router routes: `/`, `/create`, `/preview`, and not-found.
-- Versioned Zod card schema (v5), v1/v2/v3/v4 draft migration, TypeScript strict mode, shared design tokens.
+- Versioned Zod card schema (v6), v1–v5 draft migration, TypeScript strict mode, shared design tokens.
 
 Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, 3D and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
 
@@ -81,6 +81,14 @@ V3 gallery photos get scrapbook placements during in-memory migration. Previous 
 
 The music step offers three original, project-generated instrumental sketches plus “no music”. No commercial tracks or third-party recordings are bundled. The procedural source and CC0 dedication are in `scripts/generate-music.py` and `public/music/README.md`. WAV assets total about 3.1 MB, load only on Play (`preload="none"`), and are kept outside the JS bundle and saved card payload.
 
-Cards save only an allowlisted track ID, initial volume and repeat preference. Older drafts migrate to no music. The shared native player never autoplays, stops on track changes/unmount, supports native pause/seek controls, and reports media errors. Receiver preview keeps one player across the page stack; reload restores the configuration but requires a new Play action. Mobile devices may use system volume controls.
+Cards save only an allowlisted track ID, initial volume and repeat preference. Older drafts migrate to no music. The shared native player never autoplays, stops on track changes/unmount, supports native pause/seek controls, and reports media errors. Receiver preview keeps one player across the page stack; reload restores the configuration but requires a new opening/Play action. Mobile devices may use system volume controls.
 
 Verified in-browser: actual playback progression without media errors, switching tracks, silent receiver reload, and saved track/volume/repeat settings. Tests also check every bundled asset for valid PCM, audible signal levels, duration and size. Real-device mobile playback and subjective listening review remain outstanding.
+
+## Opening invitation
+
+A separate creator step configures an envelope or gift-box opening, four colors, bounded title/message/button text, a curated seal emoji, and gentle/sparkles/fade/no animation. Opening appearance is independent of inner-page appearance. Creator preview replays the visual effect without starting audio. Wizard steps use stable IDs so inserting stages does not shift existing editors.
+
+Receiver preview starts sealed, revealing inner pages only after the opening button is activated. If configured, the existing music player starts directly from that click gesture; a recipient checkbox allows opening silently. A rejected play request leaves manual Play available. Replay pauses/resets music and returns to the sealed state. Focus moves into revealed content and back to the opening button on replay. Reduced-motion preference skips the reveal delay and decorative animation.
+
+This is the local receiver preview flow; public publishing/links are still a later milestone. V1–v5 drafts get opening defaults in memory without rewriting storage on load. Verified in-browser: custom text/color/emoji restoration, sealed reload, opening reveal with music, silent reveal, replay audio reset and content focus. Real-device mobile animation/audio testing remains outstanding.

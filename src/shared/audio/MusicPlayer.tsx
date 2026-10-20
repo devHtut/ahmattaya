@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import type { MusicConfig } from '../models/music'
 import type { MusicTrack } from './tracks'
 
@@ -7,16 +7,19 @@ export function MusicPlayer({
   track,
   music,
   onVolumeChange,
+  audioRef,
 }: {
   track: MusicTrack
   music: MusicConfig
   onVolumeChange?: (volume: number) => void
+  audioRef?: RefObject<HTMLAudioElement | null>
 }) {
-  const element = useRef<HTMLAudioElement>(null)
+  const internalRef = useRef<HTMLAudioElement>(null)
+  const element = audioRef ?? internalRef
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     if (element.current) element.current.volume = music.volume
-  }, [music.volume])
+  }, [element, music.volume])
   useEffect(() => {
     const audio = element.current
     if (audio) audio.src = track.src
@@ -26,7 +29,7 @@ export function MusicPlayer({
       audio.removeAttribute('src')
       audio.load()
     }
-  }, [track.src])
+  }, [element, track.src])
   return (
     <div className="music-player">
       <p className="music-player-title">♫ {track.title}</p>
@@ -49,7 +52,9 @@ export function MusicPlayer({
           သီချင်း ဖွင့်မရပါ။ Connection ကို စစ်ပြီး Play ကို ထပ်နှိပ်ကြည့်ပါ။
         </p>
       )}
-      <p className="field-hint">Play ကို နှိပ်မှ အသံထွက်ပါမယ်။</p>
+      <p className="field-hint">
+        Play / Pause နဲ့ အသံကို ထိန်းချုပ်နိုင်ပါတယ်။
+      </p>
     </div>
   )
 }

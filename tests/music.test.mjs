@@ -79,6 +79,6 @@ test('music choices survive storage and v4 drafts safely migrate to silent defau
   const loaded = loadDraft(storage)
   assert.equal(loaded.status, 'restored')
   assert.deepEqual(loaded.card.music, createMusic())
-  assert.equal(loaded.card.schemaVersion, 5)
+  assert.equal(loaded.card.schemaVersion, 6)
   assert.equal(raw, original)
 })

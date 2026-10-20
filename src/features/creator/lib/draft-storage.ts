@@ -5,24 +5,33 @@ import {
   v2CardSchema,
   v3CardSchema,
   v4CardSchema,
+  v5CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
+import { createOpening } from '../../../shared/models/opening.ts'
 import { createMusic } from '../../../shared/models/music.ts'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry.ts'
 import { createAppearance } from '../../../shared/templates/card-styles.ts'
 
 const storedCardSchema = z.union([
   cardSchema,
+  v5CardSchema.transform((card) => ({
+    ...card,
+    schemaVersion: 6 as const,
+    opening: createOpening(),
+  })),
   v4CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 5 as const,
+    schemaVersion: 6 as const,
+    opening: createOpening(),
     music: createMusic(),
   })),
   v3CardSchema
     .transform((card) => ({
       ...card,
-      schemaVersion: 5 as const,
+      schemaVersion: 6 as const,
+      opening: createOpening(),
       music: createMusic(),
       photos: card.photos.map((photo, index) => ({
         ...photo,
@@ -32,14 +41,16 @@ const storedCardSchema = z.union([
     .pipe(cardSchema),
   v2CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 5 as const,
+    schemaVersion: 6 as const,
+    opening: createOpening(),
     music: createMusic(),
     pages: [],
     photos: [],
   })),
   legacyCardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 5 as const,
+    schemaVersion: 6 as const,
+    opening: createOpening(),
     music: createMusic(),
     pages: [],
     photos: [],

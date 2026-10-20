@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { openingSchema } from './opening.ts'
 import { musicSchema } from './music.ts'
 
 export const occasionSchema = z.enum([
@@ -133,7 +134,12 @@ function validateCardReferences(
   }
 }
 export const v4CardSchema = v4CardFields.superRefine(validateCardReferences)
-export const cardSchema = v4CardFields
-  .extend({ schemaVersion: z.literal(5), music: musicSchema })
+const v5CardFields = v4CardFields.extend({
+  schemaVersion: z.literal(5),
+  music: musicSchema,
+})
+export const v5CardSchema = v5CardFields.superRefine(validateCardReferences)
+export const cardSchema = v5CardFields
+  .extend({ schemaVersion: z.literal(6), opening: openingSchema })
   .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>

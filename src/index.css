@@ -1446,3 +1446,314 @@ input[type='range'] {
   box-shadow: 0 6px 20px #30204018;
   border-radius: 14px;
 }
+
+.opening-invitation {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 36px 24px;
+  border: 1px solid #ffffffa0;
+  border-radius: 24px;
+  background: var(--opening-bg);
+  color: var(--opening-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+.receiver-preview > .opening-invitation {
+  max-width: 560px;
+}
+.opening-kicker {
+  font:
+    700 9px 'Plus Jakarta Sans',
+    sans-serif;
+  letter-spacing: 2px;
+  opacity: 0.65;
+}
+.opening-recipient {
+  margin-top: 18px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.opening-art {
+  position: relative;
+  width: min(100%, 280px);
+  aspect-ratio: 1.5;
+  margin: 40px 0 30px;
+  perspective: 800px;
+}
+.opening-pocket {
+  position: absolute;
+  inset: 12% 0 0;
+  background: var(--opening-color);
+  border-radius: 8px 8px 16px 16px;
+  box-shadow: 0 18px 35px #30204020;
+}
+.opening-pocket::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%);
+  background: linear-gradient(35deg, #ffffff45, transparent 70%);
+  border-radius: inherit;
+}
+.opening-flap {
+  position: absolute;
+  inset: 12% 0 34%;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: color-mix(in srgb, var(--opening-color) 78%, white);
+  transform-origin: top;
+  z-index: 3;
+  backface-visibility: hidden;
+}
+.opening-seal {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--opening-seal);
+  box-shadow: 0 4px 12px #30204025;
+  font-size: 25px;
+  z-index: 4;
+}
+.opening-note {
+  position: absolute;
+  width: 80%;
+  height: 72%;
+  left: 10%;
+  top: 18%;
+  background: #fff9;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  z-index: 1;
+}
+.opening-invitation h2 {
+  font-size: 22px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.opening-message {
+  font-size: 12px;
+  line-height: 2.1;
+  white-space: pre-wrap;
+  max-width: 380px;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+.opening-sender {
+  font-size: 10px;
+  opacity: 0.75;
+  margin-top: 18px;
+  overflow-wrap: anywhere;
+}
+.opening-button {
+  color: var(--opening-bg);
+  background: var(--opening-text);
+  border: 0;
+  border-radius: 100px;
+  padding: 12px 25px;
+  font-size: 13px;
+  margin-top: 24px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+}
+.opening-music-note {
+  margin-top: 14px;
+  font-size: 10px;
+  opacity: 0.75;
+}
+.opening-gift .opening-art {
+  aspect-ratio: 1.35;
+}
+.opening-gift .opening-pocket {
+  inset: 18% 10% 0;
+  border-radius: 8px;
+}
+.opening-gift .opening-pocket::after {
+  clip-path: none;
+  left: 42%;
+  right: 42%;
+  background: var(--opening-seal);
+  border-radius: 0;
+}
+.opening-gift .opening-flap {
+  inset: 12% 6% 70%;
+  clip-path: none;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--opening-color) 85%, white);
+}
+.opening-gift .opening-seal {
+  top: 14%;
+  width: 64px;
+  height: 42px;
+  border-radius: 50% 50% 10% 10%;
+}
+.opening-gift .opening-note {
+  left: 18%;
+  width: 64%;
+  top: 20%;
+}
+.motion-gentle.phase-closed .opening-art {
+  animation: invitation-float 3s ease-in-out infinite;
+}
+.phase-opening .opening-flap {
+  animation: invitation-flap 0.7s ease forwards;
+}
+.phase-opening .opening-seal {
+  animation: invitation-seal 0.7s ease forwards;
+}
+.phase-opening .opening-note {
+  animation: invitation-note 0.7s ease forwards;
+}
+.opening-gift.phase-opening .opening-flap {
+  animation: gift-lid 0.7s ease forwards;
+}
+.motion-fade.phase-opening {
+  animation: invitation-fade 0.75s ease forwards;
+}
+.opening-sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.opening-sparkles span {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  opacity: 0;
+  font-size: 24px;
+}
+.phase-opening .opening-sparkles span {
+  animation: invitation-spark 0.6s ease-out var(--spark-delay) forwards;
+}
+.opening-emoji-picker {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  min-width: 0;
+}
+.opening-emoji-picker legend {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.opening-emoji-picker > div {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.opening-emoji-picker button {
+  padding: 10px;
+  font-size: 22px;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+.opening-emoji-picker button[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: #f3edff;
+}
+.receiver-content-heading {
+  font-size: 16px;
+  text-align: center;
+  line-height: 1.9;
+}
+.music-start-hint {
+  font-size: 11px;
+  padding: 10px;
+  color: #654398;
+}
+@keyframes invitation-float {
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes invitation-flap {
+  to {
+    transform: rotateX(180deg);
+  }
+}
+@keyframes invitation-seal {
+  50%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -90%) scale(0.8);
+  }
+}
+@keyframes invitation-note {
+  to {
+    transform: translateY(-45%);
+  }
+}
+@keyframes invitation-fade {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+@keyframes gift-lid {
+  to {
+    transform: translateY(-80%) rotate(-12deg);
+  }
+}
+@keyframes invitation-spark {
+  20% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--spark-x), var(--spark-y))
+      rotate(var(--spark-rotation));
+  }
+}
+@media (max-width: 760px) {
+  .opening-invitation {
+    padding: 26px 18px;
+  }
+  .opening-invitation h2 {
+    font-size: 19px;
+  }
+  .opening-art {
+    margin-top: 25px;
+    margin-bottom: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opening-invitation *,
+  .opening-invitation {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.opening-music-note {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.opening-music-note input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--opening-seal);
+}
+.wizard-steps button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .wizard-grid > .wizard-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+}

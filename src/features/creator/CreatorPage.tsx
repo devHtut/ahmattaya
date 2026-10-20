@@ -9,20 +9,45 @@ import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
+import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
+import { OpeningFields } from './components/OpeningFields'
 import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
 
 const steps = [
-  { title: 'အခမ်းအနား', description: 'အထူးနေ့လေးကို ရွေးပါ' },
-  { title: 'စကားလေးများ', description: 'ရင်ထဲက စာသားလေးတွေ ရေးပါ' },
-  { title: 'အရောင်နဲ့ စာလုံး', description: 'သင့်စိတ်ကြိုက် ပုံစံပြင်ပါ' },
+  { id: 'occasion', title: 'အခမ်းအနား', description: 'အထူးနေ့လေးကို ရွေးပါ' },
   {
+    id: 'opening',
+    title: 'အဖွင့်ဖိတ်စာ',
+    description: 'လက်ခံသူ ပထမဆုံးမြင်မယ့် ဖိတ်စာလေး',
+  },
+  {
+    id: 'words',
+    title: 'စကားလေးများ',
+    description: 'ရင်ထဲက စာသားလေးတွေ ရေးပါ',
+  },
+  {
+    id: 'style',
+    title: 'အရောင်နဲ့ စာလုံး',
+    description: 'သင့်စိတ်ကြိုက် ပုံစံပြင်ပါ',
+  },
+  {
+    id: 'pages',
     title: 'ပုံနဲ့ စာမျက်နှာများ',
     description: 'အမှတ်တရပုံနဲ့ စာမျက်နှာလေးတွေ ထည့်ပါ',
   },
-  { title: 'သံစဉ်လေး', description: 'အမှတ်တရကို သံစဉ်လေးနဲ့ ဖြည့်ပါ' },
-  { title: 'နမူနာကြည့်မယ်', description: 'မပို့ခင် ပြန်စစ်ကြည့်ပါ' },
-]
+  {
+    id: 'music',
+    title: 'သံစဉ်လေး',
+    description: 'အမှတ်တရကို သံစဉ်လေးနဲ့ ဖြည့်ပါ',
+  },
+  {
+    id: 'review',
+    title: 'နမူနာကြည့်မယ်',
+    description: 'မပို့ခင် ပြန်စစ်ကြည့်ပါ',
+  },
+] as const
+type CreatorStep = (typeof steps)[number]['id']
 export function CreatorPage({
   card,
   onChange,
@@ -34,11 +59,12 @@ export function CreatorPage({
   saveStatus: 'idle' | 'saved' | 'error' | 'blocked'
   onRetrySave: () => void
 }) {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState<CreatorStep>('occasion')
+  const stepIndex = steps.findIndex((item) => item.id === step)
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
   const previewPageId =
-    step === 3 && card.pages.some((page) => page.id === selectedPageId)
+    step === 'pages' && card.pages.some((page) => page.id === selectedPageId)
       ? selectedPageId
       : 'cover'
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -70,8 +96,8 @@ export function CreatorPage({
           {steps.map((item, index) => (
             <button
               key={item.title}
-              aria-current={step === index ? 'step' : undefined}
-              onClick={() => setStep(index)}
+              aria-current={step === item.id ? 'step' : undefined}
+              onClick={() => setStep(item.id)}
             >
               <span className="step-number">{index + 1}</span>
               <span>{item.title}</span>
@@ -82,7 +108,7 @@ export function CreatorPage({
           <summary>
             LIVE PREVIEW <span>ဖွင့် / ပိတ် ကြည့်နိုင်ပါတယ်</span>
           </summary>
-          {step === 3 && (
+          {step === 'pages' && (
             <CanvasWorkspace
               card={card}
               pageId={previewPageId}
@@ -98,37 +124,45 @@ export function CreatorPage({
               }
             />
           )}
-          <CardPreview
-            key={previewPageId}
-            card={card}
-            pageId={previewPageId}
-            selectedPhotoId={step === 3 ? selectedPhotoId : null}
-            onSelectPhoto={step === 3 ? setSelectedPhotoId : undefined}
-            onCommitPhoto={
-              step === 3
-                ? (id, frame) =>
-                    onChange({
-                      ...card,
-                      photos: card.photos.map((photo) =>
-                        photo.id === id ? { ...photo, frame } : photo,
-                      ),
-                    })
-                : undefined
-            }
-          />
+          {step === 'opening' ? (
+            <OpeningInvitation
+              opening={card.opening}
+              receiverName={card.receiverName}
+              senderName={card.senderName}
+            />
+          ) : (
+            <CardPreview
+              key={previewPageId}
+              card={card}
+              pageId={previewPageId}
+              selectedPhotoId={step === 'pages' ? selectedPhotoId : null}
+              onSelectPhoto={step === 'pages' ? setSelectedPhotoId : undefined}
+              onCommitPhoto={
+                step === 'pages'
+                  ? (id, frame) =>
+                      onChange({
+                        ...card,
+                        photos: card.photos.map((photo) =>
+                          photo.id === id ? { ...photo, frame } : photo,
+                        ),
+                      })
+                  : undefined
+              }
+            />
+          )}
         </details>
         <section
           className="properties wizard-properties"
           aria-labelledby="step-heading"
         >
           <p className="eyebrow step-counter">
-            အဆင့် {step + 1} / {steps.length}
+            အဆင့် {stepIndex + 1} / {steps.length}
           </p>
           <h2 id="step-heading" ref={headingRef} tabIndex={-1}>
-            {steps[step].title}
+            {steps[stepIndex].title}
           </h2>
-          <p className="step-description">{steps[step].description}</p>
-          {step === 0 && (
+          <p className="step-description">{steps[stepIndex].description}</p>
+          {step === 'occasion' && (
             <div className="fields">
               <label>
                 အခမ်းအနား
@@ -156,9 +190,12 @@ export function CreatorPage({
               </p>
             </div>
           )}
-          {step === 1 && <WordsFields card={card} onChange={onChange} />}
-          {step === 2 && <StyleFields card={card} onChange={onChange} />}
-          {step === 3 && (
+          {step === 'opening' && (
+            <OpeningFields card={card} onChange={onChange} />
+          )}
+          {step === 'words' && <WordsFields card={card} onChange={onChange} />}
+          {step === 'style' && <StyleFields card={card} onChange={onChange} />}
+          {step === 'pages' && (
             <PagesFields
               card={card}
               onChange={onChange}
@@ -171,8 +208,8 @@ export function CreatorPage({
               onSelectPhoto={setSelectedPhotoId}
             />
           )}
-          {step === 4 && <MusicFields card={card} onChange={onChange} />}
-          {step === 5 && (
+          {step === 'music' && <MusicFields card={card} onChange={onChange} />}
+          {step === 'review' && (
             <div className="review-panel">
               <p>
                 အမည်၊ ဆုတောင်းစာနဲ့ စာလုံးပုံစံတွေကို နမူနာမှာ ပြန်စစ်ကြည့်ပါ။
@@ -190,15 +227,15 @@ export function CreatorPage({
           <div className="wizard-actions">
             <button
               className="button secondary"
-              disabled={step === 0}
-              onClick={() => setStep((value) => value - 1)}
+              disabled={step === 'occasion'}
+              onClick={() => setStep(steps[stepIndex - 1].id)}
             >
               <ArrowLeft size={16} /> နောက်ပြန်
             </button>
-            {step < steps.length - 1 && (
+            {stepIndex < steps.length - 1 && (
               <button
                 className="button primary"
-                onClick={() => setStep((value) => value + 1)}
+                onClick={() => setStep(steps[stepIndex + 1].id)}
               >
                 နောက်တစ်ဆင့် <ArrowRight size={16} />
               </button>
