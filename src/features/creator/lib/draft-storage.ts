@@ -8,6 +8,7 @@ import {
   v5CardSchema,
   v6CardSchema,
   v7CardSchema,
+  v8CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
@@ -17,35 +18,40 @@ import { createMusic } from '../../../shared/models/music.ts'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry.ts'
 import { createAppearance } from '../../../shared/templates/card-styles.ts'
 
-const storedCardSchema = z.union([
-  cardSchema,
-  v7CardSchema.transform((card) => ({
-    ...card,
-    schemaVersion: 8 as const,
-    cake: { ...card.cake, strokes: [], candles: [] },
-  })),
-  v6CardSchema.transform((card) => ({
-    ...card,
-    schemaVersion: 8 as const,
-    cake: createCake(),
-  })),
-  v5CardSchema.transform((card) => ({
-    ...card,
-    schemaVersion: 8 as const,
-    cake: createCake(),
-    opening: createOpening(),
-  })),
-  v4CardSchema.transform((card) => ({
-    ...card,
-    schemaVersion: 8 as const,
-    cake: createCake(),
-    opening: createOpening(),
-    music: createMusic(),
-  })),
-  v3CardSchema
-    .transform((card) => ({
+export const storedCardSchema = z
+  .union([
+    cardSchema,
+    v8CardSchema.transform((card) => ({
       ...card,
-      schemaVersion: 8 as const,
+      schemaVersion: 9 as const,
+      background: null,
+    })),
+    v7CardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
+      cake: { ...card.cake, strokes: [], candles: [] },
+    })),
+    v6CardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
+      cake: createCake(),
+    })),
+    v5CardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
+      cake: createCake(),
+      opening: createOpening(),
+    })),
+    v4CardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
+      cake: createCake(),
+      opening: createOpening(),
+      music: createMusic(),
+    })),
+    v3CardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
       cake: createCake(),
       opening: createOpening(),
       music: createMusic(),
@@ -53,28 +59,28 @@ const storedCardSchema = z.union([
         ...photo,
         frame: defaultPhotoFrame(index),
       })),
-    }))
-    .pipe(cardSchema),
-  v2CardSchema.transform((card) => ({
-    ...card,
-    schemaVersion: 8 as const,
-    cake: createCake(),
-    opening: createOpening(),
-    music: createMusic(),
-    pages: [],
-    photos: [],
-  })),
-  legacyCardSchema.transform((card) => ({
-    ...card,
-    schemaVersion: 8 as const,
-    cake: createCake(),
-    opening: createOpening(),
-    music: createMusic(),
-    pages: [],
-    photos: [],
-    appearance: createAppearance(card.theme),
-  })),
-])
+    })),
+    v2CardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
+      cake: createCake(),
+      opening: createOpening(),
+      music: createMusic(),
+      pages: [],
+      photos: [],
+    })),
+    legacyCardSchema.transform((card) => ({
+      ...card,
+      schemaVersion: 9 as const,
+      cake: createCake(),
+      opening: createOpening(),
+      music: createMusic(),
+      pages: [],
+      photos: [],
+      appearance: createAppearance(card.theme),
+    })),
+  ])
+  .pipe(z.preprocess((card) => card, cardSchema))
 
 export const DRAFT_STORAGE_KEY = 'ahmattaya.creator-draft'
 const draftEnvelopeSchema = z.object({

@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { useImageAsset } from '../media/useImageAsset'
 import type { CardAppearance, CardConfig, PhotoFrame } from '../models/card'
 import { occasions } from '../templates/templates'
 import { PhotoCanvas } from './PhotoCanvas'
@@ -27,6 +28,10 @@ export function CardPreview({
   onCommitPhoto?: (id: string, frame: PhotoFrame) => void
 }) {
   const page = card.pages.find((item) => item.id === pageId)
+  const background = page ? page.background : card.background
+  const { url: backgroundUrl, failed: backgroundFailed } = useImageAsset(
+    background?.assetId,
+  )
   const photos = card.photos.filter(
     (photo) => photo.pageId === (page?.id ?? 'cover'),
   )
@@ -41,6 +46,31 @@ export function CardPreview({
           color: colors.text,
         }}
       >
+        {background && backgroundUrl && (
+          <div className="page-background" aria-hidden="true">
+            <img
+              src={backgroundUrl}
+              alt=""
+              style={{
+                objectPosition: `${background.positionX}% ${background.positionY}%`,
+                transform: `scale(${background.zoom})`,
+                transformOrigin: `${background.positionX}% ${background.positionY}%`,
+                opacity: background.opacity,
+              }}
+            />
+            <div
+              style={{
+                backgroundColor: background.overlayColor,
+                opacity: background.overlayOpacity,
+              }}
+            />
+          </div>
+        )}
+        {backgroundFailed && (
+          <span className="background-missing" role="status">
+            နောက်ခံပုံ ဖွင့်မရပါ
+          </span>
+        )}
         <div className="card-copy">
           {!page && (
             <span className="eyebrow" style={{ color: colors.accent }}>

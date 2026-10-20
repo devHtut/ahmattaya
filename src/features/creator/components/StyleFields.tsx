@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BackgroundFields } from './BackgroundFields'
 import type { CardAppearance, CardConfig } from '../../../shared/models/card'
 import { fontSchema } from '../../../shared/models/card'
 import { palettes } from '../../../shared/templates/card-styles'
@@ -25,6 +26,7 @@ export function StyleFields({
     })
   return (
     <div className="style-fields">
+      <BackgroundFields card={card} onChange={onChange} />
       <fieldset>
         <legend>လိုက်ဖက်တဲ့ အရောင်တွဲများ</legend>
         <div className="palette-grid">

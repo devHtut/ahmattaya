@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { BackgroundFields } from './BackgroundFields'
 import { ImagePlus, Plus, Trash2 } from 'lucide-react'
 import {
   MAX_PAGES,
@@ -215,9 +216,15 @@ export function PagesFields({
       )}
       {pageId === 'cover' && (
         <p className="field-hint">
-          အဖုံးက စာသားတွေကို “စကားလေးများ” အဆင့်မှာ ပြင်နိုင်ပါတယ်။
+          အဖုံးက စာသားတွေကို “ကတ် → စာသား” မှာ ပြင်နိုင်ပါတယ်။
         </p>
       )}
+      <BackgroundFields
+        key={pageId}
+        card={card}
+        pageId={pageId}
+        onChange={onChange}
+      />
       <div
         className={`photo-dropzone ${draggingOver ? 'is-over' : ''}`}
         onDragOver={(e) => {

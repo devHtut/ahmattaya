@@ -1,6 +1,9 @@
 import { z } from 'zod'
-import { cardSchema } from '../../shared/models/card.ts'
-import { loadDraft, type DraftStorage } from '../creator/lib/draft-storage.ts'
+import {
+  loadDraft,
+  storedCardSchema,
+  type DraftStorage,
+} from '../creator/lib/draft-storage.ts'
 
 export const PROJECTS_KEY = 'ahmattaya.projects'
 export const projectSchema = z.object({
@@ -8,7 +11,7 @@ export const projectSchema = z.object({
   name: z.string().trim().min(1).max(100),
   updatedAt: z.iso.datetime(),
   deleted: z.boolean().default(false),
-  card: cardSchema,
+  card: storedCardSchema,
 })
 export type Project = z.infer<typeof projectSchema>
 export const librarySchema = z

@@ -20,5 +20,5 @@ export function removePage(card: CardConfig, pageId: string): CardConfig {
   }
 }
 export function createPage(id: string): CardPage {
-  return { id, title: '', message: '', paper: 'blank' }
+  return { id, title: '', message: '', paper: 'blank', background: null }
 }

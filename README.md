@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/editor-projects`, branched from the Cake decoration milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/page-backgrounds`, branched from the Editor projects milestone.
 
 ## Development
 
@@ -115,6 +115,16 @@ V7 base cakes migrate with empty decoration arrays while preserving all existing
 
 Branch `codex/editor-projects` adds a top File/name/local-save/Undo/Redo/Preview/Share toolbar, a horizontal five-stage navigator, and a compact stage picker on phones. Undo/Redo retains the last ten card edits in this session; Cake cream tools also retain their own stroke history. Share explains that public links are not yet available.
 
-`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, background images, custom music and a template library remain separate milestones.
+`/projects` lists local projects with thumbnails, names and timestamps. Create, rename, duplicate, reopen, move to recoverable trash and restore are supported. The validated version-1 project library stores all projects and the active selection in one localStorage envelope. The previous single draft migrates in memory and is retained untouched as a backup; the first edit or project action writes the new library. Invalid/future library data blocks automatic writes; quota failures retain current state in memory and offer Retry. Trashed projects still consume browser storage. Cloud sync, real-time collaboration, custom music and a template library remain separate milestones.
 
 Verified: legacy recovery, project duplication, card edit/Undo, recoverable trash/restore, Share explanation and project persistence after reload. Browser-storage tests cover migration, multiple projects, active selection, invalid/future data, duplicate IDs and quota failures.
+
+## Page background images
+
+Cover backgrounds live in Card → Appearance and are also editable from Pages. Every extra page has an independent background editor. Upload/drop one JPG, PNG or WebP (up to 15 MB); the existing compression pipeline produces a local image up to 200 KB. Position, 100–300% zoom, image opacity, overlay color and overlay opacity update the shared creator/full-canvas/receiver renderer. Paper lines and freely positioned photos remain above the background. Reset and remove are undoable with toolbar history.
+
+Card schema v9 adds nullable cover/page backgrounds. V1–v8 drafts and v8 project libraries migrate without rewriting storage on read. Invalid/future data remains protected. Background image bytes are immutable, content-addressed Blobs in IndexedDB (`ahmattaya.media`); localStorage holds only image IDs and settings. The image transaction completes before attaching its reference to a project. Duplicates share the asset, object URLs are revoked on replacement/unmount, and image-storage failures leave the previous background in place. Existing scrapbook photos retain their previous bounded data-URL storage for now.
+
+Removed/replaced background assets are retained to protect Undo and copied/trashed projects; automatic garbage collection and storage management remain future work. Clearing browser site data removes both projects and media; these are local drafts, not cloud backups. Missing assets show a readable fallback plus an editor replacement option. Native phone file picking/touch and storage eviction still need real-device testing.
+
+Tests cover schema bounds, independent page settings, v8 library migration, shared asset IDs, metadata roundtrip and unsupported/oversized uploads. Browser checks cover image upload/compression, cover/page isolation, position/zoom/overlay edits, remove/Undo and receiver persistence after a full reload.

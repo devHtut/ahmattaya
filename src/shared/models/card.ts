@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { cakeSchema, legacyCakeSchema } from './cake.ts'
 import { openingSchema } from './opening.ts'
 import { musicSchema } from './music.ts'
+import { backgroundSchema } from './background.ts'
 
 export const occasionSchema = z.enum([
   'birthday',
@@ -84,6 +85,7 @@ export const pageSchema = z.object({
   title: z.string().max(160),
   message: z.string().max(2000),
   paper: z.enum(['blank', 'lined']),
+  background: backgroundSchema.nullable().default(null),
 })
 export type CardPage = z.infer<typeof pageSchema>
 export const v3PhotoSchema = z.object({
@@ -148,7 +150,14 @@ export const v6CardSchema = v6CardFields.superRefine(validateCardReferences)
 export const v7CardSchema = v6CardFields
   .extend({ schemaVersion: z.literal(7), cake: legacyCakeSchema })
   .superRefine(validateCardReferences)
-export const cardSchema = v6CardFields
+export const v8CardSchema = v6CardFields
   .extend({ schemaVersion: z.literal(8), cake: cakeSchema })
+  .superRefine(validateCardReferences)
+export const cardSchema = v6CardFields
+  .extend({
+    schemaVersion: z.literal(9),
+    cake: cakeSchema,
+    background: backgroundSchema.nullable().default(null),
+  })
   .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>
