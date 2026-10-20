@@ -4,6 +4,7 @@ import type { CardConfig } from '../../shared/models/card'
 import { findMusicTrack } from '../../shared/audio/tracks'
 import { MusicPlayer } from '../../shared/audio/MusicPlayer'
 import { CardPreview } from '../../shared/ui/CardPreview'
+import { CakePreview } from '../cake/components/CakePreview'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 
 export function PreviewPage({ card }: { card: CardConfig }) {
@@ -113,6 +114,12 @@ export function PreviewPage({ card }: { card: CardConfig }) {
               <CardPreview card={card} pageId={page.id} />
             </section>
           ))}
+          {card.cake.enabled && (
+            <section className="receiver-cake" aria-label="သင့်အတွက် Cake">
+              <h2>သင့်အတွက် Cake လေး 🎂</h2>
+              <CakePreview recipe={card.cake} />
+            </section>
+          )}
           <button className="button secondary" onClick={replay}>
             ဖိတ်စာ ပြန်ကြည့်မယ်
           </button>

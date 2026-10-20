@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { cakeSchema } from './cake.ts'
 import { openingSchema } from './opening.ts'
 import { musicSchema } from './music.ts'
 
@@ -139,7 +140,12 @@ const v5CardFields = v4CardFields.extend({
   music: musicSchema,
 })
 export const v5CardSchema = v5CardFields.superRefine(validateCardReferences)
-export const cardSchema = v5CardFields
-  .extend({ schemaVersion: z.literal(6), opening: openingSchema })
+const v6CardFields = v5CardFields.extend({
+  schemaVersion: z.literal(6),
+  opening: openingSchema,
+})
+export const v6CardSchema = v6CardFields.superRefine(validateCardReferences)
+export const cardSchema = v6CardFields
+  .extend({ schemaVersion: z.literal(7), cake: cakeSchema })
   .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>

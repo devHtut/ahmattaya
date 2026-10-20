@@ -83,7 +83,7 @@ test('v5 migration adds opening without losing music, content or rewriting stora
   }
   const loaded = loadDraft(storage)
   assert.equal(loaded.status, 'restored')
-  assert.equal(loaded.card.schemaVersion, 6)
+  assert.equal(loaded.card.schemaVersion, 7)
   assert.deepEqual(loaded.card.music, card.music)
   assert.deepEqual(loaded.card.opening, createOpening())
   assert.deepEqual(loaded.card.photos, card.photos)

@@ -9,6 +9,8 @@ import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
+import { CakeFields } from '../cake/components/CakeFields'
+import { CakePreview } from '../cake/components/CakePreview'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 import { OpeningFields } from './components/OpeningFields'
 import { MusicFields } from './components/MusicFields'
@@ -35,6 +37,11 @@ const steps = [
     id: 'pages',
     title: 'ပုံနဲ့ စာမျက်နှာများ',
     description: 'အမှတ်တရပုံနဲ့ စာမျက်နှာလေးတွေ ထည့်ပါ',
+  },
+  {
+    id: 'cake',
+    title: 'Cake Studio',
+    description: 'ကိုယ်ပိုင် cake design လေး ဖန်တီးပါ',
   },
   {
     id: 'music',
@@ -130,6 +137,8 @@ export function CreatorPage({
               receiverName={card.receiverName}
               senderName={card.senderName}
             />
+          ) : step === 'cake' ? (
+            <CakePreview recipe={card.cake} />
           ) : (
             <CardPreview
               key={previewPageId}
@@ -208,6 +217,7 @@ export function CreatorPage({
               onSelectPhoto={setSelectedPhotoId}
             />
           )}
+          {step === 'cake' && <CakeFields card={card} onChange={onChange} />}
           {step === 'music' && <MusicFields card={card} onChange={onChange} />}
           {step === 'review' && (
             <div className="review-panel">

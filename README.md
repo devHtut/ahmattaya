@@ -1,6 +1,6 @@
 # AhMatTaYa (အမှတ်တရ)
 
-Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/opening-invitation`, branched from the preset music milestone.
+Myanmar-first interactive digital experience creator. Clean foundation rebuild based on `main`. Current feature: `codex/cake-studio-foundation`, branched from the opening invitation milestone.
 
 ## Development
 
@@ -17,16 +17,16 @@ npm run build
 ## Current scope
 
 - Burmese-first Home page and four occasion entry points.
-- Guided Creator Studio with Next/Back: occasion, opening invitation, words, appearance, photos/pages, music and review.
+- Guided Creator Studio with Next/Back: occasion, opening invitation, words, appearance, photos/pages, Cake Studio, music and review.
 - Six coordinated palettes, four custom color pickers, and independent heading/message font, size, bold, italic and alignment.
 - Expandable sticky live preview and keyboard-accessible step navigation.
 - Browser photo selection/drop, compression, captions, drag reorder and accessible move controls.
 - Up to eight additional blank/lined pages, page ordering/deletion and full multi-page preview.
 - Validated browser-local draft recovery and live/static receiver preview.
 - React Router routes: `/`, `/create`, `/preview`, and not-found.
-- Versioned Zod card schema (v6), v1–v5 draft migration, TypeScript strict mode, shared design tokens.
+- Versioned Zod card schema (v7), v1–v6 draft migration, TypeScript strict mode, shared design tokens.
 
-Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, 3D and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
+Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, interactive candles and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
 
 ## Structure
 
@@ -41,7 +41,7 @@ The host must serve `index.html` for unknown application routes (SPA fallback), 
 ## Next stages
 
 1. Occasion-specific fields and template selection.
-2. A separate Cake Studio step.
+2. Cream drawing and candle designs/placement inside Cake Studio.
 3. Supabase migrations/RLS, hybrid authentication, media and publishing.
 4. Receiver interactions, followed by 3D/AR as separate milestones.
 
@@ -55,7 +55,7 @@ Create a `codex/` feature branch for each independently reviewable feature; choo
 
 The current card model stores four hex colors and separate heading/body typography. V1 text-only drafts load with theme-matched appearance defaults. Loading does not rewrite stored data; the next edit saves the upgraded current-version draft. Future versions or malformed drafts stay protected from automatic replacement. Font choices include Burmese fallbacks; italic can be synthesized for fonts without an italic face.
 
-The wizard currently covers implemented features only. The separate Cake Studio step will be added incrementally. Steps can be revisited freely, and unfinished drafts do not require publish-time fields.
+The wizard currently covers implemented features only. Cake Studio currently covers recipe foundations; cream drawing and candles come next. Steps can be revisited freely, and unfinished drafts do not require publish-time fields.
 
 ## Responsive editor preview
 
@@ -92,3 +92,13 @@ A separate creator step configures an envelope or gift-box opening, four colors,
 Receiver preview starts sealed, revealing inner pages only after the opening button is activated. If configured, the existing music player starts directly from that click gesture; a recipient checkbox allows opening silently. A rejected play request leaves manual Play available. Replay pauses/resets music and returns to the sealed state. Focus moves into revealed content and back to the opening button on replay. Reduced-motion preference skips the reveal delay and decorative animation.
 
 This is the local receiver preview flow; public publishing/links are still a later milestone. V1–v5 drafts get opening defaults in memory without rewriting storage on load. Verified in-browser: custom text/color/emoji restoration, sealed reload, opening reveal with music, silent reveal, replay audio reset and content focus. Real-device mobile animation/audio testing remains outstanding.
+
+## Cake Studio foundation
+
+Optional JSON cake recipes include vanilla/chocolate/strawberry sponge, one/two/three tiers, cream/accent colors and plain/pearls/berries decoration. Three editable starter designs and a blank recipe are available. Disabling a cake preserves its settings while omitting it from receiver preview. Prior drafts migrate with cake disabled.
+
+The procedural Three.js renderer and OrbitControls load only when an enabled cake is displayed. Creator and receiver share that renderer/recipe. Geometry is replaced and disposed when the recipe changes while the canvas/camera remain stable. Rendering occurs only on changes or resize, with capped pixel ratio, instanced pearls and no perpetual animation loop. WebGL/context/loading failures show a recipe-matched SVG fallback. Geometry, materials, controls, shadow resources, ResizeObserver and canvas are cleaned up on unmount.
+
+This stage has no freehand cream drawing, candles, microphone or AR. Flavor is represented visually by sponge color. Browser-tested: actual WebGL rendering, 3-tier preset, custom cream color, orbit drag, saved recipe restoration and receiver rendering after the invitation opens; no browser console errors observed. Real-device touch, hardware fallback and performance tests remain outstanding.
+
+The separately loaded CakeScene bundle is currently about 562 KB minified / 140 KB gzip; the build reports its size warning. It does not load for Home, a disabled cake or a sealed receiver preview. Further mobile delivery optimization is reserved for performance testing.
