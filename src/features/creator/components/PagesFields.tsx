@@ -7,6 +7,8 @@ import {
   type CardPhoto,
 } from '../../../shared/models/card'
 import { compressPhoto } from '../lib/compress-photo'
+import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry'
+import { PhotoProperties } from './PhotoProperties'
 import { createPage, moveItem, removePage } from '../lib/pages'
 
 export function PagesFields({
@@ -14,11 +16,15 @@ export function PagesFields({
   onChange,
   pageId,
   onSelectPage,
+  selectedPhotoId,
+  onSelectPhoto,
 }: {
   card: CardConfig
   onChange: (card: CardConfig) => void
   pageId: string
   onSelectPage: (id: string) => void
+  selectedPhotoId: string | null
+  onSelectPhoto: (id: string | null) => void
 }) {
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState('')
@@ -55,13 +61,19 @@ export function PagesFields({
     try {
       for (const file of files) {
         try {
-          const src = await compressPhoto(file)
+          const { src, ratio } = await compressPhoto(file)
           if (!mounted.current) return
           added.push({
             id: crypto.randomUUID(),
             pageId: targetPageId,
             src,
             caption: '',
+            frame: defaultPhotoFrame(
+              latest.current.photos.filter(
+                (photo) => photo.pageId === targetPageId,
+              ).length + added.length,
+              ratio,
+            ),
           })
         } catch (error) {
           failures.push(error instanceof Error ? error.message : 'ပုံထည့်မရပါ။')
@@ -77,8 +89,10 @@ export function PagesFields({
         return
       }
       const accepted = added.slice(0, MAX_PHOTOS - current.photos.length)
-      if (accepted.length)
+      if (accepted.length) {
         onChange({ ...current, photos: [...current.photos, ...accepted] })
+        onSelectPhoto(accepted[accepted.length - 1].id)
+      }
       setFeedback(
         [
           accepted.length ? `ပုံ ${accepted.length} ပုံ ထည့်ပြီးပါပြီ။` : '',
@@ -99,16 +113,6 @@ export function PagesFields({
         item.id === pageId ? { ...item, ...change } : item,
       ),
     })
-  const reorderPhoto = (id: string, targetId: string) => {
-    const from = card.photos.findIndex(
-      (photo) => photo.id === id && photo.pageId === pageId,
-    )
-    const to = card.photos.findIndex(
-      (photo) => photo.id === targetId && photo.pageId === pageId,
-    )
-    if (from >= 0 && to >= 0)
-      onChange({ ...card, photos: moveItem(card.photos, from, to) })
-  }
   return (
     <div className="pages-editor">
       <label>
@@ -256,75 +260,35 @@ export function PagesFields({
       <p className="upload-feedback" role="status" aria-live="polite">
         {feedback}
       </p>
-      <div className="photo-editor-grid">
+      <p className="field-hint">
+        Preview ပေါ်က ပုံကို ဆွဲရွှေ့ပါ။ ရွေးထားတဲ့ပုံရဲ့ ↘ ထောင့်ကို ဆွဲပြီး
+        အရွယ်ပြောင်း၊ ↻ ကို ဆွဲပြီး လှည့်နိုင်ပါတယ်။ Keyboard
+        မြားခလုတ်တွေနဲ့လည်း ရွှေ့နိုင်ပါတယ်။
+      </p>
+      <div className="photo-layer-list" role="group" aria-label="ပုံ အလွှာများ">
         {photos.map((photo, index) => (
-          <div
-            className="photo-editor-item"
+          <button
             key={photo.id}
-            draggable={!busy}
-            onDragStart={(e) =>
-              e.dataTransfer.setData('application/x-ahmattaya-photo', photo.id)
-            }
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault()
-              const id = e.dataTransfer.getData('application/x-ahmattaya-photo')
-              if (id) reorderPhoto(id, photo.id)
-            }}
+            className="photo-layer-choice"
+            aria-pressed={selectedPhotoId === photo.id}
+            onClick={() => onSelectPhoto(photo.id)}
           >
-            <img
-              src={photo.src}
-              alt={photo.caption || `ဓာတ်ပုံ ${index + 1}`}
-            />
-            <label>
-              ပုံ {index + 1} စာတန်း
-              <input
-                maxLength={120}
-                value={photo.caption}
-                onChange={(e) =>
-                  onChange({
-                    ...card,
-                    photos: card.photos.map((item) =>
-                      item.id === photo.id
-                        ? { ...item, caption: e.target.value }
-                        : item,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <div className="item-actions">
-              <button
-                aria-label={`ပုံ ${index + 1} အပေါ်ရွှေ့မယ်`}
-                disabled={busy || index === 0}
-                onClick={() => reorderPhoto(photo.id, photos[index - 1].id)}
-              >
-                ↑
-              </button>
-              <button
-                aria-label={`ပုံ ${index + 1} အောက်ရွှေ့မယ်`}
-                disabled={busy || index === photos.length - 1}
-                onClick={() => reorderPhoto(photo.id, photos[index + 1].id)}
-              >
-                ↓
-              </button>
-              <button
-                className="danger"
-                aria-label={`ပုံ ${index + 1} ဖျက်မယ်`}
-                disabled={busy}
-                onClick={() =>
-                  onChange({
-                    ...card,
-                    photos: card.photos.filter((item) => item.id !== photo.id),
-                  })
-                }
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          </div>
+            <img src={photo.src} alt="" />
+            <span>
+              ပုံ {index + 1}
+              {photo.caption ? ` · ${photo.caption}` : ''}
+            </span>
+          </button>
         ))}
       </div>
+      {photos.find((photo) => photo.id === selectedPhotoId) && (
+        <PhotoProperties
+          card={card}
+          photoId={selectedPhotoId!}
+          onChange={onChange}
+          onSelect={onSelectPhoto}
+        />
+      )}
     </div>
   )
 }

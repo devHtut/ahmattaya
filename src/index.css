@@ -1061,3 +1061,301 @@ input[type='range'] {
     max-height: 160px;
   }
 }
+
+/* A consistent 600 × 800 page gives every photo the same coordinates on all screens. */
+.card-page-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  container-type: inline-size;
+  flex-shrink: 0;
+}
+.card-page-frame > .experience.scrapbook-page {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  display: block;
+  border-radius: 4cqw;
+  overflow: hidden;
+  isolation: isolate;
+}
+.receiver-preview > .card-page-frame {
+  max-width: 440px;
+}
+.card-copy {
+  position: absolute;
+  inset: 0;
+  padding: 7cqw 6cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.scrapbook-page .card-copy .eyebrow {
+  display: block;
+  font-size: 1.5cqw;
+  letter-spacing: 0.3cqw;
+}
+.scrapbook-page .card-copy .preview-symbol {
+  display: block;
+  font-size: 10cqw;
+  margin: 4cqw 0 2cqw;
+}
+.scrapbook-page .card-copy .recipient {
+  font-size: 2cqw;
+  margin-bottom: 1.3cqw;
+}
+.scrapbook-page .card-copy h2 {
+  line-height: 1.9;
+  width: 100%;
+}
+.scrapbook-page .card-copy .card-message {
+  width: 100%;
+  max-width: none;
+  margin-top: 2.5cqw;
+  line-height: 2.2;
+}
+.scrapbook-page .card-copy .signature {
+  margin-top: 4cqw;
+  font-size: 1.8cqw;
+}
+.scrapbook-page .card-copy .preview-brand {
+  display: block;
+  margin-top: 4cqw;
+  font-size: 1.5cqw;
+  letter-spacing: 0.15cqw;
+}
+.scrapbook-page.paper-lined .card-message {
+  min-height: 0;
+  background: none;
+}
+.scrapbook-page.paper-lined::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(5cqw - 1px),
+    color-mix(in srgb, currentColor 12%, transparent) calc(5cqw - 1px),
+    color-mix(in srgb, currentColor 12%, transparent) 5cqw
+  );
+}
+.photo-canvas-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.photo-canvas-layer.is-editable {
+  pointer-events: auto;
+}
+.canvas-photo {
+  position: absolute;
+  padding: 1cqw;
+  background: #fff;
+  border-radius: 0.8cqw;
+  display: flex;
+  flex-direction: column;
+  color: #34313b;
+}
+.canvas-photo.has-shadow {
+  box-shadow: 0.5cqw 1.4cqw 2.7cqw #201b4038;
+}
+.canvas-photo > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  flex: 1 1 0;
+  user-select: none;
+  pointer-events: none;
+  border-radius: 0.3cqw;
+}
+.canvas-caption {
+  flex: 0 0 auto;
+  max-height: 30%;
+  overflow: hidden;
+  font-size: 2cqw;
+  line-height: 1.7;
+  padding: 0.5cqw 0 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.is-editable .canvas-photo {
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+.is-editable .canvas-photo:active {
+  cursor: grabbing;
+}
+.canvas-photo.is-selected {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+.canvas-handle {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: #8b5cf6;
+  color: white;
+  display: grid;
+  place-items: center;
+  font: 18px sans-serif;
+  box-shadow: 0 1px 6px #30204033;
+  touch-action: none;
+  z-index: 1;
+}
+.rotate-handle {
+  left: 50%;
+  top: -34px;
+  transform: translateX(-50%);
+  cursor: crosshair;
+}
+.resize-handle {
+  right: -15px;
+  bottom: -15px;
+  cursor: nwse-resize;
+}
+.photo-layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.photo-layer-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px;
+  background: white;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  text-align: left;
+  font-size: 11px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.photo-layer-choice img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.photo-layer-choice[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: #faf7ff;
+}
+.photo-properties {
+  border: 1px solid var(--line);
+  padding: 16px;
+  border-radius: 12px;
+  min-width: 0;
+}
+.photo-properties legend {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 6px;
+}
+.photo-position-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.shadow-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.shadow-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+@media (max-width: 760px) {
+  .canvas-handle {
+    width: 36px;
+    height: 36px;
+  }
+  .resize-handle {
+    right: -18px;
+    bottom: -18px;
+  }
+  .rotate-handle {
+    top: -40px;
+  }
+  .wizard-grid .card-page-frame > .experience.scrapbook-page {
+    padding: 0;
+    min-height: 0;
+    border-radius: 4cqw;
+  }
+}
+.canvas-expand {
+  width: 100%;
+  margin-bottom: 12px;
+  font-size: 11px;
+  padding: 8px;
+}
+.canvas-workspace {
+  width: min(95vw, 860px);
+  max-height: 96svh;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--background);
+  color: var(--text);
+  margin: auto;
+}
+.canvas-workspace[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.canvas-workspace::backdrop {
+  background: #20152bc4;
+  backdrop-filter: blur(4px);
+}
+.canvas-workspace-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.canvas-workspace-bar h2 {
+  font-size: 14px;
+}
+.canvas-workspace-bar .button {
+  font-size: 11px;
+  padding: 8px 12px;
+}
+.canvas-workspace > p {
+  font-size: 10px;
+}
+.canvas-workspace-page {
+  width: min(100%, calc((100svh - 190px) * 0.75), 520px);
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  .wizard-grid .expandable-preview > .card-page-frame {
+    width: min(100%, calc((38svh - 100px) * 0.75));
+    margin-inline: auto;
+  }
+  .canvas-workspace {
+    width: calc(100% - 16px);
+    padding: 12px;
+  }
+  .canvas-workspace-bar h2 {
+    font-size: 12px;
+  }
+}

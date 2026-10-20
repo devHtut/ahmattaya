@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { defaultPhotoFrame } from '../src/shared/lib/photo-geometry.ts'
 import { cardSchema, MAX_PHOTO_BYTES } from '../src/shared/models/card.ts'
 import { createCard } from '../src/shared/templates/templates.ts'
 import {
@@ -14,6 +15,7 @@ const tinyPhoto = {
   pageId: 'cover',
   src: 'data:image/webp;base64,YWJj',
   caption: 'အမှတ်တရလေး',
+  frame: defaultPhotoFrame(0),
 }
 
 test('allows at most five photos across the whole card and eight additional pages', () => {

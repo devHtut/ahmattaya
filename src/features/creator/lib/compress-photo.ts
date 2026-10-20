@@ -30,7 +30,9 @@ function readDataUrl(blob: Blob): Promise<string> {
     reader.readAsDataURL(blob)
   })
 }
-export async function compressPhoto(file: File): Promise<string> {
+export async function compressPhoto(
+  file: File,
+): Promise<{ src: string; ratio: number }> {
   const invalid = validatePhotoFile(file)
   if (invalid) throw new Error(invalid)
   const url = URL.createObjectURL(file)
@@ -56,11 +58,25 @@ export async function compressPhoto(file: File): Promise<string> {
       for (const quality of [0.82, 0.68, 0.5]) {
         const blob = await toBlob(canvas, quality)
         if (!best || blob.size < best.size) best = blob
-        if (blob.size <= 150 * 1024) return readDataUrl(blob)
+        if (blob.size <= 150 * 1024)
+          return {
+            src: await readDataUrl(blob),
+            ratio: Math.min(
+              5,
+              Math.max(0.2, image.naturalWidth / image.naturalHeight),
+            ),
+          }
       }
       edge = Math.round(edge * 0.75)
     }
-    if (best && best.size <= MAX_PHOTO_BYTES) return readDataUrl(best)
+    if (best && best.size <= MAX_PHOTO_BYTES)
+      return {
+        src: await readDataUrl(best),
+        ratio: Math.min(
+          5,
+          Math.max(0.2, image.naturalWidth / image.naturalHeight),
+        ),
+      }
     throw new Error('200 KB အောက် ချုံ့မရပါ။ ပိုသေးတဲ့ ပုံကို ရွေးပေးပါ။')
   } catch (error) {
     if (error instanceof Error && error.message.includes('ပုံ')) throw error

@@ -3,22 +3,34 @@ import {
   cardSchema,
   legacyCardSchema,
   v2CardSchema,
+  v3CardSchema,
   type CardConfig,
 } from '../../../shared/models/card.ts'
 
+import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry.ts'
 import { createAppearance } from '../../../shared/templates/card-styles.ts'
 
 const storedCardSchema = z.union([
   cardSchema,
+  v3CardSchema
+    .transform((card) => ({
+      ...card,
+      schemaVersion: 4 as const,
+      photos: card.photos.map((photo, index) => ({
+        ...photo,
+        frame: defaultPhotoFrame(index),
+      })),
+    }))
+    .pipe(cardSchema),
   v2CardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 3 as const,
+    schemaVersion: 4 as const,
     pages: [],
     photos: [],
   })),
   legacyCardSchema.transform((card) => ({
     ...card,
-    schemaVersion: 3 as const,
+    schemaVersion: 4 as const,
     pages: [],
     photos: [],
     appearance: createAppearance(card.theme),

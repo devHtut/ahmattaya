@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { defaultPhotoFrame } from '../src/shared/lib/photo-geometry.ts'
 import {
   DRAFT_STORAGE_KEY,
   loadDraft,
@@ -51,7 +52,7 @@ test('rejects damaged data and future versions without modifying storage', () =>
     JSON.stringify({
       storageVersion: 1,
       savedAt: new Date().toISOString(),
-      card: { ...card, schemaVersion: 4 },
+      card: { ...card, schemaVersion: 5 },
     }),
     JSON.stringify({ storageVersion: 1, savedAt: 'invalid', card }),
   ]) {
@@ -125,7 +126,7 @@ test('legacy v1 drafts migrate without losing text or the chosen theme', () => {
   )
   const restored = loadDraft(storage)
   assert.equal(restored.status, 'restored')
-  assert.equal(restored.card.schemaVersion, 3)
+  assert.equal(restored.card.schemaVersion, 4)
   assert.equal(restored.card.message, card.message)
   assert.equal(restored.card.theme, 'rose')
   assert.equal(restored.card.appearance.colors.background, '#fce5ed')
@@ -153,7 +154,7 @@ test('custom appearance survives storage and occasion changes', () => {
   )
 })
 
-test('v2 drafts migrate to v3 while preserving custom appearance', () => {
+test('v2 drafts migrate to v4 while preserving custom appearance', () => {
   const { pages: _pages, photos: _photos, ...current } = createCard('birthday')
   const card = { ...current, schemaVersion: 2 }
   card.appearance.heading.font = 'Padauk'
@@ -187,9 +188,43 @@ test('multi-page drafts and compressed images round-trip through storage', () =>
       pageId: 'memory',
       src: 'data:image/webp;base64,YWJj',
       caption: 'အတူတူ',
+      frame: defaultPhotoFrame(0),
     },
   ]
   const storage = memoryStorage()
   assert.equal(saveDraft(storage, card), true)
   assert.deepEqual(loadDraft(storage).card, card)
+})
+
+test('v3 photos migrate into independent positioned frames without changing storage', () => {
+  const { photos: _photos, ...current } = createCard('birthday')
+  const photo = {
+    id: 'old',
+    pageId: 'cover',
+    src: 'data:image/webp;base64,YWJj',
+    caption: 'အမှတ်တရ',
+  }
+  const card = { ...current, schemaVersion: 3, photos: [photo] }
+  const raw = JSON.stringify({
+    storageVersion: 1,
+    savedAt: '2026-10-20T00:00:00.000Z',
+    card,
+  })
+  const storage = memoryStorage(raw)
+  const loaded = loadDraft(storage)
+  assert.equal(loaded.status, 'restored')
+  assert.equal(loaded.card.schemaVersion, 4)
+  assert.deepEqual(loaded.card.photos[0], {
+    ...photo,
+    frame: defaultPhotoFrame(0),
+  })
+  assert.equal(storage.getItem(DRAFT_STORAGE_KEY), raw)
+  loaded.card.photos[0].frame = {
+    ...loaded.card.photos[0].frame,
+    x: 60,
+    rotation: 20,
+    shadow: false,
+  }
+  assert.equal(saveDraft(storage, loaded.card), true)
+  assert.deepEqual(loadDraft(storage).card, loaded.card)
 })

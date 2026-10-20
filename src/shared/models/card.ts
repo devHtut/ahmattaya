@@ -83,16 +83,32 @@ export const pageSchema = z.object({
   paper: z.enum(['blank', 'lined']),
 })
 export type CardPage = z.infer<typeof pageSchema>
-export const photoSchema = z.object({
+export const v3PhotoSchema = z.object({
   id: z.string().min(1).max(80),
   pageId: z.string().min(1).max(80),
   src: imageDataSchema,
   caption: z.string().max(120),
 })
+export const photoFrameSchema = z.object({
+  x: z.number().finite().min(0).max(100),
+  y: z.number().finite().min(0).max(100),
+  width: z.number().finite().min(10).max(85),
+  ratio: z.number().finite().min(0.2).max(5),
+  rotation: z.number().finite().min(-180).max(180),
+  shadow: z.boolean(),
+})
+export type PhotoFrame = z.infer<typeof photoFrameSchema>
+export const photoSchema = v3PhotoSchema.extend({ frame: photoFrameSchema })
 export type CardPhoto = z.infer<typeof photoSchema>
+const v3CardFields = v2CardSchema.extend({
+  schemaVersion: z.literal(3),
+  pages: z.array(pageSchema).max(MAX_PAGES),
+  photos: z.array(v3PhotoSchema).max(MAX_PHOTOS),
+})
+export const v3CardSchema = v3CardFields
 export const cardSchema = v2CardSchema
   .extend({
-    schemaVersion: z.literal(3),
+    schemaVersion: z.literal(4),
     pages: z.array(pageSchema).max(MAX_PAGES),
     photos: z.array(photoSchema).max(MAX_PHOTOS),
   })

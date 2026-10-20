@@ -8,6 +8,7 @@ import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
+import { CanvasWorkspace } from './components/CanvasWorkspace'
 import { PagesFields } from './components/PagesFields'
 
 const steps = [
@@ -32,6 +33,7 @@ export function CreatorPage({
   onRetrySave: () => void
 }) {
   const [step, setStep] = useState(0)
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
   const previewPageId =
     step === 3 && card.pages.some((page) => page.id === selectedPageId)
@@ -78,7 +80,40 @@ export function CreatorPage({
           <summary>
             LIVE PREVIEW <span>ဖွင့် / ပိတ် ကြည့်နိုင်ပါတယ်</span>
           </summary>
-          <CardPreview card={card} pageId={previewPageId} />
+          {step === 3 && (
+            <CanvasWorkspace
+              card={card}
+              pageId={previewPageId}
+              selectedId={selectedPhotoId}
+              onSelect={setSelectedPhotoId}
+              onCommit={(id, frame) =>
+                onChange({
+                  ...card,
+                  photos: card.photos.map((photo) =>
+                    photo.id === id ? { ...photo, frame } : photo,
+                  ),
+                })
+              }
+            />
+          )}
+          <CardPreview
+            key={previewPageId}
+            card={card}
+            pageId={previewPageId}
+            selectedPhotoId={step === 3 ? selectedPhotoId : null}
+            onSelectPhoto={step === 3 ? setSelectedPhotoId : undefined}
+            onCommitPhoto={
+              step === 3
+                ? (id, frame) =>
+                    onChange({
+                      ...card,
+                      photos: card.photos.map((photo) =>
+                        photo.id === id ? { ...photo, frame } : photo,
+                      ),
+                    })
+                : undefined
+            }
+          />
         </details>
         <section
           className="properties wizard-properties"
@@ -126,7 +161,12 @@ export function CreatorPage({
               card={card}
               onChange={onChange}
               pageId={previewPageId}
-              onSelectPage={setSelectedPageId}
+              onSelectPage={(id) => {
+                setSelectedPageId(id)
+                setSelectedPhotoId(null)
+              }}
+              selectedPhotoId={selectedPhotoId}
+              onSelectPhoto={setSelectedPhotoId}
             />
           )}
           {step === 4 && (
