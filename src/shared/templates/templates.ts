@@ -1,4 +1,5 @@
 import type { CardConfig, Occasion } from '../models/card'
+import { createAppearance } from './card-styles.ts'
 
 export const occasions: {
   id: Occasion
@@ -39,13 +40,14 @@ const titles: Record<Occasion, string> = {
 }
 export function createCard(occasion: Occasion): CardConfig {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     occasion,
     senderName: '',
     receiverName: '',
     title: titles[occasion],
     message: '',
     theme: 'lavender',
+    appearance: createAppearance('lavender'),
   }
 }
 

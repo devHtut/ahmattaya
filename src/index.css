@@ -607,3 +607,221 @@ textarea {
 .draft-status .button {
   font-size: 11px;
 }
+
+/* Guided editor: content, colors and typography share the same live preview. */
+.wizard-grid {
+  grid-template-columns: 140px minmax(260px, 1fr) 340px;
+}
+.wizard-steps button {
+  text-align: center;
+  line-height: 1.9;
+}
+.wizard-steps button[aria-current='step'] {
+  color: var(--primary);
+  background: #f0eafd;
+  border-color: #d6c3f8;
+}
+.step-number {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.step-counter {
+  color: var(--primary);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.properties h2 {
+  margin-bottom: 8px;
+}
+.step-description {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.wizard-actions .button {
+  padding: 10px 12px;
+  font-size: 11px;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+.style-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.style-fields fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.style-fields legend {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+.palette-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: white;
+  text-align: left;
+  font-size: 10px;
+  line-height: 1.9;
+}
+.palette-choice[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: #faf7ff;
+}
+.palette-swatches {
+  display: flex;
+  width: 100%;
+  height: 23px;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+.palette-swatches span {
+  flex: 1;
+}
+.color-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.color-control {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 4px 8px;
+  align-items: center;
+}
+.color-control > span:first-child {
+  grid-column: 1 / -1;
+}
+.color-control input {
+  padding: 2px;
+  height: 34px;
+  width: 36px;
+  cursor: pointer;
+}
+.hex-value {
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+.field-hint {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.text-target,
+.text-toggles {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.text-target button,
+.text-toggles button {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 9px;
+  padding: 9px;
+  font-size: 11px;
+}
+.text-target button[aria-pressed='true'],
+.text-toggles button[aria-pressed='true'] {
+  background: #f0eafd;
+  color: #654398;
+  border-color: #bda4eb;
+}
+.text-toggles {
+  margin-bottom: 0;
+}
+input[type='range'] {
+  padding: 8px 0;
+  accent-color: var(--primary);
+}
+.review-panel > p {
+  font-size: 12px;
+}
+.review-panel > .button {
+  margin-top: 20px;
+}
+.expandable-preview > summary {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+.expandable-preview > summary span {
+  float: right;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+.experience h2,
+.experience .card-message {
+  width: 100%;
+  white-space: pre-wrap;
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .wizard-grid {
+    grid-template-columns: 100px minmax(230px, 1fr) 300px;
+    gap: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .wizard-steps {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wizard-steps button {
+    justify-content: flex-start;
+    text-align: left;
+    padding: 12px;
+  }
+  .step-number {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+  }
+  .wizard-grid .preview-panel {
+    order: 3;
+  }
+  .wizard-grid .properties {
+    order: 2;
+  }
+  .palette-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 390px) {
+  .palette-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

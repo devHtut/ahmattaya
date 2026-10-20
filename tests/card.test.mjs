@@ -14,7 +14,7 @@ test('every occasion starts with a valid independent draft', () => {
 test('rejects unsupported schema versions, occasions and oversized content', () => {
   const draft = createCard('birthday')
   for (const change of [
-    { schemaVersion: 2 },
+    { schemaVersion: 3 },
     { occasion: 'unknown' },
     { message: 'a'.repeat(2001) },
     { receiverName: 'a'.repeat(81) },
@@ -28,4 +28,60 @@ test('Burmese multiline content survives validation', () => {
     cardSchema.parse({ ...createCard('anniversary'), message }).message,
     message,
   )
+})
+
+test('custom colors and typography validate with bounded sizes', () => {
+  const card = createCard('birthday')
+  card.appearance.colors.background = '#123aBc'
+  card.appearance.heading = {
+    font: 'Padauk',
+    size: 48,
+    bold: false,
+    italic: true,
+    align: 'left',
+  }
+  assert.equal(cardSchema.safeParse(card).success, true)
+  for (const bad of ['red', '#fff', '#123456; background:url(x)']) {
+    assert.equal(
+      cardSchema.safeParse({
+        ...card,
+        appearance: {
+          ...card.appearance,
+          colors: { ...card.appearance.colors, text: bad },
+        },
+      }).success,
+      false,
+    )
+  }
+  for (const size of [17, 49, 24.5]) {
+    assert.equal(
+      cardSchema.safeParse({
+        ...card,
+        appearance: {
+          ...card.appearance,
+          heading: { ...card.appearance.heading, size },
+        },
+      }).success,
+      false,
+    )
+  }
+  assert.equal(
+    cardSchema.safeParse({
+      ...card,
+      appearance: {
+        ...card.appearance,
+        body: { ...card.appearance.body, font: 'unknown' },
+      },
+    }).success,
+    false,
+  )
+})
+
+test('drafts do not share nested style objects', () => {
+  const first = createCard('birthday')
+  first.appearance.heading.size = 48
+  first.appearance.colors.background = '#000000'
+  const second = createCard('birthday')
+  assert.equal(second.appearance.heading.size, 24)
+  assert.notEqual(second.appearance.colors.background, '#000000')
 })

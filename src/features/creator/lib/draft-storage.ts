@@ -1,11 +1,26 @@
 import { z } from 'zod'
-import { cardSchema, type CardConfig } from '../../../shared/models/card.ts'
+import {
+  cardSchema,
+  legacyCardSchema,
+  type CardConfig,
+} from '../../../shared/models/card.ts'
+
+import { createAppearance } from '../../../shared/templates/card-styles.ts'
+
+const storedCardSchema = z.union([
+  cardSchema,
+  legacyCardSchema.transform((card) => ({
+    ...card,
+    schemaVersion: 2 as const,
+    appearance: createAppearance(card.theme),
+  })),
+])
 
 export const DRAFT_STORAGE_KEY = 'ahmattaya.creator-draft'
 const draftEnvelopeSchema = z.object({
   storageVersion: z.literal(1),
   savedAt: z.iso.datetime(),
-  card: cardSchema,
+  card: storedCardSchema,
 })
 export interface DraftStorage {
   getItem(key: string): string | null

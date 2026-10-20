@@ -51,7 +51,7 @@ test('rejects damaged data and future versions without modifying storage', () =>
     JSON.stringify({
       storageVersion: 1,
       savedAt: new Date().toISOString(),
-      card: { ...card, schemaVersion: 2 },
+      card: { ...card, schemaVersion: 3 },
     }),
     JSON.stringify({ storageVersion: 1, savedAt: 'invalid', card }),
   ]) {
@@ -104,4 +104,51 @@ test('occasion switches preserve personal content and custom titles', () => {
   assert.equal(changeOccasion(custom, 'anniversary').title, custom.title)
   assert.deepEqual(changeOccasion(custom, 'birthday'), custom)
   assert.equal(birthday.occasion, 'birthday')
+})
+
+test('legacy v1 drafts migrate without losing text or the chosen theme', () => {
+  const card = {
+    schemaVersion: 1,
+    occasion: 'birthday',
+    senderName: 'မောင်မောင်',
+    receiverName: 'သီရိ',
+    title: 'Happy Birthday',
+    message: 'ကျန်းမာပျော်ရွှင်ပါစေ။',
+    theme: 'rose',
+  }
+  const storage = memoryStorage(
+    JSON.stringify({
+      storageVersion: 1,
+      savedAt: '2026-10-20T00:00:00.000Z',
+      card,
+    }),
+  )
+  const restored = loadDraft(storage)
+  assert.equal(restored.status, 'restored')
+  assert.equal(restored.card.schemaVersion, 2)
+  assert.equal(restored.card.message, card.message)
+  assert.equal(restored.card.theme, 'rose')
+  assert.equal(restored.card.appearance.colors.background, '#fce5ed')
+  assert.equal(
+    JSON.parse(storage.getItem(DRAFT_STORAGE_KEY)).card.schemaVersion,
+    1,
+  )
+  assert.equal(saveDraft(storage, restored.card), true)
+  assert.deepEqual(loadDraft(storage).card, restored.card)
+})
+
+test('custom appearance survives storage and occasion changes', () => {
+  const storage = memoryStorage()
+  const card = createCard('birthday')
+  card.appearance.colors.text = '#123456'
+  card.appearance.heading.font = 'Padauk'
+  card.appearance.heading.size = 40
+  card.appearance.body.italic = true
+  assert.equal(saveDraft(storage, card), true)
+  const recovered = loadDraft(storage)
+  assert.deepEqual(recovered.card.appearance, card.appearance)
+  assert.deepEqual(
+    changeOccasion(recovered.card, 'anniversary').appearance,
+    card.appearance,
+  )
 })
