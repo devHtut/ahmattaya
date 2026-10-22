@@ -56,6 +56,7 @@ export async function cacheImageAsset(id: string, blob: Blob): Promise<void> {
   }
 }
 export async function loadImageAsset(id: string): Promise<Blob | null> {
+  if (typeof indexedDB === 'undefined') return null
   const db = await openDatabase()
   try {
     return await new Promise<Blob | null>((resolve, reject) => {
@@ -67,6 +68,54 @@ export async function loadImageAsset(id: string): Promise<Blob | null> {
       }
       tx.oncomplete = () => resolve(result)
       tx.onabort = () => reject(tx.error ?? new Error('Media read aborted'))
+      tx.onerror = () => reject(tx.error)
+    })
+  } finally {
+    db.close()
+  }
+}
+
+export async function listAllImageAssets(): Promise<
+  { id: string; size: number }[]
+> {
+  if (typeof indexedDB === 'undefined') return []
+  const db = await openDatabase()
+  try {
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly')
+      const store = tx.objectStore(STORE)
+      const results: { id: string; size: number }[] = []
+      const request = store.openCursor()
+      request.onsuccess = () => {
+        const cursor = request.result
+        if (cursor) {
+          const blob = cursor.value instanceof Blob ? cursor.value : null
+          results.push({
+            id: String(cursor.key),
+            size: blob ? blob.size : 0,
+          })
+          cursor.continue()
+        } else {
+          resolve(results)
+        }
+      }
+      request.onerror = () => reject(request.error)
+      tx.onabort = () => reject(tx.error ?? new Error('Cursor aborted'))
+    })
+  } finally {
+    db.close()
+  }
+}
+
+export async function deleteImageAsset(id: string): Promise<void> {
+  if (typeof indexedDB === 'undefined') return
+  const db = await openDatabase()
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite')
+      tx.objectStore(STORE).delete(id)
+      tx.oncomplete = () => resolve()
+      tx.onabort = () => reject(tx.error ?? new Error('Delete aborted'))
       tx.onerror = () => reject(tx.error)
     })
   } finally {

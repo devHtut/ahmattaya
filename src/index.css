@@ -4259,3 +4259,258 @@ footer {
   font-size: 12px;
   color: var(--muted, #718096);
 }
+
+/* --------------------------------------------------------------------------
+   Storage Management: Quota, Breakdown & Safe Retention Cleanup
+   -------------------------------------------------------------------------- */
+
+.storage-manager-card {
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-l, 18px);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  margin: 20px 0 32px;
+}
+
+.storage-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-light, #edf2f7);
+}
+
+.storage-title {
+  margin: 10px 0 6px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text, #1a202c);
+}
+
+.storage-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted, #718096);
+  line-height: 1.5;
+}
+
+.storage-loading-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted, #718096);
+  font-size: 14px;
+}
+
+.storage-gauge-wrap {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--paper-soft, #f7fafc);
+  border-radius: var(--radius-m, 12px);
+  border: 1px solid var(--line, #e2e8f0);
+}
+
+.storage-gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.storage-gauge-text {
+  color: var(--text, #2d3748);
+}
+
+.storage-gauge-quota {
+  color: var(--muted, #718096);
+  font-weight: 600;
+}
+
+.storage-gauge-track {
+  height: 10px;
+  background: #edf2f7;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.storage-gauge-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition:
+    width 0.4s ease,
+    background 0.4s ease;
+}
+
+.storage-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.storage-stat-tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--paper-soft, #f7fafc);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-m, 12px);
+}
+
+.storage-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.storage-icon-circle.image-icon {
+  background: #ebf8ff;
+  color: #3182ce;
+}
+
+.storage-icon-circle.audio-icon {
+  background: #faf5ff;
+  color: #805ad5;
+}
+
+.storage-icon-circle.project-icon {
+  background: #feebc8;
+  color: #dd6b20;
+}
+
+.storage-stat-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--muted, #718096);
+  margin-bottom: 2px;
+}
+
+.storage-stat-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #2d3748);
+}
+
+.storage-alert-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-m, 10px);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.storage-alert-box.success {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  color: #22543d;
+}
+
+.storage-cleanup-section {
+  margin-top: 10px;
+}
+
+.storage-cleanup-alert {
+  padding: 18px 20px;
+  background: #fffaf0;
+  border: 1.5px solid #fbd38d;
+  border-radius: var(--radius-m, 14px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cleanup-alert-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.alert-warn-icon {
+  color: #dd6b20;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cleanup-alert-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #9c4221;
+}
+
+.cleanup-alert-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #7b341e;
+}
+
+.cleanup-action-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cleanup-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.storage-optimal-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #f0fff4;
+  border: 1px solid #c6f6d5;
+  border-radius: var(--radius-m, 14px);
+}
+
+.optimal-check-icon {
+  color: #38a169;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.optimal-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #22543d;
+}
+
+.optimal-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #276749;
+  line-height: 1.5;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

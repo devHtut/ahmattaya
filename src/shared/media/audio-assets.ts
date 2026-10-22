@@ -128,6 +128,7 @@ export async function cacheAudioAsset(
   }
 }
 export async function loadAudioAsset(id: string): Promise<Blob | null> {
+  if (typeof indexedDB === 'undefined') return null
   const db = await openDatabase()
   try {
     return await new Promise<Blob | null>((resolve, reject) => {
@@ -139,6 +140,54 @@ export async function loadAudioAsset(id: string): Promise<Blob | null> {
       }
       tx.oncomplete = () => resolve(result)
       tx.onabort = () => reject(tx.error ?? new Error('Audio read aborted'))
+      tx.onerror = () => reject(tx.error)
+    })
+  } finally {
+    db.close()
+  }
+}
+
+export async function listAllAudioAssets(): Promise<
+  { id: string; size: number }[]
+> {
+  if (typeof indexedDB === 'undefined') return []
+  const db = await openDatabase()
+  try {
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction('tracks', 'readonly')
+      const store = tx.objectStore('tracks')
+      const results: { id: string; size: number }[] = []
+      const request = store.openCursor()
+      request.onsuccess = () => {
+        const cursor = request.result
+        if (cursor) {
+          const blob = cursor.value instanceof Blob ? cursor.value : null
+          results.push({
+            id: String(cursor.key),
+            size: blob ? blob.size : 0,
+          })
+          cursor.continue()
+        } else {
+          resolve(results)
+        }
+      }
+      request.onerror = () => reject(request.error)
+      tx.onabort = () => reject(tx.error ?? new Error('Audio cursor aborted'))
+    })
+  } finally {
+    db.close()
+  }
+}
+
+export async function deleteAudioAsset(id: string): Promise<void> {
+  if (typeof indexedDB === 'undefined') return
+  const db = await openDatabase()
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('tracks', 'readwrite')
+      tx.objectStore('tracks').delete(id)
+      tx.oncomplete = () => resolve()
+      tx.onabort = () => reject(tx.error ?? new Error('Audio delete aborted'))
       tx.onerror = () => reject(tx.error)
     })
   } finally {

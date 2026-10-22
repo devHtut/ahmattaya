@@ -18,8 +18,10 @@ Real-time collaborative editing and WebAR are deliberately deferred.
 6. **Mobile and accessibility QA** — real phone/tablet keyboard behavior, photo
    gestures, cream/candle placement, audio/3D performance and keyboard navigation.
    Replace position-based completion checks with genuine per-step completion.
-7. **Storage management** — usage/quota visibility, retention and safe cleanup of
-   unreferenced media without deleting files used by other drafts/publications.
+7. **Storage management — implemented** — browser storage estimate & quota usage gauge,
+   asset breakdown (photos, audio tracks, projects), and safe retention garbage
+   collection that removes unreferenced media without deleting files used by active
+   or trashed projects.
 
 Use focused `codex/` branches at sensible feature boundaries, preserve existing
 UI work, verify changes, and commit/push each completed stage. Do not conflate
