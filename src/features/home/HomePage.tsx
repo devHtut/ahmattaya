@@ -6,7 +6,7 @@ import { CardPreview } from '../../shared/ui/CardPreview'
 export function HomePage() {
   const demoCard = {
     ...createCard('birthday'),
-    receiverName: 'ချစ်ရတဲ့ သီရိရေ',
+    receiverName: 'ချစ်ရသူ',
     message:
       'ပျော်ရွှင်မှုတွေနဲ့ ပြည့်နေတဲ့ မွေးနေ့လေး ဖြစ်ပါစေ။ လိုရာဆန္ဒတွေလည်း ပြည့်ဝပါစေနော်။',
     senderName: 'မောင်မောင်',

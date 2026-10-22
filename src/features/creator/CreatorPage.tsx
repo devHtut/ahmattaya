@@ -6,23 +6,28 @@ import {
   Cake,
   Calendar,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Eye,
-  Images,
   Mail,
   Music,
   Palette,
+  Plus,
   Send,
   Share2,
   Sparkles,
   Type,
 } from 'lucide-react'
-import type { CardConfig, Occasion } from '../../shared/models/card'
+import {
+  MAX_PAGES,
+  type CardConfig,
+  type Occasion,
+} from '../../shared/models/card'
 import { occasionSchema } from '../../shared/models/card'
 import { changeOccasion, occasions } from '../../shared/templates/templates'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
-import { StyleFields } from './components/StyleFields'
 import { EventFields } from './components/EventFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
 import { useCakeEditor } from '../cake/lib/useCakeEditor'
@@ -35,19 +40,13 @@ import { OpeningFields } from './components/OpeningFields'
 import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
 import { CloudConnection } from '../publishing/CloudConnection'
+import { createPage } from './lib/pages'
 import type { ProjectWorkspace } from './hooks/useCreatorDraft'
 
 export type MakerStep =
-  | 'opening'
-  | 'card'
-  | 'style'
-  | 'event'
-  | 'pages'
-  | 'cake'
-  | 'music'
-  | 'publish'
+  'opening' | 'card' | 'pages' | 'event' | 'cake' | 'music' | 'publish'
 
-type CanvasView = 'opening' | 'cover' | 'pages' | 'cake' | 'event'
+type CanvasView = 'opening' | 'pages' | 'cake' | 'event'
 
 const steps: {
   id: MakerStep
@@ -71,15 +70,15 @@ const steps: {
     title: 'ကတ်ထဲက စာသား',
     hint: 'လက်ခံသူအမည်၊ ခေါင်းစဉ်နဲ့ ရင်ထဲက စကားလေးတွေ ရေးပါ။',
     icon: Type,
-    view: 'cover',
+    view: 'pages',
   },
   {
-    id: 'style',
-    label: 'အလှဆင်',
-    title: 'အရောင်နဲ့ ဖောင့်',
-    hint: 'ကတ်တစ်ခုလုံးရဲ့ အရောင်တွဲနဲ့ စာလုံးပုံစံကို လိုက်အောင် ဆင်ပါ။',
+    id: 'pages',
+    label: 'စာမျက်နှာ / အလှဆင်',
+    title: 'စာမျက်နှာနဲ့ အလှဆင်',
+    hint: 'ကတ်အဖုံးနဲ့ စာမျက်နှာများကို နောက်ခံ၊ အရောင်၊ စာလုံးပုံစံနဲ့ ဓာတ်ပုံများ ဖြည့်စွက်ပါ။',
     icon: Palette,
-    view: 'cover',
+    view: 'pages',
   },
   {
     id: 'event',
@@ -88,14 +87,6 @@ const steps: {
     hint: 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ် နှစ်ပတ်လည် မှတ်တမ်း။',
     icon: Calendar,
     view: 'event',
-  },
-  {
-    id: 'pages',
-    label: 'စာမျက်နှာ',
-    title: 'စာမျက်နှာနဲ့ ဓာတ်ပုံ',
-    hint: 'မှတ်တမ်းပုံလေးတွေ ကပ်ပါ၊ စာမျက်နှာ ထပ်ပေါင်းပါ။',
-    icon: Images,
-    view: 'pages',
   },
   {
     id: 'cake',
@@ -111,7 +102,7 @@ const steps: {
     title: 'နောက်ခံ သံစဉ်',
     hint: 'ကတ်ဖွင့်ချိန် တေးလေးတစ်ပုဒ် သီဆိုစေချင်လား။',
     icon: Music,
-    view: 'cover',
+    view: 'pages',
   },
   {
     id: 'publish',
@@ -119,7 +110,7 @@ const steps: {
     title: 'စစ်ဆေး & မျှဝေမယ်',
     hint: 'ကတ်လေးကို အစအဆုံး စစ်ဆေးပြီး Reviewer သို့မဟုတ် လက်ခံသူထံ မျှဝေလိုက်ပါ။',
     icon: Send,
-    view: 'cover',
+    view: 'pages',
   },
 ]
 
@@ -137,9 +128,10 @@ export function CreatorPage({
   workspace?: ProjectWorkspace
 }) {
   const [step, setStep] = useState<MakerStep>('card')
-  const [view, setView] = useState<CanvasView>('cover')
+  const [view, setView] = useState<CanvasView>('pages')
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
+  const [touchStartX, setTouchStartX] = useState<number | null>(null)
 
   const cakeEditor = useCakeEditor(card.cake, (cake) =>
     onChange({ ...card, cake }),
@@ -149,6 +141,49 @@ export function CreatorPage({
     ? selectedPageId
     : 'cover'
 
+  const allPageIds = ['cover', ...card.pages.map((p) => p.id)]
+  const currentPageIndex = Math.max(0, allPageIds.indexOf(previewPageId))
+  const totalPagesCount = allPageIds.length
+
+  function handlePrevPage() {
+    if (currentPageIndex > 0) {
+      setSelectedPageId(allPageIds[currentPageIndex - 1])
+      setSelectedPhotoId(null)
+    }
+  }
+
+  function handleNextPage() {
+    if (currentPageIndex < totalPagesCount - 1) {
+      setSelectedPageId(allPageIds[currentPageIndex + 1])
+      setSelectedPhotoId(null)
+    }
+  }
+
+  function handleAddNewPage() {
+    if (card.pages.length < MAX_PAGES) {
+      const next = createPage(crypto.randomUUID())
+      onChange({ ...card, pages: [...card.pages, next] })
+      setSelectedPageId(next.id)
+      setSelectedPhotoId(null)
+      setView('pages')
+    }
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    setTouchStartX(e.touches[0].clientX)
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX === null) return
+    const diffX = e.changedTouches[0].clientX - touchStartX
+    if (diffX > 45) {
+      handlePrevPage()
+    } else if (diffX < -45) {
+      handleNextPage()
+    }
+    setTouchStartX(null)
+  }
+
   const stepIndex = steps.findIndex((s) => s.id === step)
   const stepDef = steps[stepIndex]
   const isFirst = stepIndex <= 0
@@ -157,13 +192,7 @@ export function CreatorPage({
   function goTo(target: MakerStep) {
     const def = steps.find((s) => s.id === target)
     setStep(target)
-    if (def) {
-      if (target === 'style' && view === 'pages') {
-        // Keep view on 'pages' so user can preview theme/font on the active page
-      } else {
-        setView(def.view)
-      }
-    }
+    if (def) setView(def.view)
     if (target !== 'pages') setSelectedPhotoId(null)
   }
   function go(delta: -1 | 1) {
@@ -208,10 +237,9 @@ export function CreatorPage({
             {(
               [
                 { id: 'opening', label: 'ဖိတ်စာ' },
-                { id: 'cover', label: 'အဖုံး' },
                 {
                   id: 'pages',
-                  label: `စာမျက်နှာ${card.pages.length ? ` (${card.pages.length})` : ''}`,
+                  label: `ကတ်ပြား${card.pages.length ? ` (${card.pages.length + 1} မျက်နှာ)` : ''}`,
                 },
                 ...(card.occasion === 'wedding-invitation'
                   ? [{ id: 'event' as CanvasView, label: 'မင်္ဂလာပွဲ' }]
@@ -231,7 +259,49 @@ export function CreatorPage({
             ))}
           </div>
 
-          <div className="bench">
+          <div
+            className="bench"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {view === 'pages' && (
+              <>
+                <button
+                  type="button"
+                  className="canvas-flip-arrow prev"
+                  disabled={currentPageIndex <= 0}
+                  onClick={handlePrevPage}
+                  title="ရှေ့စာမျက်နှာသို့ လှန်မယ်"
+                  aria-label="ရှေ့စာမျက်နှာ"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+
+                <button
+                  type="button"
+                  className="canvas-flip-arrow next"
+                  disabled={currentPageIndex >= totalPagesCount - 1}
+                  onClick={handleNextPage}
+                  title="နောက်စာမျက်နှာသို့ လှန်မယ်"
+                  aria-label="နောက်စာမျက်နှာ"
+                >
+                  <ChevronRight size={24} />
+                </button>
+
+                {card.pages.length < MAX_PAGES && (
+                  <button
+                    type="button"
+                    className="canvas-add-page-floating"
+                    onClick={handleAddNewPage}
+                    title="စာမျက်နှာသစ် ထည့်မယ် (+)"
+                  >
+                    <Plus size={16} />
+                    <span className="floating-text">စာမျက်နှာသစ်</span>
+                  </button>
+                )}
+              </>
+            )}
+
             <div className="artboard">
               {view === 'opening' ? (
                 <OpeningInvitation
@@ -305,12 +375,57 @@ export function CreatorPage({
               )}
             </div>
           </div>
+
+          {view === 'pages' && (
+            <div
+              className="card-stage-pagination"
+              role="tablist"
+              aria-label="စာမျက်နှာ ရွေးချယ်ရန်"
+            >
+              <button
+                type="button"
+                className={`stage-page-dot ${selectedPageId === 'cover' ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedPageId('cover')
+                  setSelectedPhotoId(null)
+                }}
+                title="ကတ်အဖုံး"
+              >
+                📇 အဖုံး
+              </button>
+              {card.pages.map((p, idx) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`stage-page-dot ${selectedPageId === p.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedPageId(p.id)
+                    setSelectedPhotoId(null)
+                  }}
+                  title={p.title || `စာမျက်နှာ ${idx + 1}`}
+                >
+                  📄 {idx + 1}
+                </button>
+              ))}
+              {card.pages.length < MAX_PAGES && (
+                <button
+                  type="button"
+                  className="stage-page-add"
+                  onClick={handleAddNewPage}
+                  title="စာမျက်နှာအသစ် ထည့်မယ်"
+                >
+                  <Plus size={13} />
+                </button>
+              )}
+            </div>
+          )}
+
           <p className="stage-caption">
             {view === 'opening'
               ? 'လက်ခံသူ ပထမဆုံး ဖွင့်တွေ့ရမယ့် အထုပ်'
               : view === 'cake'
                 ? 'ကိတ်မုန့် ပုံစံ'
-                : 'ကတ်ရဲ့ လက်ရှိပုံစံ'}
+                : 'ကတ်ရဲ့ လက်ရှိပုံစံ (ဘယ်/ညာ လှန်ကြည့်နိုင်ပါသည်)'}
           </p>
         </section>
 
@@ -353,10 +468,6 @@ export function CreatorPage({
                 </label>
                 <WordsFields card={card} onChange={onChange} />
               </div>
-            )}
-
-            {step === 'style' && (
-              <StyleFields card={card} onChange={onChange} />
             )}
 
             {step === 'event' && (

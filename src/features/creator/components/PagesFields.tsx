@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { BackgroundFields } from './BackgroundFields'
-import { ImagePlus, Plus, Trash2 } from 'lucide-react'
+import { StyleFields } from './StyleFields'
+import { ImagePlus, Trash2 } from 'lucide-react'
 import {
-  MAX_PAGES,
   MAX_PHOTOS,
   type CardConfig,
   type CardPhoto,
@@ -10,7 +10,7 @@ import {
 import { compressPhoto } from '../lib/compress-photo'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry'
 import { PhotoProperties } from './PhotoProperties'
-import { createPage, moveItem, removePage } from '../lib/pages'
+import { moveItem, removePage } from '../lib/pages'
 
 export function PagesFields({
   card,
@@ -45,6 +45,7 @@ export function PagesFields({
   const page = card.pages.find((item) => item.id === pageId)
   const photos = card.photos.filter((photo) => photo.pageId === pageId)
   const pageIndex = card.pages.findIndex((item) => item.id === pageId)
+  const isCover = pageId === 'cover'
 
   async function addPhotos(files: File[]) {
     if (uploading.current || files.length === 0) return
@@ -116,145 +117,107 @@ export function PagesFields({
     })
   return (
     <div className="pages-editor">
-      <div className="page-nav-section">
-        <div className="page-nav-header">
-          <label className="page-nav-label">ပြင်မယ့် စာမျက်နှာ ရွေးပါ</label>
-          <span className="page-count-badge">
-            {card.pages.length} / {MAX_PAGES} မျက်နှာ
+      <div className="active-page-banner">
+        <span className="active-page-icon">{isCover ? '📇' : '📄'}</span>
+        <div className="active-page-info">
+          <strong>
+            {isCover
+              ? 'ကတ်အဖုံး (Cover)'
+              : page?.title || `စာမျက်နှာ (${pageIndex + 1})`}
+          </strong>
+          <span className="active-page-sub">
+            {isCover
+              ? ' — အရောင်၊ ဖောင့်နှင့် အဖုံးအလှဆင်ခြင်း'
+              : ' — စာမျက်နှာ စာသား၊ စာရွက်ပုံစံနှင့် ဓာတ်ပုံများ'}
           </span>
         </div>
-        <div
-          className="page-pills-scroll"
-          role="tablist"
-          aria-label="စာမျက်နှာများ"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={pageId === 'cover'}
-            className={`page-pill ${pageId === 'cover' ? 'is-active' : ''}`}
-            onClick={() => onSelectPage('cover')}
-          >
-            <span className="page-pill-icon">📇</span>
-            <span>အဖုံး</span>
-          </button>
-          {card.pages.map((item, index) => {
-            const isActive = pageId === item.id
-            const title = item.title.trim()
-              ? item.title
-              : `စာမျက်နှာ ${index + 1}`
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={`page-pill ${isActive ? 'is-active' : ''}`}
-                onClick={() => onSelectPage(item.id)}
-                title={title}
-              >
-                <span className="page-pill-icon">📄</span>
-                <span className="page-pill-title">{title}</span>
-              </button>
-            )
-          })}
-          {card.pages.length < MAX_PAGES && (
-            <button
-              type="button"
-              className="page-pill-add"
-              disabled={busy}
-              onClick={() => {
-                const next = createPage(crypto.randomUUID())
-                onChange({ ...card, pages: [...card.pages, next] })
-                onSelectPage(next.id)
-              }}
-              title="စာမျက်နှာအသစ် ထပ်ပေါင်းမယ်"
-            >
-              <Plus size={14} /> <span>စာမျက်နှာသစ်</span>
-            </button>
-          )}
-        </div>
       </div>
-      {page && (
-        <div className="fields page-fields">
-          <label>
-            စာရွက်ပုံစံ
-            <select
-              value={page.paper}
-              onChange={(e) =>
-                updatePage({ paper: e.target.value as typeof page.paper })
-              }
-            >
-              <option value="blank">Blank — စာရွက်အလွတ်</option>
-              <option value="lined">မျဉ်းကြောင်းပါ စာရွက်</option>
-            </select>
-          </label>
-          <label>
-            စာမျက်နှာ ခေါင်းစဉ်
-            <input
-              maxLength={160}
-              value={page.title}
-              onChange={(e) => updatePage({ title: e.target.value })}
-            />
-          </label>
-          <label>
-            စာမျက်နှာ စာသား
-            <textarea
-              rows={5}
-              maxLength={2000}
-              value={page.message}
-              onChange={(e) => updatePage({ message: e.target.value })}
-            />
-          </label>
-          <div className="item-actions">
-            <button
-              disabled={busy || pageIndex === 0}
-              onClick={() =>
-                onChange({
-                  ...card,
-                  pages: moveItem(card.pages, pageIndex, pageIndex - 1),
-                })
-              }
-            >
-              စာမျက်နှာ ↑
-            </button>
-            <button
-              disabled={busy || pageIndex === card.pages.length - 1}
-              onClick={() =>
-                onChange({
-                  ...card,
-                  pages: moveItem(card.pages, pageIndex, pageIndex + 1),
-                })
-              }
-            >
-              စာမျက်နှာ ↓
-            </button>
-            <button
-              disabled={busy}
-              className="danger"
-              onClick={() => {
-                if (window.confirm('ဒီစာမျက်နှာနဲ့ သူ့ပုံတွေကို ဖျက်မလား?')) {
-                  onChange(removePage(card, pageId))
-                  onSelectPage('cover')
-                }
-              }}
-            >
-              <Trash2 size={14} /> ဖျက်မယ်
-            </button>
-          </div>
+
+      {isCover && (
+        <div className="cover-style-container">
+          <StyleFields card={card} onChange={onChange} />
         </div>
       )}
-      {pageId === 'cover' && (
-        <p className="field-hint">
-          အဖုံးက စာသားတွေကို “ကတ် → စာသား” မှာ ပြင်နိုင်ပါတယ်။
-        </p>
+
+      {!isCover && page && (
+        <div className="inside-page-container">
+          <div className="fields page-fields">
+            <label>
+              စာရွက်ပုံစံ
+              <select
+                value={page.paper}
+                onChange={(e) =>
+                  updatePage({ paper: e.target.value as typeof page.paper })
+                }
+              >
+                <option value="blank">Blank — စာရွက်အလွတ်</option>
+                <option value="lined">မျဉ်းကြောင်းပါ စာရွက်</option>
+              </select>
+            </label>
+            <label>
+              စာမျက်နှာ ခေါင်းစဉ်
+              <input
+                maxLength={160}
+                placeholder="ဥပမာ - အမှတ်တရ ဓာတ်ပုံများ"
+                value={page.title}
+                onChange={(e) => updatePage({ title: e.target.value })}
+              />
+            </label>
+            <label>
+              စာမျက်နှာ စာသား
+              <textarea
+                rows={5}
+                maxLength={2000}
+                placeholder="ဒီစာမျက်နှာအတွက် ဆုတောင်းစကား သို့မဟုတ် ရင်ဖွင့်စကား..."
+                value={page.message}
+                onChange={(e) => updatePage({ message: e.target.value })}
+              />
+            </label>
+            <div className="item-actions">
+              <button
+                disabled={busy || pageIndex === 0}
+                onClick={() =>
+                  onChange({
+                    ...card,
+                    pages: moveItem(card.pages, pageIndex, pageIndex - 1),
+                  })
+                }
+              >
+                စာမျက်နှာ ↑
+              </button>
+              <button
+                disabled={busy || pageIndex === card.pages.length - 1}
+                onClick={() =>
+                  onChange({
+                    ...card,
+                    pages: moveItem(card.pages, pageIndex, pageIndex + 1),
+                  })
+                }
+              >
+                စာမျက်နှာ ↓
+              </button>
+              <button
+                disabled={busy}
+                className="danger"
+                onClick={() => {
+                  if (window.confirm('ဒီစာမျက်နှာနဲ့ သူ့ပုံတွေကို ဖျက်မလား?')) {
+                    onChange(removePage(card, pageId))
+                    onSelectPage('cover')
+                  }
+                }}
+              >
+                <Trash2 size={14} /> ဖျက်မယ်
+              </button>
+            </div>
+          </div>
+          <BackgroundFields
+            key={pageId}
+            card={card}
+            pageId={pageId}
+            onChange={onChange}
+          />
+        </div>
       )}
-      <BackgroundFields
-        key={pageId}
-        card={card}
-        pageId={pageId}
-        onChange={onChange}
-      />
       <div
         className={`photo-dropzone ${draggingOver ? 'is-over' : ''}`}
         onDragOver={(e) => {

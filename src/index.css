@@ -643,6 +643,7 @@ legend {
   min-width: 0;
 }
 .bench {
+  position: relative;
   width: 100%;
   border-radius: var(--radius-xl);
   border: 1px solid var(--line);
@@ -655,6 +656,127 @@ legend {
   padding: clamp(16px, 3vw, 34px);
   display: grid;
   place-items: center;
+}
+
+/* Canvas Flip Arrows */
+.canvas-flip-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(51, 42, 29, 0.14);
+  z-index: 10;
+  transition: all 0.15s ease;
+}
+.canvas-flip-arrow.prev {
+  left: 14px;
+}
+.canvas-flip-arrow.next {
+  right: 14px;
+}
+.canvas-flip-arrow:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper-soft);
+  border-color: var(--ink);
+  transform: translateY(-50%) scale(1.08);
+}
+.canvas-flip-arrow:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* Floating Add Page Button on Canvas */
+.canvas-add-page-floating {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1.5px dashed var(--accent);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(184, 70, 42, 0.15);
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+.canvas-add-page-floating:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(184, 70, 42, 0.3);
+  transform: translateY(-2px);
+}
+.canvas-add-page-floating .floating-text {
+  font-size: 12px;
+}
+
+/* Stage Pagination below Bench */
+.card-stage-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -4px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stage-page-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.stage-page-dot:hover {
+  color: var(--ink);
+  border-color: var(--ink-soft);
+  background: var(--paper-soft);
+}
+.stage-page-dot.active {
+  background: var(--ink);
+  color: var(--paper-soft);
+  border-color: var(--ink);
+  box-shadow: 0 2px 8px rgba(51, 42, 29, 0.2);
+}
+.stage-page-add {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1.5px dashed var(--accent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.stage-page-add:hover {
+  background: var(--accent-faint);
+  border-color: var(--accent);
+  transform: scale(1.1);
 }
 .artboard {
   width: min(100%, 640px);
@@ -1350,103 +1472,47 @@ legend {
   gap: 14px;
 }
 
-/* Page Selector Pills */
-.page-nav-section {
+/* Contextual Active Page Banner */
+.active-page-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-m);
+  background: linear-gradient(135deg, var(--card) 0%, var(--paper-soft) 100%);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(60, 40, 20, 0.04);
+}
+.active-page-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.active-page-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: var(--paper-soft);
-  padding: 12px;
-  border-radius: var(--radius-m);
-  border: 1px solid var(--line);
+  gap: 2px;
 }
-.page-nav-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.page-nav-label {
-  font-size: 12px;
-  font-weight: 700;
+.active-page-info strong {
+  font-size: 14px;
   color: var(--ink);
-  margin: 0;
+  font-family: var(--font-display);
 }
-.page-count-badge {
+.active-page-sub {
   font-size: 11px;
-  font-weight: 600;
   color: var(--ink-soft);
-  background: var(--card);
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
+  line-height: 1.4;
 }
-.page-pills-scroll {
+.cover-style-container,
+.inside-page-container {
   display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: thin;
+  flex-direction: column;
+  gap: 14px;
 }
-.page-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.page-pill:hover {
-  border-color: var(--ink-soft);
-  color: var(--ink);
-  background: var(--card);
-}
-.page-pill.is-active {
-  background: var(--ink);
-  color: var(--paper-soft);
-  border-color: var(--ink);
-  box-shadow: 0 2px 8px rgba(51, 42, 29, 0.18);
-}
-.page-pill.is-active .page-pill-icon {
-  filter: brightness(1.2);
-}
-.page-pill-icon {
+.section-subheading {
   font-size: 13px;
-}
-.page-pill-title {
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.page-pill-add {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: transparent;
-  border: 1px dashed var(--accent);
-  color: var(--accent);
-  font-size: 12px;
   font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.page-pill-add:hover:not(:disabled) {
-  background: var(--accent-faint);
-  border-color: var(--accent-deep);
-}
-.page-pill-add:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  color: var(--ink);
+  margin: 14px 0 6px;
 }
 
 /* Publish Step Panel */
