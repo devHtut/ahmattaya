@@ -3523,3 +3523,26 @@ footer {
   border-radius: 0.75rem;
   box-shadow: 0 8px 24px #332a1d14;
 }
+
+.trash-selection-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 18px 0;
+}
+.trash-selection-bar label,
+.trash-card-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.trash-card-select {
+  margin-bottom: 12px;
+}
+.trash-selection-bar input,
+.trash-card-select input {
+  width: 18px;
+  height: 18px;
+}

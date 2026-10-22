@@ -30,7 +30,9 @@ export const librarySchema = z
       .refine((items) => new Set(items.map((p) => p.id)).size === items.length),
   })
   .refine((data) =>
-    data.projects.some((p) => p.id === data.activeId && !p.deleted),
+    data.activeId === ''
+      ? data.projects.every((p) => p.deleted)
+      : data.projects.some((p) => p.id === data.activeId && !p.deleted),
   )
 export type Library = z.infer<typeof librarySchema>
 export function attachCloudReceipt(
@@ -98,5 +100,31 @@ export function saveProjects(storage: DraftStorage, library: Library): boolean {
     return true
   } catch {
     return false
+  }
+}
+
+export function trashProject(
+  library: Library,
+  id: string,
+  deleted: boolean,
+): Library {
+  const projects = library.projects.map((p) =>
+    p.id === id ? { ...p, deleted } : p,
+  )
+  const activeId =
+    projects.find((p) => p.id === library.activeId && !p.deleted)?.id ??
+    projects.find((p) => !p.deleted)?.id ??
+    ''
+  return { ...library, projects, activeId }
+}
+
+export function deleteTrashedProjects(
+  library: Library,
+  ids: string[],
+): Library {
+  const selected = new Set(ids)
+  return {
+    ...library,
+    projects: library.projects.filter((p) => !p.deleted || !selected.has(p.id)),
   }
 }

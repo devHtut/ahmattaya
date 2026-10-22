@@ -11,6 +11,8 @@ import {
 import { createCard } from '../../../shared/templates/templates'
 import { browserDraftStorage } from '../lib/draft-storage'
 import {
+  trashProject,
+  deleteTrashedProjects,
   loadProjects,
   saveProjects,
   type Library,
@@ -54,9 +56,10 @@ function initialize() {
 }
 export function useCreatorDraft() {
   const [state, setState] = useState(initialize)
-  const active = state.library.projects.find(
-    (p) => p.id === state.library.activeId,
-  )!
+  const [emptyProject] = useState(() => makeProject())
+  const active =
+    state.library.projects.find((p) => p.id === state.library.activeId) ??
+    emptyProject
   const persist = (
     library: Library,
     past = state.past,
@@ -91,6 +94,7 @@ export function useCreatorDraft() {
     )
   }
   return {
+    hasActiveProject: state.library.activeId !== '',
     card: active.card,
     project: active,
     projects: state.library.projects,
@@ -196,19 +200,10 @@ export function useCreatorDraft() {
       )
     },
     trash: (id: string, deleted: boolean) => {
-      let projects = state.library.projects.map((p) =>
-        p.id === id ? { ...p, deleted } : p,
-      )
-      let activeId = state.library.activeId
-      if (!projects.some((p) => p.id === activeId && !p.deleted)) {
-        let next = projects.find((p) => !p.deleted)
-        if (!next) {
-          next = makeProject()
-          projects = [...projects, next]
-        }
-        activeId = next.id
-      }
-      persist({ ...state.library, projects, activeId }, [], [])
+      persist(trashProject(state.library, id, deleted), [], [])
+    },
+    deletePermanently: (ids: string[]) => {
+      persist(deleteTrashedProjects(state.library, ids), [], [])
     },
     canUndo: state.past.length > 0,
     canRedo: state.future.length > 0,

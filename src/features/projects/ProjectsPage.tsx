@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Copy, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
@@ -12,10 +12,16 @@ export function ProjectsPage({
   workspace: ProjectWorkspace
 }) {
   const [trash, setTrash] = useState(false)
+  const [selected, setSelected] = useState<string[]>([])
+  const confirmation = useRef<HTMLDialogElement>(null)
   const navigate = useNavigate()
   const items = w.projects
     .filter((p) => p.deleted === trash)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+
+  const selectedIds = items
+    .filter((p) => selected.includes(p.id))
+    .map((p) => p.id)
 
   return (
     <main id="main-content" className="page-width shelf-page">
@@ -41,13 +47,81 @@ export function ProjectsPage({
         <DraftStatus status={w.saveStatus} onRetry={w.retrySave} />
       )}
       <div className="shelf-tabs">
-        <button aria-pressed={!trash} onClick={() => setTrash(false)}>
+        <button
+          aria-pressed={!trash}
+          onClick={() => {
+            setTrash(false)
+            setSelected([])
+          }}
+        >
           ကတ်များ ({w.projects.filter((p) => !p.deleted).length})
         </button>
-        <button aria-pressed={trash} onClick={() => setTrash(true)}>
+        <button
+          aria-pressed={trash}
+          onClick={() => {
+            setTrash(true)
+            setSelected([])
+          }}
+        >
           ဖျက်ထားတာ ({w.projects.filter((p) => p.deleted).length})
         </button>
       </div>
+      {trash && items.length > 0 && (
+        <div className="trash-selection-bar">
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedIds.length === items.length}
+              onChange={(e) =>
+                setSelected(e.target.checked ? items.map((p) => p.id) : [])
+              }
+            />
+            အားလုံးရွေးမယ်
+          </label>
+          <span aria-live="polite">ရွေးထားတာ {selectedIds.length} ခု</span>
+          <button
+            className="button secondary"
+            disabled={selectedIds.length === 0}
+            onClick={() => confirmation.current?.showModal()}
+          >
+            <Trash2 size={16} /> အပြီးတိုင်ဖျက်မယ်
+          </button>
+        </div>
+      )}
+      <dialog
+        ref={confirmation}
+        className="share-dialog"
+        aria-labelledby="delete-heading"
+        aria-describedby="delete-description"
+      >
+        <h2 id="delete-heading">
+          ရွေးထားတဲ့ ကတ် {selectedIds.length} ခုကို အပြီးတိုင်ဖျက်မလား။
+        </h2>
+        <p id="delete-description">
+          ဒီ browser ထဲက ရွေးထားတဲ့ကတ်တွေကို ပြန်ယူလို့ မရတော့ပါ။ Cloud
+          မိတ္တူနဲ့ မျှဝေထားတဲ့ link တွေကို မဖျက်ပါ။
+        </p>
+        <div className="share-dialog-actions">
+          <button
+            className="button secondary"
+            autoFocus
+            onClick={() => confirmation.current?.close()}
+          >
+            မဖျက်တော့ပါ
+          </button>
+          <button
+            className="button primary"
+            disabled={selectedIds.length === 0}
+            onClick={() => {
+              w.deletePermanently(selectedIds)
+              setSelected([])
+              confirmation.current?.close()
+            }}
+          >
+            အပြီးတိုင်ဖျက်မယ်
+          </button>
+        </div>
+      </dialog>
       <div className="shelf-grid">
         {items.map((project) => (
           <article className="shelf-card" key={project.id}>
@@ -57,6 +131,23 @@ export function ProjectsPage({
               </div>
             </div>
             <div className="shelf-card-body">
+              {trash && (
+                <label className="trash-card-select">
+                  <input
+                    type="checkbox"
+                    aria-label={`${project.name} ကို ရွေးမယ်`}
+                    checked={selected.includes(project.id)}
+                    onChange={(e) =>
+                      setSelected((ids) =>
+                        e.target.checked
+                          ? [...ids, project.id]
+                          : ids.filter((id) => id !== project.id),
+                      )
+                    }
+                  />
+                  ရွေးမယ်
+                </label>
+              )}
               <h2>{project.name}</h2>
               <p className="muted">
                 နောက်ဆုံး ပြင်တာ ·{' '}
@@ -66,7 +157,12 @@ export function ProjectsPage({
                 {trash ? (
                   <button
                     className="button secondary"
-                    onClick={() => w.trash(project.id, false)}
+                    onClick={() => {
+                      w.trash(project.id, false)
+                      setSelected((ids) =>
+                        ids.filter((id) => id !== project.id),
+                      )
+                    }}
                   >
                     <RotateCcw size={16} /> ပြန်ယူမယ်
                   </button>

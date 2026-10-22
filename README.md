@@ -210,3 +210,17 @@ unpublished draft edits private. Downloads recheck that the publication is activ
 republishing keeps the URL, while disabling it also disables the QR destination.
 QR generation stays local and loads on demand. See [QR invitations](docs/QR-INVITATIONS.md)
 for verification, download checks and text/scan behavior.
+
+### Project trash
+
+The last local card can be moved to Trash without creating a replacement. Empty
+libraries survive reload; creating a card or restoring one selects it again.
+Trash supports individual selection, Select all, and permanent deletion through
+a confirmation dialog with Cancel focused by default. This removes only the
+selected browser-local project records, preserving Cloud copies and receiver
+links. Shared local media assets are retained for other cards that reference them.
+Cloud account access and restore remain available when the local shelf is empty.
+
+Verified: regression tests for last-card trash/restore, empty-library persistence,
+and bulk deletion preserving active/unselected cards; browser checks for empty
+shelf reload, selection, confirmation and Escape cancellation.

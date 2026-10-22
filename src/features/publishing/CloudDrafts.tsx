@@ -178,17 +178,19 @@ export function CloudDrafts({
     w.project.cloud?.ownerId === ownerId ? w.project.cloud : undefined
   return (
     <div className="cloud-drafts">
-      <PublishCard
-        key={w.project.id}
-        workspace={w}
-        ownerId={ownerId}
-        disabled={loading || Boolean(action) || externalDisabled}
-        publishBlocked={Boolean(mediaIssue)}
-        onBusy={(value) => {
-          setPublishing(value)
-          onBusy?.(value)
-        }}
-      />
+      {w.hasActiveProject && (
+        <PublishCard
+          key={w.project.id}
+          workspace={w}
+          ownerId={ownerId}
+          disabled={loading || Boolean(action) || externalDisabled}
+          publishBlocked={Boolean(mediaIssue)}
+          onBusy={(value) => {
+            setPublishing(value)
+            onBusy?.(value)
+          }}
+        />
+      )}
       <h3>ကိုယ့်အတွက် Cloud ကတ်များ</h3>
       <p className="field-hint">
         ကိုယ်တိုင် သိမ်းမယ်နှိပ်မှ Cloud ပေါ်တင်ပေးပါတယ်။ ဓာတ်ပုံ၊ စာသား၊
@@ -197,7 +199,12 @@ export function CloudDrafts({
       </p>
       <button
         className="button primary"
-        disabled={disabled || Boolean(mediaIssue) || w.saveStatus === 'blocked'}
+        disabled={
+          !w.hasActiveProject ||
+          disabled ||
+          Boolean(mediaIssue) ||
+          w.saveStatus === 'blocked'
+        }
         onClick={() => void save()}
       >
         <CloudUpload size={16} />

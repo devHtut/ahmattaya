@@ -1,6 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  trashProject,
+  deleteTrashedProjects,
   loadProjects,
   saveProjects,
   PROJECTS_KEY,
@@ -94,4 +96,58 @@ test('library rejects duplicate ids, missing active project and quota failures',
     ),
     false,
   )
+})
+
+test('last card can be trashed, restored, and permanently removed without replacement', () => {
+  const storage = memory()
+  const p = {
+    id: 'last',
+    name: 'Last',
+    updatedAt: new Date().toISOString(),
+    deleted: false,
+    card: createCard('birthday'),
+  }
+  const initial = { version: 1, activeId: p.id, projects: [p] }
+  const trashed = trashProject(initial, p.id, true)
+  assert.equal(trashed.activeId, '')
+  assert.equal(trashed.projects.length, 1)
+  assert.equal(saveProjects(storage, trashed), true)
+  assert.deepEqual(loadProjects(storage).library, trashed)
+  assert.deepEqual(trashProject(trashed, p.id, true), trashed)
+  assert.deepEqual(trashProject(trashed, p.id, false), initial)
+  const empty = deleteTrashedProjects(trashed, [p.id])
+  assert.deepEqual(empty.projects, [])
+  assert.equal(saveProjects(storage, empty), true)
+  assert.deepEqual(loadProjects(storage).library, empty)
+})
+test('bulk permanent deletion preserves active and unselected cards', () => {
+  const p = {
+    id: 'active',
+    name: 'Active',
+    updatedAt: new Date().toISOString(),
+    deleted: false,
+    card: createCard('birthday'),
+  }
+  const library = {
+    version: 1,
+    activeId: p.id,
+    projects: [
+      p,
+      { ...p, id: 'one', deleted: true },
+      { ...p, id: 'two', deleted: true },
+      { ...p, id: 'keep', deleted: true },
+    ],
+  }
+  const result = deleteTrashedProjects(library, [
+    'active',
+    'one',
+    'two',
+    'missing',
+  ])
+  assert.deepEqual(
+    result.projects.map((p) => p.id),
+    ['active', 'keep'],
+  )
+  assert.equal(result.activeId, 'active')
+  assert.equal(trashProject(library, 'active', true).activeId, '')
 })

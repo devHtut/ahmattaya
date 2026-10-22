@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Link, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { HomePage } from '../features/home/HomePage'
 import { TemplatesPage } from '../features/templates/TemplatesPage'
 import { CreatorPage } from '../features/creator/CreatorPage'
@@ -38,22 +38,37 @@ function EditorApp() {
       <a className="skip-link" href="#main-content">
         အကြောင်းအရာသို့ သွားရန်
       </a>
-      {!isReceiver && (
-        <EditorToolbar key={workspace.project.id} workspace={workspace} />
-      )}
+      {!isReceiver &&
+        (workspace.hasActiveProject ? (
+          <EditorToolbar key={workspace.project.id} workspace={workspace} />
+        ) : (
+          <header className="atelier-bar">
+            <Link to="/">အမှတ်တရ</Link>
+            <Link to="/templates" className="button primary">
+              ကတ်အသစ်
+            </Link>
+            <Link to="/projects" className="button secondary">
+              ကတ်များ
+            </Link>
+          </header>
+        ))}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
           path="/create"
           element={
-            <CreatorPage
-              key={workspace.project.id}
-              workspace={workspace}
-              card={card}
-              onChange={onChange}
-              saveStatus={saveStatus}
-              onRetrySave={retrySave}
-            />
+            !workspace.hasActiveProject ? (
+              <Navigate to="/projects" replace />
+            ) : (
+              <CreatorPage
+                key={workspace.project.id}
+                workspace={workspace}
+                card={card}
+                onChange={onChange}
+                saveStatus={saveStatus}
+                onRetrySave={retrySave}
+              />
+            )
           }
         />
         <Route
@@ -64,7 +79,16 @@ function EditorApp() {
           path="/projects"
           element={<ProjectsPage workspace={workspace} />}
         />
-        <Route path="/preview" element={<PreviewPage card={card} />} />
+        <Route
+          path="/preview"
+          element={
+            workspace.hasActiveProject ? (
+              <PreviewPage card={card} />
+            ) : (
+              <Navigate to="/projects" replace />
+            )
+          }
+        />
         <Route
           path="*"
           element={
