@@ -8,6 +8,13 @@ export function getCloudClient(): Promise<SupabaseClient> {
   const { url, publicKey } = cloudConfig
   client ??= import('@supabase/supabase-js').then(({ createClient }) =>
     createClient(url, publicKey, {
+      global: {
+        fetch: (input, init) =>
+          fetch(input, {
+            ...init,
+            signal: init?.signal ?? AbortSignal.timeout(120_000),
+          }),
+      },
       auth: {
         persistSession: true,
         autoRefreshToken: true,

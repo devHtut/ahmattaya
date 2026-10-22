@@ -1,5 +1,6 @@
 // Image bytes stay outside localStorage project metadata. Immutable content IDs
 // allow project duplicates and undo history to share one durable Blob.
+import { verifyAsset } from './asset-bytes.ts'
 const DB_NAME = 'ahmattaya.media'
 const STORE = 'images'
 function openDatabase(): Promise<IDBDatabase> {
@@ -36,6 +37,11 @@ export async function saveImageAsset(dataUrl: string): Promise<string> {
     b.toString(16).padStart(2, '0'),
   ).join('')
   const blob = new Blob([bytes], { type: match[1] })
+  await cacheImageAsset(id, blob)
+  return id
+}
+export async function cacheImageAsset(id: string, blob: Blob): Promise<void> {
+  await verifyAsset(id, blob, 'image')
   const db = await openDatabase()
   try {
     await new Promise<void>((resolve, reject) => {
@@ -45,7 +51,6 @@ export async function saveImageAsset(dataUrl: string): Promise<string> {
       tx.onabort = () => reject(tx.error ?? new Error('Media write aborted'))
       tx.onerror = () => reject(tx.error)
     })
-    return id
   } finally {
     db.close()
   }

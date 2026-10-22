@@ -3421,3 +3421,13 @@ footer {
     flex-wrap: wrap;
   }
 }
+
+.cloud-transfer {
+  margin-block: 12px;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.cloud-transfer progress {
+  width: 100%;
+  accent-color: var(--accent);
+}

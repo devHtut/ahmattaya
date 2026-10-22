@@ -60,7 +60,7 @@ function api(body, status = 200) {
   )
   return { client, requests }
 }
-test('cloud snapshots retain photo bytes, page appearance and cake, but reject device-only assets', () => {
+test('cloud snapshots retain embedded photos and external media references without mutating local cards', () => {
   const p = project()
   p.card.message = 'ချစ်ခြင်းတွေနဲ့\n  အမှတ်တရ'
   p.card.photos.push({
@@ -73,7 +73,7 @@ test('cloud snapshots retain photo bytes, page appearance and cake, but reject d
   assert.deepEqual(prepareCloudDraft(p).card, p.card)
   const original = structuredClone(p)
   p.card.background = createBackground('a'.repeat(64))
-  assert.throws(() => prepareCloudDraft(p), { code: 'local-media' })
+  assert.deepEqual(prepareCloudDraft(p).card, p.card)
   p.card.background = null
   p.card.pages.push({
     id: 'p1',
@@ -82,7 +82,7 @@ test('cloud snapshots retain photo bytes, page appearance and cake, but reject d
     paper: 'lined',
     background: createBackground('b'.repeat(64)),
   })
-  assert.throws(() => prepareCloudDraft(p), { code: 'local-media' })
+  assert.deepEqual(prepareCloudDraft(p).card, p.card)
   p.card.pages = []
   p.card.music = {
     trackId: 'custom',
@@ -96,7 +96,7 @@ test('cloud snapshots retain photo bytes, page appearance and cake, but reject d
       bytes: 30,
     },
   }
-  assert.throws(() => prepareCloudDraft(p), { code: 'local-media' })
+  assert.deepEqual(prepareCloudDraft(p).card, p.card)
   assert.equal(original.card.background, null)
   assert.throws(
     () => prepareCloudDraft({ ...original, card: { schemaVersion: 999 } }),
@@ -121,6 +121,7 @@ test('initial save uses insert; linked drafts use owner and revision filters wit
   assert.equal(sent.url.searchParams.get('revision'), 'eq.2')
   assert.deepEqual(Object.keys(JSON.parse(sent.init.body)).sort(), [
     'card',
+    'media',
     'name',
   ])
   // A different Guest never inherits another Guest's remote identity.

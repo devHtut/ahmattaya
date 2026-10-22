@@ -1,10 +1,10 @@
+import type { CloudDraft } from '../../shared/cloud/drafts.ts'
 import { z } from 'zod'
 import {
   cloudReceiptSchema,
   receiptFor,
-  type CloudDraft,
   type CloudReceipt,
-} from '../../shared/cloud/drafts.ts'
+} from '../../shared/cloud/receipts.ts'
 import {
   loadDraft,
   storedCardSchema,

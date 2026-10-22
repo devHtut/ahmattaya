@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { cloudConfig, getCloudClient } from '../../shared/cloud/client'
 import { guestAuthMessage } from '../../shared/cloud/auth-errors'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
-import { CloudDrafts } from './CloudDrafts'
+const CloudDrafts = lazy(() =>
+  import('./CloudDrafts').then((module) => ({ default: module.CloudDrafts })),
+)
 
 export function CloudConnection({
   workspace,
@@ -111,12 +113,14 @@ export function CloudConnection({
         </button>
       )}
       {status === 'connected' && ownerId && (
-        <CloudDrafts
-          key={ownerId}
-          workspace={workspace}
-          ownerId={ownerId}
-          onRestored={onRestored}
-        />
+        <Suspense fallback={<p role="status">Cloud ကတ်များ ပြင်ဆင်နေပါတယ်…</p>}>
+          <CloudDrafts
+            key={ownerId}
+            workspace={workspace}
+            ownerId={ownerId}
+            onRestored={onRestored}
+          />
+        </Suspense>
       )}
     </section>
   )

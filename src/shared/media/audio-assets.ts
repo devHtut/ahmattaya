@@ -1,4 +1,5 @@
 import { MAX_AUDIO_BYTES, MAX_AUDIO_SECONDS } from '../models/music.ts'
+import { verifyAsset } from './asset-bytes.ts'
 const formats: Record<string, string> = {
   mp3: 'audio/mpeg',
   m4a: 'audio/mp4',
@@ -105,6 +106,14 @@ export async function saveAudioAsset(
   const assetId = Array.from(new Uint8Array(hash), (b) =>
     b.toString(16).padStart(2, '0'),
   ).join('')
+  await cacheAudioAsset(assetId, blob)
+  return { assetId, seconds }
+}
+export async function cacheAudioAsset(
+  assetId: string,
+  blob: Blob,
+): Promise<void> {
+  await verifyAsset(assetId, blob, 'audio')
   const db = await openDatabase()
   try {
     await new Promise<void>((resolve, reject) => {
@@ -114,7 +123,6 @@ export async function saveAudioAsset(
       tx.onabort = () => reject(tx.error ?? new Error('Audio write aborted'))
       tx.onerror = () => reject(tx.error)
     })
-    return { assetId, seconds }
   } finally {
     db.close()
   }

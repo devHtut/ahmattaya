@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { CloudDownload, CloudUpload, RefreshCw } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { getCloudClient } from '../../shared/cloud/client'
+import type { TransferProgress } from '../../shared/cloud/media'
 import {
   CLOUD_PAGE_SIZE,
   cloudDraftMessage,
@@ -28,6 +29,10 @@ export function CloudDrafts({
   const [action, setAction] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
+  const [transfer, setTransfer] = useState<TransferProgress | null>(null)
+  const onProgress = (progress: TransferProgress) => {
+    if (alive.current) setTransfer(progress)
+  }
   const alive = useRef(false)
   const busy = useRef(false)
   const navigate = useNavigate()
@@ -96,13 +101,16 @@ export function CloudDrafts({
     if (busy.current || loading || mediaIssue) return
     busy.current = true
     setAction('save')
+    setTransfer(null)
     setFeedback('')
     setError('')
     // Capture exactly the requested snapshot. Later edits stay in the workspace.
     const project = structuredClone(w.project)
     try {
       const client = await getCloudClient()
-      const receipt = await saveCloudDraft(client, ownerId, project)
+      const receipt = await saveCloudDraft(client, ownerId, project, {
+        onProgress,
+      })
       w.recordCloudSave(project.id, receipt)
       if (alive.current) {
         setFeedback(
@@ -125,17 +133,19 @@ export function CloudDrafts({
     } finally {
       busy.current = false
       if (alive.current) setAction('')
+      if (alive.current) setTransfer(null)
     }
   }
   async function restore(id: string) {
     if (busy.current || loading) return
     busy.current = true
     setAction(id)
+    setTransfer(null)
     setFeedback('')
     setError('')
     try {
       const client = await getCloudClient()
-      const row = await readCloudDraft(client, ownerId, id)
+      const row = await readCloudDraft(client, ownerId, id, { onProgress })
       if (!alive.current) return
       w.importCloudCopy(row)
       onRestored?.()
@@ -145,6 +155,7 @@ export function CloudDrafts({
     } finally {
       busy.current = false
       if (alive.current) setAction('')
+      if (alive.current) setTransfer(null)
     }
   }
   const disabled = loading || Boolean(action)
@@ -155,7 +166,8 @@ export function CloudDrafts({
       <h3>ကိုယ့်အတွက် Cloud ကတ်များ</h3>
       <p className="field-hint">
         ကိုယ်တိုင် သိမ်းမယ်နှိပ်မှ Cloud ပေါ်တင်ပေးပါတယ်။ ဓာတ်ပုံ၊ စာသား၊
-        အလှဆင်နဲ့ Cake ပါဝင်ပြီး Share link မဟုတ်သေးပါ။
+        နောက်ခံပုံ၊ ကိုယ်ပိုင်သီချင်း၊ အလှဆင်နဲ့ Cake ပါဝင်ပြီး Share link
+        မဟုတ်သေးပါ။
       </p>
       <button
         className="button primary"
@@ -167,6 +179,21 @@ export function CloudDrafts({
           ? 'Cloud မှာ သိမ်းနေပါတယ်…'
           : 'ဒီကတ်ကို Cloud မှာ သိမ်းမယ်'}
       </button>
+      {transfer && transfer.total > 0 && (
+        <div className="cloud-transfer" role="status">
+          <p>
+            {transfer.phase === 'upload'
+              ? 'ပုံ/သီချင်း တင်နေပါတယ်'
+              : 'ပုံ/သီချင်း ပြန်ယူနေပါတယ်'}{' '}
+            · {transfer.completed} / {transfer.total}
+          </p>
+          <progress
+            aria-label="ပုံ/သီချင်း လွှဲပြောင်းမှု"
+            value={transfer.completed}
+            max={transfer.total}
+          />
+        </div>
+      )}
       {receipt && (
         <p className="field-hint">
           နောက်ဆုံး Cloud သိမ်းချိန် ·{' '}
