@@ -69,5 +69,8 @@ Reference: https://developers.brevo.com/docs/supabase-smtp-integration
 
 Implementation validation: 84 unit/database tests pass, lint/build pass. The local
 browser renders the account form beside existing private cloud cards and active
-published links. Live delivery, guest conversion and second-device sign-in still
-require the owner's SMTP/template setup and email verification.
+published links. The owner configured Brevo SMTP, enabled manual linking and updated all three
+OTP templates. The account UI is deployed to production. The server accepted
+the initial code request and one user-requested resend. Email receipt, guest
+conversion and fresh-browser sign-in still await the owner's code verification;
+request acceptance alone does not establish delivery or a completed account.
