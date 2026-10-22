@@ -73,7 +73,7 @@ export function CardPreview({
           </span>
         )}
         <div className="card-copy">
-          <div className="copy-side">
+          <div className="copy-side reveal-step-1">
             {isCover && (
               <div className="preview-symbol" aria-hidden="true">
                 {occasions.find((item) => item.id === card.occasion)?.icon}
@@ -93,34 +93,42 @@ export function CardPreview({
           </div>
           <div className="copy-main">
             {isCover && (
-              <span className="eyebrow" style={{ color: colors.accent }}>
+              <span
+                className="eyebrow reveal-step-2"
+                style={{ color: colors.accent }}
+              >
                 A LITTLE MOMENT, JUST FOR YOU
               </span>
             )}
-            <h2 style={textStyle(heading)}>
+            <h2 className="reveal-step-3" style={textStyle(heading)}>
               {page ? page.title || 'စာမျက်နှာအသစ်' : card.title}
             </h2>
-            <p className="card-message" style={textStyle(body)}>
+            <p className="card-message reveal-step-4" style={textStyle(body)}>
               {(page ? page.message : card.message) ||
                 'ရင်ထဲက စကားလေးတွေကို ဒီနေရာမှာ ရေးသားနိုင်ပါတယ်။'}
             </p>
             {isCover && (
-              <div className="signature">
+              <div className="signature reveal-step-5">
                 ချစ်ခြင်းများစွာဖြင့် ·{' '}
                 <strong>{card.senderName || 'သင့်အမည်'}</strong>
               </div>
             )}
           </div>
-          <span className="preview-brand" style={{ color: colors.accent }}>
+          <span
+            className="preview-brand reveal-step-5"
+            style={{ color: colors.accent }}
+          >
             အမှတ်တရ · AhMatTaYa
           </span>
         </div>
-        <PhotoCanvas
-          photos={photos}
-          selectedId={selectedPhotoId}
-          onSelect={onSelectPhoto}
-          onCommit={onCommitPhoto}
-        />
+        <div className="photo-canvas-wrapper reveal-step-photo">
+          <PhotoCanvas
+            photos={photos}
+            selectedId={selectedPhotoId}
+            onSelect={onSelectPhoto}
+            onCommit={onCommitPhoto}
+          />
+        </div>
       </article>
     </div>
   )

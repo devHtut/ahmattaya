@@ -173,6 +173,7 @@ export function buildCandle(
     new THREE.SphereGeometry(0.035, 10, 10),
     new THREE.MeshBasicMaterial({ color: '#ffc66b' }),
   )
+  flame.name = 'flame'
   flame.position.y = flameHeight + 0.015
   flame.scale.set(1, 1.8, 1)
   group.add(flame)

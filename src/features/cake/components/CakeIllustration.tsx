@@ -1,6 +1,12 @@
 import { flavorColors, type CakeRecipe } from '../../../shared/models/cake'
 
-export function CakeIllustration({ recipe }: { recipe: CakeRecipe }) {
+export function CakeIllustration({
+  recipe,
+  extinguishedCandleIds = [],
+}: {
+  recipe: CakeRecipe
+  extinguishedCandleIds?: string[]
+}) {
   return (
     <svg
       className="cake-illustration"
@@ -87,13 +93,16 @@ export function CakeIllustration({ recipe }: { recipe: CakeRecipe }) {
         )
       })}
       {recipe.candles.map((candle) => {
+        const isExtinguished = extinguishedCandleIds.includes(candle.id)
         const radius = [118, 88, 58][recipe.tiers - 1]
         const x = 180 + candle.position.x * radius,
           y = 204 - (recipe.tiers - 1) * 58 + candle.position.z * 14
         return (
-          <g key={candle.id}>
+          <g key={candle.id} opacity={isExtinguished ? 0.8 : 1}>
             <path d={`M${x} ${y} v-28`} stroke={candle.color} strokeWidth="5" />
-            <ellipse cx={x} cy={y - 33} rx="3" ry="5" fill="#ffc66b" />
+            {!isExtinguished && (
+              <ellipse cx={x} cy={y - 33} rx="3" ry="5" fill="#ffc66b" />
+            )}
             {['number', 'heart', 'star'].includes(candle.design) && (
               <text
                 x={x}

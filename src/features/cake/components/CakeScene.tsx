@@ -25,19 +25,23 @@ export default function CakeScene({
   recipe,
   onFailure,
   editor,
+  extinguishedCandleIds = [],
+  onToggleCandle,
 }: {
   recipe: CakeRecipe
   onFailure: () => void
   editor?: CakeEditorSession
+  extinguishedCandleIds?: string[]
+  onToggleCandle?: (candleId: string) => void
 }) {
   const selectedId = editor?.tools.selectedId
   const mode = editor?.tools.mode ?? 'orbit'
   const host = useRef<HTMLDivElement>(null)
   const runtime = useRef<Runtime | null>(null)
-  const latest = useRef({ recipe, editor })
+  const latest = useRef({ recipe, editor, onToggleCandle })
   useEffect(() => {
-    latest.current = { recipe, editor }
-  }, [recipe, editor])
+    latest.current = { recipe, editor, onToggleCandle }
+  }, [recipe, editor, onToggleCandle])
   useEffect(() => {
     const container = host.current
     if (!container) return
@@ -181,10 +185,16 @@ export default function CakeScene({
         render()
       })
     }
+    let tapStart: { x: number; y: number } | null = null
     const down = (event: PointerEvent) => {
       const session = latest.current.editor
+      if (!session) {
+        if (event.isPrimary && event.button === 0) {
+          tapStart = { x: event.clientX, y: event.clientY }
+        }
+        return
+      }
       if (
-        !session ||
         session.tools.mode === 'orbit' ||
         !event.isPrimary ||
         event.button !== 0 ||
@@ -256,9 +266,32 @@ export default function CakeScene({
       }
     }
     const up = (event: PointerEvent) => {
+      const session = latest.current.editor
+      if (!session && tapStart) {
+        const dx = Math.abs(event.clientX - tapStart.x)
+        const dy = Math.abs(event.clientY - tapStart.y)
+        tapStart = null
+        if (dx < 8 && dy < 8 && state.cake && latest.current.onToggleCandle) {
+          const rect = renderer.domElement.getBoundingClientRect()
+          raycaster.setFromCamera(
+            new THREE.Vector2(
+              ((event.clientX - rect.left) / rect.width) * 2 - 1,
+              (-(event.clientY - rect.top) / rect.height) * 2 + 1,
+            ),
+            camera,
+          )
+          const hit = raycaster
+            .intersectObject(state.cake, true)
+            .find((item) => typeof item.object.userData.candleId === 'string')
+          const id = hit?.object.userData.candleId as string | undefined
+          if (id) {
+            latest.current.onToggleCandle(id)
+          }
+        }
+        return
+      }
       if (!gesture || event.pointerId !== gesture.pointerId) return
       const completed = gesture
-      const session = latest.current.editor
       const point = pointAt(event) ?? completed.points.at(-1)!
       cancel()
       if (completed.kind === 'cream')
@@ -339,10 +372,17 @@ export default function CakeScene({
       )
       next.add(marker)
     }
+    for (const candle of recipe.candles) {
+      if (extinguishedCandleIds.includes(candle.id)) {
+        const candleObj = next.getObjectByName(`candle:${candle.id}`)
+        const flame = candleObj?.getObjectByName('flame')
+        if (flame) flame.visible = false
+      }
+    }
     state.cake = next
     state.scene.add(next)
     state.render()
-  }, [recipe, selectedId])
+  }, [recipe, selectedId, extinguishedCandleIds])
   useEffect(() => {
     const state = runtime.current
     if (!state) return

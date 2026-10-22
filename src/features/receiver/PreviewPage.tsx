@@ -9,6 +9,7 @@ import { ConfettiBurst } from '../../shared/ui/ConfettiBurst'
 import { useReveal } from '../../shared/ui/useReveal'
 import { CakePreview } from '../cake/components/CakePreview'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
+import { FloatingEmojis } from '../../shared/ui/FloatingEmojis'
 
 function ScrollHint({ target }: { target: string }) {
   return (
@@ -49,6 +50,7 @@ export function PreviewPage({
   const [burst, setBurst] = useState(0)
   const [musicEnabled, setMusicEnabled] = useState(true)
   const [musicBlocked, setMusicBlocked] = useState(false)
+  const [extinguishedCandles, setExtinguishedCandles] = useState<string[]>([])
   const audio = useRef<HTMLAudioElement>(null)
   const pageRoot = useRef<HTMLElement>(null)
   const replayRequested = useRef(false)
@@ -60,6 +62,41 @@ export function PreviewPage({
     failed: audioMissing,
     loading: audioLoading,
   } = useMusicTrack(card.music)
+
+  const candleCount = card.cake.candles.length
+  const allCandlesBlown =
+    card.cake.enabled &&
+    candleCount > 0 &&
+    card.cake.candles.every((c) => extinguishedCandles.includes(c.id))
+
+  const handleToggleCandle = useCallback(
+    (id: string) => {
+      setExtinguishedCandles((prev) => {
+        const next = prev.includes(id)
+          ? prev.filter((item) => item !== id)
+          : [...prev, id]
+        if (
+          candleCount > 0 &&
+          card.cake.candles.every((c) => next.includes(c.id))
+        ) {
+          setBurst((n) => n + 1)
+        }
+        return next
+      })
+    },
+    [card.cake.candles, candleCount],
+  )
+
+  const handleBlowAll = useCallback(() => {
+    if (!card.cake.enabled || candleCount === 0) return
+    setExtinguishedCandles(card.cake.candles.map((c) => c.id))
+    setBurst((n) => n + 1)
+  }, [card.cake.candles, card.cake.enabled, candleCount])
+
+  const handleRelight = useCallback(() => {
+    setExtinguishedCandles([])
+  }, [])
+
   useEffect(() => {
     alive.current = true
     return () => {
@@ -103,6 +140,7 @@ export function PreviewPage({
     }
     if (burstTimer.current) clearTimeout(burstTimer.current)
     setBurst(0)
+    setExtinguishedCandles([])
     replayRequested.current = true
     setOpened(false)
     setMusicBlocked(false)
@@ -164,6 +202,7 @@ export function PreviewPage({
       )}
       {opened && (
         <>
+          <FloatingEmojis emoji={card.opening.emoji} active={opened} />
           <ConfettiBurst
             className="story-confetti"
             burst={burst}
@@ -234,10 +273,43 @@ export function PreviewPage({
                   {card.receiverName || 'သင့်'} အတွက် Cake လေး 🎂
                 </h2>
                 <div className="story-cake">
-                  <CakePreview recipe={card.cake} />
+                  <CakePreview
+                    recipe={card.cake}
+                    extinguishedCandleIds={extinguishedCandles}
+                    onToggleCandle={handleToggleCandle}
+                  />
                 </div>
+                {candleCount > 0 && (
+                  <div className="cake-actions">
+                    {!allCandlesBlown ? (
+                      <button
+                        type="button"
+                        className="cake-blow-btn"
+                        onClick={handleBlowAll}
+                      >
+                        🕯️💨 ဆုတောင်းပြီး မီးမှုတ်မယ်
+                      </button>
+                    ) : (
+                      <div className="cake-wish-banner" role="status">
+                        <h3>🎉 ဆုတောင်းပြည့်ပါစေ! ✨</h3>
+                        <p>မွေးနေ့/အမှတ်တရဆုမွန်ကောင်းများ အမြဲပြည့်စုံပါစေ။</p>
+                        <button
+                          type="button"
+                          className="button secondary"
+                          onClick={handleRelight}
+                        >
+                          🕯️ ဖယောင်းတိုင် ပြန်ထွန်းမယ်
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <p className="cake-wish">
-                  ကိတ်လေးကို လှည့်ကြည့်ရင်း ဆုတောင်းလေး တောင်းလိုက်ပါ ✨
+                  {candleCount > 0
+                    ? allCandlesBlown
+                      ? 'ဆုတောင်းလေး တောင်းပြီးပါပြီ ✨ ကိတ်လေးကို လှည့်ကြည့်နိုင်ပါတယ်'
+                      : 'ဖယောင်းတိုင်လေးများကို နှိပ်၍လည်း မီးငြိမ်းနိုင်ပါတယ် ✨'
+                    : 'ကိတ်လေးကို လှည့်ကြည့်ရင်း ဆုတောင်းလေး တောင်းလိုက်ပါ ✨'}
                 </p>
               </Reveal>
             </section>

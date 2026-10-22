@@ -29,16 +29,23 @@ class SceneBoundary extends Component<
 export function CakePreview({
   recipe,
   editor,
+  extinguishedCandleIds = [],
+  onToggleCandle,
 }: {
   recipe: CakeRecipe
   editor?: CakeEditorSession
+  extinguishedCandleIds?: string[]
+  onToggleCandle?: (id: string) => void
 }) {
   const [failed, setFailed] = useState(false)
   const onFailure = useCallback(() => setFailed(true), [])
   if (!recipe.enabled)
     return (
       <div className="cake-preview cake-disabled">
-        <CakeIllustration recipe={recipe} />
+        <CakeIllustration
+          recipe={recipe}
+          extinguishedCandleIds={extinguishedCandleIds}
+        />
         <h2>Cake လေး ထည့်မလား?</h2>
         <p>
           ညာဘက်မှာ Cake ထည့်မယ်ကို ရွေးပြီး ကိုယ်ပိုင် design လေး
@@ -56,7 +63,10 @@ export function CakePreview({
       </div>
       {failed ? (
         <>
-          <CakeIllustration recipe={recipe} />
+          <CakeIllustration
+            recipe={recipe}
+            extinguishedCandleIds={extinguishedCandleIds}
+          />
           <p className="cake-fallback-note" role="status">
             ဒီ browser မှာ 3D မပြနိုင်လို့ အရောင်နဲ့ အလွှာတူ 2D နမူနာ
             ပြထားပါတယ်။ Cake ကို ဆက်ပြင်နိုင်ပါတယ်။
@@ -67,12 +77,21 @@ export function CakePreview({
           <Suspense
             fallback={
               <>
-                <CakeIllustration recipe={recipe} />
+                <CakeIllustration
+                  recipe={recipe}
+                  extinguishedCandleIds={extinguishedCandleIds}
+                />
                 <p role="status">3D cake ပြင်ဆင်နေပါတယ်…</p>
               </>
             }
           >
-            <CakeScene recipe={recipe} onFailure={onFailure} editor={editor} />
+            <CakeScene
+              recipe={recipe}
+              onFailure={onFailure}
+              editor={editor}
+              extinguishedCandleIds={extinguishedCandleIds}
+              onToggleCandle={onToggleCandle}
+            />
           </Suspense>
         </SceneBoundary>
       )}
