@@ -15,7 +15,10 @@ import {
   saveProjects,
   type Library,
   type Project,
+  attachCloudReceipt,
+  cloudProjectCopy,
 } from '../../projects/project-storage'
+import type { CloudDraft, CloudReceipt } from '../../../shared/cloud/drafts'
 
 type SaveStatus = 'idle' | 'saved' | 'error' | 'blocked'
 function makeProject(
@@ -92,6 +95,41 @@ export function useCreatorDraft() {
     project: active,
     projects: state.library.projects,
     saveStatus: state.saveStatus,
+    recordCloudSave: (id: string, receipt: CloudReceipt) =>
+      setState((current) => {
+        const library = attachCloudReceipt(current.library, id, receipt)
+        return {
+          ...current,
+          library,
+          saveStatus:
+            current.saveStatus === 'blocked'
+              ? 'blocked'
+              : saveProjects(browserDraftStorage, library)
+                ? 'saved'
+                : 'error',
+        }
+      }),
+    importCloudCopy: (row: CloudDraft) => {
+      const project = cloudProjectCopy(row)
+      setState((current) => {
+        const library = {
+          ...current.library,
+          activeId: project.id,
+          projects: [...current.library.projects, project],
+        }
+        return {
+          library,
+          past: [],
+          future: [],
+          saveStatus:
+            current.saveStatus === 'blocked'
+              ? 'blocked'
+              : saveProjects(browserDraftStorage, library)
+                ? 'saved'
+                : 'error',
+        }
+      })
+    },
     onChange,
     retrySave: () =>
       setState({

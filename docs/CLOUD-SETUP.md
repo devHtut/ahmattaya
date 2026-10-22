@@ -1,68 +1,33 @@
-# Cloud publishing setup — next stage
+# Private cloud drafts and publishing setup
 
-The UI checkpoint is preserved at `0822734` on `claude/unique-ui-redesign`.
-Work continues on `codex/publishing-foundation`. All pre-existing local branches
-were pushed to origin without force updates.
+Current branch: `codex/private-cloud-drafts`, based on the completed receiver UI at `0a2f3b7`.
 
-## Current behavior
+## Completed
 
-Projects, photos, backgrounds and music remain local to this browser/origin.
-`/preview` reads the current editor workspace, including unsaved in-memory edits;
-it is not a recipient URL. The Share dialog explains this and does not offer a
-Copy Link action. Vercel hosting alone does not publish individual projects.
+- Public Supabase configuration lives in ignored `.env.local` and Vercel's Production/Preview environment settings. `.env.example` documents names only. Secret/service-role keys are rejected by frontend configuration validation.
+- Guest sign-in remains explicit. Restored sessions are checked with `getUser()`; no guest account is created during page loads.
+- The owner ran `supabase/migrations/202610220001_private_drafts.sql` in the project's SQL Editor. This migration creates private drafts with RLS and column-level grants. Auth guests use the authenticated role; only their own rows are visible/editable. Unauthenticated visitors have no table access. No delete grant is provided.
+- The Cloud toolbar icon, Share panel and Projects page expose manual Save and the current Guest's paginated draft list. Browser saving remains separate and automatic. Saving does not publish anything.
+- Complete snapshots currently contain text, opening, appearance, embedded compressed photos, pages, preset music and cake configuration. Background images and custom music use IndexedDB-only assets and explicitly block Cloud Save until media upload is implemented; they are never silently omitted. Payload size is bounded on client and database.
+- Updating uses owner/project/revision filters with server-controlled revision increments and timestamps. Stale saves fail rather than replacing newer content. The client never uses an unconditional upsert. A failed or uncertain write preserves the local draft and requires reading the newer cloud snapshot before retrying an outdated revision.
+- Successful receipts are persisted with the local project; receipt updates preserve edits made while the upload is in flight. Cloud imports create a new local working copy linked to the source cloud revision, preserving every existing local project. Saving that working copy updates its source cloud draft. File → Duplicate creates an independent unlinked project.
+- Requests time out after 20 seconds and can be retried. Only server-confirmed saves show a success message. No background autosave or misleading “all changes saved to cloud” status is used.
 
-## Project configuration received
+## Verification
 
-The owner supplied the new project URL and legacy public `anon` key. They are
-stored only in ignored `.env.local`; `.env.example` documents the variable names.
-Both `VITE_SUPABASE_PUBLISHABLE_KEY` and `VITE_SUPABASE_ANON_KEY` are supported.
-Configuration validation rejects secret/service-role keys, insecure URLs and
-legacy keys for a different Supabase project. This is a configuration guard, not
-server-side authentication validation. The official SDK is dynamically imported
-only when the Share dialog's cloud panel is opened.
+- 67 automated tests, lint and production build pass. Embedded PostgreSQL tests apply the actual migration and verify owner/other/anon access, immutable identity/revisions, conflicting updates, payload limits and invalid JSON shape.
+- `scripts/verify-cloud-drafts.mjs` is an opt-in live check using two isolated test guests. It passed against the configured Supabase project: insert/read/update, stale-save rejection, unrelated-guest read/update isolation, forged-owner insert denial, immutable ownership, and unauthenticated denial. One harmless private verification fixture remains under the temporary test guest; existing user drafts were not read or changed by that script.
+- Browser verification uses a separate “Cloud Save စမ်းသပ်ကတ်” project made from the golden birthday template. Save, reload/restore and update pass through the real app UI. A stale phone-width browser view also receives the expected conflict instead of overwriting a newer revision. The 390×844 iframe viewport was reviewed for dialog layout; physical devices remain untested.
+- The pre-existing large CakeScene build warning remains.
 
-The public Auth settings endpoint responded successfully. The first guest sign-in
-attempt returned `anonymous_provider_disabled`; the owner then enabled Anonymous
-Sign-Ins. A real browser guest sign-in and server-verified restoration after reload
-both succeeded. The public key cannot change administrative project settings. No database
-schema, media bucket or cloud draft has been created by this change.
+## Limits and next stages
 
-The Share dialog exposes an explicit Guest connection action; it never creates
-anonymous users during page loads. Existing sessions are restored and checked
-with `getUser()` instead of being treated as verified solely from local storage.
-The SDK persists and refreshes the session, while the UI continues to identify
-projects as browser-local. Closing/reopening the panel rechecks the session.
-Provider-disabled, CAPTCHA and rate-limit errors receive readable messages.
-Guest creation and reload restoration are verified. Private-draft/RLS migrations
-are the next stage.
+Guest access is tied to the saved session on this browser/origin. Another device or preview URL creates a different Guest; losing the session can lose access to its cloud drafts. Account linking/recovery is not implemented yet, so this UI does not claim cross-device sign-in. Local trash does not delete remote drafts.
 
-Database passwords and service-role/secret keys must not be placed in frontend
-variables or committed. Do not confuse a connected guest session with a completed
-cloud save or a published recipient link. Vercel public environment configuration is managed separately from Git. Production and Preview public variables are configured. The production deployment
-is ready at https://ahmattaya.vercel.app; guest sign-in and server-verified session
-restoration after reload both passed on the hosted site.
+Cloud storage is private. `/preview` still reads the local workspace, including in-memory edits, and is not a recipient URL. Share Link stays disabled until publishing is implemented.
 
-## Implementation sequence
+Next: private media storage/uploads and media reference validation; then published snapshots and recipient routes; then account linking/recovery, unpublish/delete, quotas/cleanup and QR tickets. Collaboration/RSVP/AR remain later work.
 
-1. Enable guest (anonymous) authentication and establish owner identity. Guests
-   must be able to later register/claim their cards. Anonymous sign-in requires
-   the provider to be enabled and abuse protection to be configured.
-2. Add reviewed database migrations and RLS for private drafts, ownership/access,
-   media records and published snapshots. Keep public card content separated from
-   private editing credentials. Verify policies using owner, unrelated user and
-   unauthenticated requests before deployment.
-3. Upload compressed images and bounded audio into storage, replacing device-local
-   references in published snapshots. Validate type/size and limit access to media
-   associated with a published snapshot. Preserve local projects during migration.
-4. Publish a validated snapshot and return a unique recipient URL only after the
-   server confirms success. Recipient routes must fetch by the public card ID;
-   they must never fall back to the visitor's local editor project.
-5. Implement owner edit/unpublish/delete, then QR tickets and optional account
-   sign-up/claim. Track quotas and clean abandoned/expired media without removing
-   assets still referenced by drafts or published snapshots.
+For a new environment, run the checked-in migration once in that project's SQL Editor; do not rerun it on an already-initialized table. No database password or privileged key belongs in frontend variables or Git.
 
-Guest ownership, storage policies and the public/private boundary are prerequisites
-for a usable Publish button. Collaborative editing, RSVP and AR remain later stages.
-
-References: [Supabase anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous),
-[public versus secret API keys](https://supabase.com/docs/guides/api/api-keys).
+References: [Supabase row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security), [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous), [public versus secret API keys](https://supabase.com/docs/guides/api/api-keys).

@@ -4,6 +4,7 @@ import { Copy, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from '../creator/components/DraftStatus'
+import { CloudConnection } from '../publishing/CloudConnection'
 
 export function ProjectsPage({
   workspace: w,
@@ -107,6 +108,7 @@ export function ProjectsPage({
       {items.length === 0 && (
         <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
       )}
+      <CloudConnection workspace={w} />
     </main>
   )
 }

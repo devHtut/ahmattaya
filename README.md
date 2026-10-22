@@ -170,3 +170,7 @@ session restoration after reload have succeeded. Keys stay in ignored `.env.loca
 media buckets or published links exist yet. See [Cloud setup](docs/CLOUD-SETUP.md)
 for the current verification results and the remaining owner/guest, media, RLS
 and publishing stages.
+
+### Private Cloud drafts
+
+Cloud toolbar icon / Projects page → Guest connection → explicit Cloud Save. Owner-only drafts include embedded photos, preset music and cake settings; background images and custom uploaded songs require the next media-storage stage and currently block saving. A cloud restore creates a new local working copy and never replaces an existing browser draft. Updates protect against stale revisions. Guest access remains tied to this browser session; account recovery/cross-device sign-in and public Share links are not implemented yet. See [Cloud setup](docs/CLOUD-SETUP.md) for the applied SQL migration and validation.

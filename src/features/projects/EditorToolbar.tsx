@@ -3,6 +3,7 @@ import { CloudConnection } from '../publishing/CloudConnection'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Check,
+  Cloud,
   Eye,
   FolderKanban,
   LayoutTemplate,
@@ -134,6 +135,17 @@ export function EditorToolbar({
           <span>မသိမ်းရသေးပါ</span>
         )}
       </span>
+      <button
+        className="icon-button"
+        aria-label="Cloud ကတ်များ"
+        title="Cloud သိမ်းဆည်းမှု"
+        onClick={() => {
+          setCloudOpened(true)
+          shareDialog.current?.showModal()
+        }}
+      >
+        <Cloud size={17} />
+      </button>
 
       <div className="bar-history">
         <button
@@ -199,7 +211,7 @@ export function EditorToolbar({
         aria-labelledby="share-heading"
       >
         <div className="share-dialog-header">
-          <h2 id="share-heading">ကတ်ကို မျှဝေရန်</h2>
+          <h2 id="share-heading">Cloud နဲ့ မျှဝေမှု</h2>
           <button
             className="icon-button"
             aria-label="ပိတ်မယ်"
@@ -209,8 +221,8 @@ export function EditorToolbar({
           </button>
         </div>
         <p className="share-dialog-desc">
-          ဒီကတ်ကို လောလောဆယ် ဒီ browser ထဲမှာပဲ သိမ်းထားပါတယ်။ တခြားသူ သို့မဟုတ်
-          တခြားစက်မှာ ဖွင့်ကြည့်နိုင်တဲ့ Share link မရသေးပါ။
+          ဒီ browser မှာ အလိုအလျောက် သိမ်းပေးပါတယ်။ Cloud မိတ္တူအတွက် အောက်က
+          သိမ်းမယ်ကို နှိပ်ပါ။ တခြားသူကို ပို့နိုင်တဲ့ Share link မရသေးပါ။
         </p>
         <p className="share-dialog-desc">
           Cloud မှာ သိမ်းပြီး Publish လုပ်နိုင်တဲ့အခါ ဒီကတ်အတွက် သီးခြား link
@@ -222,7 +234,12 @@ export function EditorToolbar({
             ပြန်စစ်ပေးပါ။
           </p>
         )}
-        {cloudOpened && <CloudConnection />}
+        {cloudOpened && (
+          <CloudConnection
+            workspace={w}
+            onRestored={() => shareDialog.current?.close()}
+          />
+        )}
         <div className="share-dialog-actions">
           <Link
             className="button primary"

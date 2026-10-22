@@ -1,5 +1,11 @@
 import { z } from 'zod'
 import {
+  cloudReceiptSchema,
+  receiptFor,
+  type CloudDraft,
+  type CloudReceipt,
+} from '../../shared/cloud/drafts.ts'
+import {
   loadDraft,
   storedCardSchema,
   type DraftStorage,
@@ -12,6 +18,7 @@ export const projectSchema = z.object({
   updatedAt: z.iso.datetime(),
   deleted: z.boolean().default(false),
   card: storedCardSchema,
+  cloud: cloudReceiptSchema.optional(),
 })
 export type Project = z.infer<typeof projectSchema>
 export const librarySchema = z
@@ -26,6 +33,28 @@ export const librarySchema = z
     data.projects.some((p) => p.id === data.activeId && !p.deleted),
   )
 export type Library = z.infer<typeof librarySchema>
+export function attachCloudReceipt(
+  library: Library,
+  id: string,
+  receipt: CloudReceipt,
+): Library {
+  return {
+    ...library,
+    projects: library.projects.map((p) =>
+      p.id === id ? { ...p, cloud: cloudReceiptSchema.parse(receipt) } : p,
+    ),
+  }
+}
+export function cloudProjectCopy(row: CloudDraft): Project {
+  return projectSchema.parse({
+    id: crypto.randomUUID(),
+    name: row.name,
+    updatedAt: new Date().toISOString(),
+    deleted: false,
+    card: structuredClone(row.card),
+    cloud: receiptFor(row),
+  })
+}
 export function loadProjects(
   storage: DraftStorage,
 ):

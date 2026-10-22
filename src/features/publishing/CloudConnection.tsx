@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { cloudConfig, getCloudClient } from '../../shared/cloud/client'
 import { guestAuthMessage } from '../../shared/cloud/auth-errors'
+import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
+import { CloudDrafts } from './CloudDrafts'
 
-export function CloudConnection() {
+export function CloudConnection({
+  workspace,
+  onRestored,
+}: {
+  workspace: ProjectWorkspace
+  onRestored?: () => void
+}) {
+  const [ownerId, setOwnerId] = useState<string | null>(null)
   const [status, setStatus] = useState<
     'idle' | 'loading' | 'connected' | 'error'
   >('loading')
@@ -22,8 +31,10 @@ export function CloudConnection() {
         if (data.session) {
           const verified = await client.auth.getUser()
           if (verified.error) throw verified.error
-          if (alive.current)
+          if (alive.current) {
+            setOwnerId(verified.data.user?.id ?? null)
             setStatus(verified.data.user ? 'connected' : 'idle')
+          }
         } else if (alive.current) setStatus('idle')
       })
       .catch(() => {
@@ -53,7 +64,10 @@ export function CloudConnection() {
         : await client.auth.signInAnonymously()
       if (result.error) throw result.error
       if (!result.data.user) throw new Error('No user returned')
-      if (alive.current) setStatus('connected')
+      if (alive.current) {
+        setOwnerId(result.data.user.id)
+        setStatus('connected')
+      }
     } catch (error) {
       if (alive.current) {
         setStatus('error')
@@ -77,7 +91,7 @@ export function CloudConnection() {
     <section className="cloud-connection" aria-label="Cloud ချိတ်ဆက်မှု">
       <p role="status" className="share-dialog-desc">
         {status === 'connected'
-          ? '✓ Guest session ချိတ်ပြီးပါပြီ။ ကတ်တွေကို Cloud ပေါ် မတင်ရသေးပါ။'
+          ? '✓ Guest session ချိတ်ပြီးပါပြီ။'
           : status === 'loading'
             ? 'Cloud session ကို စစ်ဆေးနေပါတယ်…'
             : 'Account မဖွင့်ဘဲ Guest အဖြစ် စတင်ချိတ်ဆက်နိုင်ပါတယ်။'}
@@ -96,10 +110,14 @@ export function CloudConnection() {
           Guest အဖြစ် ချိတ်မယ်
         </button>
       )}
-      <p className="field-hint">
-        ဒီအဆင့်က Guest session အတွက်ပါ။ Cloud သိမ်းဆည်းမှုနဲ့ Publish ကို
-        ဆက်ထည့်ရပါဦးမယ်။
-      </p>
+      {status === 'connected' && ownerId && (
+        <CloudDrafts
+          key={ownerId}
+          workspace={workspace}
+          ownerId={ownerId}
+          onRestored={onRestored}
+        />
+      )}
     </section>
   )
 }
