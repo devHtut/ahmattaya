@@ -657,7 +657,7 @@ legend {
   place-items: center;
 }
 .artboard {
-  width: min(100%, 470px);
+  width: min(100%, 640px);
   background: var(--card);
   border-radius: var(--radius-l);
   border: 1px solid rgba(60, 40, 20, 0.08);
@@ -1004,7 +1004,8 @@ legend {
 .card-page-frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  /* Widescreen storybook page — reads like a scene, not a poster */
+  aspect-ratio: 16 / 10;
   container-type: inline-size;
   flex-shrink: 0;
 }
@@ -1023,12 +1024,46 @@ legend {
 .card-copy {
   position: absolute;
   inset: 0;
-  padding: 7cqw 6cqw;
+  padding: 6.5cqw 6cqw 5cqw;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  scrollbar-width: thin;
+}
+.copy-side {
+  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: auto;
+  justify-content: center;
+  gap: 1.5cqw;
+  border-right: 1px dashed color-mix(in srgb, currentColor 16%, transparent);
+  padding-right: 4cqw;
+}
+.copy-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden auto;
+  padding-left: 4.5cqw;
   scrollbar-width: thin;
+}
+.scrapbook-page.is-page .copy-side {
+  flex-basis: 10%;
+  opacity: 0.55;
+}
+.page-motif {
+  display: flex;
+  flex-direction: column;
+  gap: 1cqw;
+}
+.page-motif span {
+  width: 0.9cqw;
+  height: 0.9cqw;
+  border-radius: 50%;
+  background: currentColor;
 }
 .scrapbook-page .card-copy .eyebrow {
   display: block;
@@ -1036,13 +1071,19 @@ legend {
   letter-spacing: 0.3cqw;
 }
 .scrapbook-page .card-copy .preview-symbol {
-  display: block;
-  font-size: 10cqw;
-  margin: 4cqw 0 2cqw;
+  display: grid;
+  place-items: center;
+  width: 12cqw;
+  height: 12cqw;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+  font-size: 6cqw;
+  margin: 0;
 }
-.scrapbook-page .card-copy .recipient {
-  font-size: 2cqw;
-  margin-bottom: 1.3cqw;
+.scrapbook-page .card-copy .copy-for {
+  font-size: 1.9cqw;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 .scrapbook-page .card-copy h2 {
   line-height: 1.9;
@@ -1051,16 +1092,17 @@ legend {
 .scrapbook-page .card-copy .card-message {
   width: 100%;
   max-width: none;
-  margin-top: 2.5cqw;
-  line-height: 2.2;
+  margin-top: 1.4cqw;
+  line-height: 2.1;
 }
 .scrapbook-page .card-copy .signature {
-  margin-top: 4cqw;
+  margin-top: 1.6cqw;
   font-size: 1.8cqw;
 }
 .scrapbook-page .card-copy .preview-brand {
-  display: block;
-  margin-top: 4cqw;
+  position: absolute;
+  left: 6cqw;
+  bottom: 3cqw;
   font-size: 1.5cqw;
   letter-spacing: 0.15cqw;
 }
@@ -1068,19 +1110,17 @@ legend {
   min-height: 0;
   background: none;
 }
-.scrapbook-page.paper-lined::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
+.scrapbook-page.paper-lined .copy-main {
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent calc(5cqw - 1px),
-    color-mix(in srgb, currentColor 12%, transparent) calc(5cqw - 1px),
-    color-mix(in srgb, currentColor 12%, transparent) 5cqw
+    transparent calc(4.6cqw - 1px),
+    color-mix(in srgb, currentColor 10%, transparent) calc(4.6cqw - 1px),
+    color-mix(in srgb, currentColor 10%, transparent) 4.6cqw
   );
+}
+.scrapbook-page.paper-lined::before {
+  display: none;
 }
 
 /* Page background layer */
@@ -1906,31 +1946,246 @@ legend {
   background: var(--accent-faint);
 }
 .receiver-content-heading {
-  font-size: 18px;
+  font-size: clamp(19px, 3.4vw, 30px);
   text-align: center;
   line-height: 1.9;
+  margin-bottom: 5cqw;
 }
-.receiver-card-page {
-  width: min(100%, 440px);
+
+/* --------------------------------------------------------------------------
+   Receiver story — continuous scroll-snap scenes
+   -------------------------------------------------------------------------- */
+
+.receiver-story {
+  position: relative;
+  scroll-snap-type: y proximity;
+  overflow-y: auto;
+  height: 100dvh;
+  scrollbar-width: thin;
 }
-.receiver-card-page .experience {
+.story-confetti {
+  position: fixed;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
 }
-.receiver-preview {
+.story-scene {
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  position: relative;
+}
+.scene-opening {
+  gap: 18px;
+}
+.scene-opening > .pill {
+  position: absolute;
+  top: 18px;
+}
+.scene-cover {
+  background: radial-gradient(
+    700px 340px at 50% 30%,
+    color-mix(in srgb, var(--card-accent, var(--accent)) 8%, transparent) 0%,
+    transparent 70%
+  );
+}
+.story-card {
+  width: min(100%, 720px);
+}
+.story-card > .card-page-frame {
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    0 34px 70px -24px rgba(60, 40, 20, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.scene-kicker {
+  font:
+    800 10px 'Nunito Sans',
+    sans-serif;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 14px;
+}
+.cake-scene-title {
+  font-size: clamp(20px, 3.6vw, 30px);
+  text-align: center;
+  line-height: 1.9;
+  margin-bottom: 18px;
+}
+.story-cake {
+  width: min(100%, 640px);
+}
+.story-cake .cake-preview {
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 34px 70px -24px rgba(60, 40, 20, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.cake-wish {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-align: center;
+  margin-top: 20px;
+  line-height: 2;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  animation: hint-bob 2.4s ease-in-out infinite;
+}
+.scroll-hint svg {
+  animation: hint-arrow 2.4s ease-in-out infinite;
+}
+.scene-end {
+  min-height: 88dvh;
+}
+.end-mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-align: center;
+}
+.end-line {
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-align: center;
+  max-width: 420px;
+  margin-top: 14px;
+  line-height: 2.2;
+}
+.end-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+.end-actions .button {
+  min-width: 240px;
+}
+
+/* Reveal — scenes float in as they enter the viewport */
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(34px) scale(0.985);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-cover .story-card {
+  transition-delay: 0.12s;
+}
+
+/* Floating audio — sits above the story, out of the way */
+.story-audio {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.floating-audio {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  gap: 24px;
-  padding-block: 40px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 28px rgba(60, 40, 20, 0.18);
+  backdrop-filter: blur(10px);
+  max-width: min(72vw, 300px);
 }
-.receiver-preview .experience {
-  width: min(100%, 440px);
-}
-.page-number {
-  text-align: center;
+.fa-title {
   font-size: 10px;
+  font-weight: 700;
   color: var(--ink-soft);
-  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+.fa-btn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper-soft);
+  transition:
+    transform 0.14s ease,
+    background 0.14s ease;
+}
+.fa-btn:hover {
+  transform: scale(1.08);
+  background: var(--accent);
+}
+.fa-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.fa-bars i {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  height: 4px;
+  transition: height 0.2s ease;
+}
+.fa-bars.on i {
+  animation: eq-bar 1s ease-in-out infinite;
+}
+.fa-bars.on i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.fa-bars.on i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.fa-bars.on i:nth-child(4) {
+  animation-delay: 0.45s;
+}
+.fa-error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--danger);
 }
 
 @keyframes invitation-float {
@@ -1974,6 +2229,32 @@ legend {
     opacity: 0;
     transform: translate(var(--spark-x), var(--spark-y))
       rotate(var(--spark-rotation));
+  }
+}
+
+@keyframes hint-bob {
+  50% {
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+@keyframes hint-arrow {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+@keyframes eq-bar {
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 13px;
   }
 }
 
@@ -2298,7 +2579,7 @@ legend {
   place-items: center;
 }
 .foyer-table .card-page-frame {
-  width: min(100%, 380px);
+  width: min(100%, 520px);
   transform: rotate(2.5deg);
   border-radius: var(--radius-l);
   box-shadow:
@@ -2630,7 +2911,7 @@ footer {
   min-width: 0;
 }
 .template-preview-stage > .card-page-frame {
-  width: min(100%, 370px);
+  width: min(100%, 560px);
 }
 .template-preview-stage > .opening-invitation {
   width: 100%;
@@ -2716,7 +2997,7 @@ footer {
   box-shadow: 0 18px 40px rgba(60, 40, 20, 0.12);
 }
 .shelf-thumb {
-  height: 220px;
+  height: 200px;
   overflow: hidden;
   background:
     radial-gradient(#dccfb4 1px, transparent 1px) 0 0 / 18px 18px,
@@ -2725,11 +3006,11 @@ footer {
   pointer-events: none;
 }
 .shelf-thumb > div {
-  width: 600px;
+  width: 560px;
   position: absolute;
-  top: 12px;
+  top: 22px;
   left: 50%;
-  transform: translateX(-50%) scale(0.44);
+  transform: translateX(-50%) scale(0.34);
   transform-origin: top center;
 }
 .shelf-card-body {
@@ -2878,7 +3159,7 @@ footer {
     display: block;
   }
   .template-preview-stage > .card-page-frame {
-    width: min(100%, 300px);
+    width: min(100%, 420px);
     margin-inline: auto;
   }
   .prop-seal,
@@ -2944,4 +3225,113 @@ footer {
 }
 .cloud-connection .button {
   margin-block: 10px;
+}
+
+/* Compact scenes keep the same canvas proportions in the editor and story. */
+.receiver-story .reveal {
+  width: 100%;
+  max-width: 680px;
+}
+.story-card {
+  width: min(100%, 620px);
+}
+.story-cake {
+  width: min(100%, 520px);
+}
+.story-scene {
+  padding-block: 64px 80px;
+}
+.story-audio[hidden] {
+  display: none;
+}
+.scroll-hint {
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 24px;
+}
+.scroll-hint:hover {
+  color: var(--accent);
+}
+.receiver-story .receiver-content-heading {
+  margin-bottom: 24px;
+}
+@media (max-width: 600px) {
+  .story-scene {
+    padding-inline: 16px;
+  }
+  .story-card > .card-page-frame {
+    border-radius: 12px;
+  }
+  .receiver-story .copy-side {
+    flex-basis: 18%;
+    padding-right: 2cqw;
+  }
+  .receiver-story .copy-main {
+    padding-left: 3cqw;
+  }
+  .receiver-story .card-copy {
+    padding: 4cqw 4cqw 7cqw;
+  }
+  .receiver-story .card-copy h2 {
+    line-height: 1.6;
+  }
+  .receiver-story .card-message {
+    line-height: 1.8;
+  }
+  .receiver-story .card-copy .eyebrow {
+    font-size: 1.6cqw;
+    letter-spacing: 0.12cqw;
+  }
+  .receiver-story .copy-for {
+    font-size: 2.4cqw !important;
+  }
+  .receiver-story .signature {
+    font-size: 2.5cqw !important;
+  }
+  .story-audio {
+    top: max(12px, env(safe-area-inset-top));
+    bottom: auto;
+    right: 12px;
+  }
+  .receiver-story { --card-min-type: 12px; }
+  .fa-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .floating-audio {
+    padding: 4px 8px;
+    gap: 6px;
+    max-width: calc(100vw - 24px);
+  }
+  .fa-title {
+    max-width: 95px;
+  }
+  .scene-end {
+    padding-bottom: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .receiver-story {
+    scroll-snap-type: none;
+  }
+}
+
+.receiver-story {
+  scroll-behavior: smooth;
+}
+.story-cake .cake-scene {
+  height: clamp(220px, 40svh, 320px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .receiver-story {
+    scroll-behavior: auto;
+  }
+}
+
+.scene-opening > .opening-invitation {
+  width: min(100%, 480px);
 }

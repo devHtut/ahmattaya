@@ -54,17 +54,18 @@ export function PhotoCanvas({
     event.currentTarget.setPointerCapture(event.pointerId)
     const rect = layer.current.getBoundingClientRect()
     onSelect?.(photo.id)
+    const frame = constrainFrame(photo.frame)
     gesture.current = {
       id: photo.id,
       pointerId: event.pointerId,
       mode,
-      start: photo.frame,
+      start: frame,
       rect,
       x: event.clientX,
       y: event.clientY,
       angle: Math.atan2(
-        event.clientY - rect.top - (photo.frame.y / 100) * rect.height,
-        event.clientX - rect.left - (photo.frame.x / 100) * rect.width,
+        event.clientY - rect.top - (frame.y / 100) * rect.height,
+        event.clientX - rect.left - (frame.x / 100) * rect.width,
       ),
     }
   }
@@ -128,7 +129,8 @@ export function PhotoCanvas({
       }}
     >
       {photos.map((photo, index) => {
-        const frame = live?.id === photo.id ? live.frame : photo.frame
+        const frame =
+          live?.id === photo.id ? live.frame : constrainFrame(photo.frame)
         const selected = editable && selectedId === photo.id
         const style: CSSProperties = {
           left: `${frame.x}%`,
@@ -175,9 +177,9 @@ export function PhotoCanvas({
               onCommit?.(
                 photo.id,
                 constrainFrame({
-                  ...photo.frame,
-                  x: photo.frame.x + dx,
-                  y: photo.frame.y + dy,
+                  ...frame,
+                  x: frame.x + dx,
+                  y: frame.y + dy,
                 }),
               )
             }}
@@ -203,10 +205,9 @@ export function PhotoCanvas({
                       onCommit?.(
                         photo.id,
                         constrainFrame({
-                          ...photo.frame,
+                          ...frame,
                           rotation:
-                            photo.frame.rotation +
-                            (e.key === 'ArrowRight' ? 5 : -5),
+                            frame.rotation + (e.key === 'ArrowRight' ? 5 : -5),
                         }),
                       )
                     }
@@ -225,9 +226,8 @@ export function PhotoCanvas({
                       onCommit?.(
                         photo.id,
                         constrainFrame({
-                          ...photo.frame,
-                          width:
-                            photo.frame.width + (e.key === 'ArrowUp' ? 2 : -2),
+                          ...frame,
+                          width: frame.width + (e.key === 'ArrowUp' ? 2 : -2),
                         }),
                       )
                     }

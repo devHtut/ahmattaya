@@ -7,7 +7,7 @@ import { PhotoCanvas } from './PhotoCanvas'
 function textStyle(style: CardAppearance['heading']): CSSProperties {
   return {
     fontFamily: `'${style.font}', 'Noto Sans Myanmar', sans-serif`,
-    fontSize: `${style.size / 6}cqw`,
+    fontSize: `max(var(--card-min-type, 11px), ${style.size / 6}cqw)`,
     fontWeight: style.bold ? 700 : 400,
     fontStyle: style.italic ? 'italic' : 'normal',
     fontSynthesis: 'style',
@@ -36,13 +36,14 @@ export function CardPreview({
     (photo) => photo.pageId === (page?.id ?? 'cover'),
   )
   const { colors, heading, body } = card.appearance
+  const isCover = !page
   return (
     <div className="card-page-frame">
       <article
-        className={`experience scrapbook-page ${page?.paper === 'lined' ? 'paper-lined' : ''}`}
+        className={`experience scrapbook-page ${page?.paper === 'lined' ? 'paper-lined' : ''} ${isCover ? 'is-cover' : 'is-page'}`}
         aria-label="ကတ် နမူနာ"
         style={{
-          background: `linear-gradient(145deg, ${colors.surface}, ${colors.background})`,
+          background: `linear-gradient(135deg, ${colors.surface}, ${colors.background})`,
           color: colors.text,
         }}
       >
@@ -72,35 +73,44 @@ export function CardPreview({
           </span>
         )}
         <div className="card-copy">
-          {!page && (
-            <span className="eyebrow" style={{ color: colors.accent }}>
-              A LITTLE MOMENT, JUST FOR YOU
-            </span>
-          )}
-          {!page && (
-            <div className="preview-symbol" aria-hidden="true">
-              {occasions.find((item) => item.id === card.occasion)?.icon}
-            </div>
-          )}
-          {!page && (
-            <p className="recipient">
-              {card.receiverName || 'ချစ်ရသူလေး အတွက်'}
+          <div className="copy-side">
+            {isCover && (
+              <div className="preview-symbol" aria-hidden="true">
+                {occasions.find((item) => item.id === card.occasion)?.icon}
+              </div>
+            )}
+            {isCover && (
+              <span className="copy-for">
+                {card.receiverName || 'ချစ်ရသူလေး'} အတွက်
+              </span>
+            )}
+            {!isCover && (
+              <div className="page-motif" aria-hidden="true">
+                <span />
+                <span />
+              </div>
+            )}
+          </div>
+          <div className="copy-main">
+            {isCover && (
+              <span className="eyebrow" style={{ color: colors.accent }}>
+                A LITTLE MOMENT, JUST FOR YOU
+              </span>
+            )}
+            <h2 style={textStyle(heading)}>
+              {page ? page.title || 'စာမျက်နှာအသစ်' : card.title}
+            </h2>
+            <p className="card-message" style={textStyle(body)}>
+              {(page ? page.message : card.message) ||
+                'ရင်ထဲက စကားလေးတွေကို ဒီနေရာမှာ ရေးသားနိုင်ပါတယ်။'}
             </p>
-          )}
-          <h2 style={textStyle(heading)}>
-            {page ? page.title || 'စာမျက်နှာအသစ်' : card.title}
-          </h2>
-          <p className="card-message" style={textStyle(body)}>
-            {(page ? page.message : card.message) ||
-              'ရင်ထဲက စကားလေးတွေကို ဒီနေရာမှာ ရေးသားနိုင်ပါတယ်။'}
-          </p>
-          {!page && (
-            <div className="signature">
-              ချစ်ခြင်းများစွာဖြင့်
-              <br />
-              <strong>{card.senderName || 'သင့်အမည်'}</strong>
-            </div>
-          )}
+            {isCover && (
+              <div className="signature">
+                ချစ်ခြင်းများစွာဖြင့် ·{' '}
+                <strong>{card.senderName || 'သင့်အမည်'}</strong>
+              </div>
+            )}
+          </div>
           <span className="preview-brand" style={{ color: colors.accent }}>
             အမှတ်တရ · AhMatTaYa
           </span>

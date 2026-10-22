@@ -1,7 +1,8 @@
 import type { PhotoFrame } from '../models/card'
 
-export const PAGE_WIDTH = 600
-export const PAGE_HEIGHT = 800
+// Logical page canvas — matches the 16 / 10 storybook aspect of .card-page-frame
+export const PAGE_WIDTH = 640
+export const PAGE_HEIGHT = 400
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value))
 export function normalizeAngle(angle: number): number {
@@ -36,9 +37,9 @@ export function constrainFrame(frame: PhotoFrame): PhotoFrame {
 }
 export function defaultPhotoFrame(index: number, ratio = 4 / 3): PhotoFrame {
   return constrainFrame({
-    x: 42 + (index % 3) * 7,
-    y: 64 + (index % 3) * 5,
-    width: 48,
+    x: 78 - (index % 3) * 9,
+    y: 42 + (index % 3) * 13,
+    width: 26,
     ratio,
     rotation: index % 2 ? 7 : -6,
     shadow: true,
