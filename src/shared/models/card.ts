@@ -3,6 +3,7 @@ import { cakeSchema, legacyCakeSchema } from './cake.ts'
 import { openingSchema } from './opening.ts'
 import { musicSchema, legacyMusicSchema } from './music.ts'
 import { backgroundSchema } from './background.ts'
+import { eventSchema } from './event.ts'
 
 export const occasionSchema = z.enum([
   'birthday',
@@ -166,6 +167,7 @@ export const cardSchema = v6CardFields
     cake: cakeSchema,
     background: backgroundSchema.nullable().default(null),
     music: musicSchema,
+    event: eventSchema.default({}),
   })
   .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>

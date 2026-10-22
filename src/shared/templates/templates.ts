@@ -3,6 +3,7 @@ import { createCake } from '../models/cake.ts'
 import { createOpening } from '../models/opening.ts'
 import { createMusic } from '../models/music.ts'
 import { createAppearance } from './card-styles.ts'
+import { createWeddingEvent, createAnniversaryEvent } from '../models/event.ts'
 
 export const occasions: {
   id: Occasion
@@ -53,6 +54,12 @@ export function createCard(occasion: Occasion): CardConfig {
     cake: createCake(),
     opening: createOpening(),
     music: createMusic(),
+    event:
+      occasion === 'wedding-invitation'
+        ? { wedding: createWeddingEvent() }
+        : occasion === 'anniversary'
+          ? { anniversary: createAnniversaryEvent() }
+          : {},
     pages: [],
     photos: [],
     theme: 'lavender',
@@ -66,9 +73,17 @@ export function changeOccasion(
   card: CardConfig,
   occasion: Occasion,
 ): CardConfig {
+  const nextEvent = { ...card.event }
+  if (occasion === 'wedding-invitation' && !nextEvent.wedding) {
+    nextEvent.wedding = createWeddingEvent()
+  } else if (occasion === 'anniversary' && !nextEvent.anniversary) {
+    nextEvent.anniversary = createAnniversaryEvent()
+  }
+
   return {
     ...card,
     occasion,
+    event: nextEvent,
     title: card.title === titles[card.occasion] ? titles[occasion] : card.title,
   }
 }

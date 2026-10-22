@@ -123,6 +123,7 @@ function PublishedCardPage() {
       <PreviewPage
         key={publicId + ':' + attempt}
         card={state.card.card}
+        cardId={publicId}
         published
       />
     </MediaDeliveryContext.Provider>

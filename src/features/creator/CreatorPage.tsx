@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Cake,
+  Calendar,
   Check,
   FolderKanban,
   Images,
@@ -20,10 +21,13 @@ import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
 import { StyleFields } from './components/StyleFields'
+import { EventFields } from './components/EventFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
 import { useCakeEditor } from '../cake/lib/useCakeEditor'
 import { CakeFields } from '../cake/components/CakeFields'
 import { CakePreview } from '../cake/components/CakePreview'
+import { WeddingEventCard } from '../receiver/components/WeddingEventCard'
+import { AnniversaryTimeline } from '../receiver/components/AnniversaryTimeline'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 import { OpeningFields } from './components/OpeningFields'
 import { MusicFields } from './components/MusicFields'
@@ -35,12 +39,13 @@ export type MakerStep =
   | 'opening'
   | 'card'
   | 'style'
+  | 'event'
   | 'pages'
   | 'cake'
   | 'music'
   | 'projects'
 
-type CanvasView = 'opening' | 'cover' | 'pages' | 'cake'
+type CanvasView = 'opening' | 'cover' | 'pages' | 'cake' | 'event'
 
 const steps: {
   id: MakerStep
@@ -81,6 +86,14 @@ const steps: {
     hint: 'နောက်ခံပုံ၊ အရောင်တွဲနဲ့ စာလုံးပုံစံကို ကတ်နဲ့ လိုက်အောင် ဆင်ပါ။',
     icon: Palette,
     view: 'cover',
+  },
+  {
+    id: 'event',
+    label: 'အခမ်းအနား',
+    title: 'ပွဲအချက်အလက် / မှတ်တမ်း',
+    hint: 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ် နှစ်ပတ်လည် မှတ်တမ်း။',
+    icon: Calendar,
+    view: 'event',
   },
   {
     id: 'pages',
@@ -206,6 +219,11 @@ export function CreatorPage({
                   id: 'pages',
                   label: `စာမျက်နှာ${card.pages.length ? ` (${card.pages.length})` : ''}`,
                 },
+                ...(card.occasion === 'wedding-invitation'
+                  ? [{ id: 'event' as CanvasView, label: 'မင်္ဂလာပွဲ' }]
+                  : card.occasion === 'anniversary'
+                    ? [{ id: 'event' as CanvasView, label: 'မှတ်တမ်း' }]
+                    : []),
                 { id: 'cake', label: 'ကိတ်မုန့်' },
               ] as { id: CanvasView; label: string }[]
             ).map((v) => (
@@ -229,6 +247,28 @@ export function CreatorPage({
                 />
               ) : view === 'cake' ? (
                 <CakePreview recipe={card.cake} editor={cakeEditor} />
+              ) : view === 'event' ? (
+                <div className="bench-event-preview">
+                  {card.occasion === 'wedding-invitation' ? (
+                    <WeddingEventCard
+                      wedding={card.event?.wedding}
+                      cardId={workspace?.project.id}
+                      coupleNames={card.title}
+                    />
+                  ) : card.occasion === 'anniversary' ? (
+                    <AnniversaryTimeline
+                      anniversary={card.event?.anniversary}
+                      coupleNames={card.title}
+                    />
+                  ) : (
+                    <div className="bench-event-empty">
+                      <p>
+                        မင်္ဂလာဖိတ်စာ သို့မဟုတ် နှစ်ပတ်လည်ကတ်များတွင်သာ
+                        အခမ်းအနား အထူးကဏ္ဍများ ပါဝင်ပါသည်။
+                      </p>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   {view === 'pages' && step === 'pages' && (
@@ -363,6 +403,14 @@ export function CreatorPage({
 
             {step === 'style' && (
               <StyleFields card={card} onChange={onChange} />
+            )}
+
+            {step === 'event' && (
+              <EventFields
+                card={card}
+                onChange={onChange}
+                projectId={workspace?.project.id}
+              />
             )}
 
             {step === 'pages' && (

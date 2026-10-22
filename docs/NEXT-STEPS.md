@@ -12,9 +12,9 @@ Real-time collaborative editing and WebAR are deliberately deferred.
    celebratory wish banner, replay and confetti burst.
 4. **Receiver animation polish — implemented** — staggered text/page reveals,
    floating celebration emojis, interactive tap reactions, reduced-motion compliance.
-5. **Occasion-specific content** — wedding date/time/location/Maps, private owner
-   RSVP/guest list, and anniversary timeline. Define data migration and access
-   rules before adding new public inputs.
+5. **Occasion-specific content — implemented** — wedding date/time/location/venue,
+   direct Google Maps navigation, guest RSVP submission, creator RSVP dashboard
+   with Burmese CSV export and copy-to-clipboard, and anniversary milestone timeline.
 6. **Mobile and accessibility QA** — real phone/tablet keyboard behavior, photo
    gestures, cream/candle placement, audio/3D performance and keyboard navigation.
    Replace position-based completion checks with genuine per-step completion.

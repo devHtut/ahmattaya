@@ -10,6 +10,8 @@ import { useReveal } from '../../shared/ui/useReveal'
 import { CakePreview } from '../cake/components/CakePreview'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 import { FloatingEmojis } from '../../shared/ui/FloatingEmojis'
+import { WeddingEventCard } from './components/WeddingEventCard'
+import { AnniversaryTimeline } from './components/AnniversaryTimeline'
 
 function ScrollHint({ target }: { target: string }) {
   return (
@@ -42,9 +44,11 @@ function Reveal({
 export function PreviewPage({
   card,
   published = false,
+  cardId = 'default',
 }: {
   card: CardConfig
   published?: boolean
+  cardId?: string
 }) {
   const [opened, setOpened] = useState(false)
   const [burst, setBurst] = useState(0)
@@ -57,6 +61,21 @@ export function PreviewPage({
   const contentsHeading = useRef<HTMLHeadingElement>(null)
   const alive = useRef(false)
   const burstTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const isWedding = card.occasion === 'wedding-invitation'
+  const isAnniversary = card.occasion === 'anniversary'
+
+  const scenes: string[] = ['story-cover']
+  card.pages.forEach((p) => scenes.push(`story-page-${p.id}`))
+  if (isWedding) scenes.push('story-wedding')
+  if (isAnniversary) scenes.push('story-anniversary')
+  if (card.cake.enabled) scenes.push('story-cake')
+  scenes.push('story-end')
+
+  function getNextScene(currentId: string) {
+    const idx = scenes.indexOf(currentId)
+    return idx >= 0 && idx < scenes.length - 1 ? scenes[idx + 1] : 'story-end'
+  }
   const {
     track,
     failed: audioMissing,
@@ -223,15 +242,7 @@ export function PreviewPage({
                 <CardPreview card={card} />
               </div>
             </Reveal>
-            <ScrollHint
-              target={
-                card.pages[0]
-                  ? `story-page-${card.pages[0].id}`
-                  : card.cake.enabled
-                    ? 'story-cake'
-                    : 'story-end'
-              }
-            />
+            <ScrollHint target={getNextScene('story-cover')} />
           </section>
 
           {card.pages.map((page, index) => (
@@ -249,17 +260,44 @@ export function PreviewPage({
                   <CardPreview card={card} pageId={page.id} />
                 </div>
               </Reveal>
-              <ScrollHint
-                target={
-                  card.pages[index + 1]
-                    ? `story-page-${card.pages[index + 1].id}`
-                    : card.cake.enabled
-                      ? 'story-cake'
-                      : 'story-end'
-                }
-              />
+              <ScrollHint target={getNextScene(`story-page-${page.id}`)} />
             </section>
           ))}
+
+          {isWedding && (
+            <section
+              id="story-wedding"
+              className="story-scene scene-wedding"
+              aria-label="မင်္ဂလာဖိတ်ကြားလွှာ အချက်အလက်များ"
+            >
+              <Reveal>
+                <p className="scene-kicker">မင်္ဂလာအခမ်းအနား အစီအစဉ်</p>
+                <WeddingEventCard
+                  wedding={card.event?.wedding}
+                  cardId={cardId}
+                  coupleNames={card.title}
+                />
+              </Reveal>
+              <ScrollHint target={getNextScene('story-wedding')} />
+            </section>
+          )}
+
+          {isAnniversary && (
+            <section
+              id="story-anniversary"
+              className="story-scene scene-anniversary"
+              aria-label="နှစ်ပတ်လည် အမှတ်တရ မှတ်တိုင်များ"
+            >
+              <Reveal>
+                <p className="scene-kicker">ချစ်သက်တမ်း မှတ်တမ်းများ</p>
+                <AnniversaryTimeline
+                  anniversary={card.event?.anniversary}
+                  coupleNames={card.title}
+                />
+              </Reveal>
+              <ScrollHint target={getNextScene('story-anniversary')} />
+            </section>
+          )}
 
           {card.cake.enabled && (
             <section

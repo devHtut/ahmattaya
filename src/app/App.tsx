@@ -83,7 +83,7 @@ function EditorApp() {
           path="/preview"
           element={
             workspace.hasActiveProject ? (
-              <PreviewPage card={card} />
+              <PreviewPage card={card} cardId={workspace.project.id} />
             ) : (
               <Navigate to="/projects" replace />
             )
