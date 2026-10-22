@@ -1,22 +1,24 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ArrowLeft,
   ArrowRight,
   Cake,
   Calendar,
   Check,
-  FolderKanban,
+  Eye,
   Images,
-  LayoutTemplate,
   Mail,
   Music,
   Palette,
+  Send,
+  Share2,
+  Sparkles,
   Type,
 } from 'lucide-react'
 import type { CardConfig, Occasion } from '../../shared/models/card'
 import { occasionSchema } from '../../shared/models/card'
 import { changeOccasion, occasions } from '../../shared/templates/templates'
-import { templateCatalog } from '../../shared/templates/catalog'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from './components/DraftStatus'
 import { WordsFields } from './components/WordsFields'
@@ -32,10 +34,10 @@ import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 import { OpeningFields } from './components/OpeningFields'
 import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
+import { CloudConnection } from '../publishing/CloudConnection'
 import type { ProjectWorkspace } from './hooks/useCreatorDraft'
 
 export type MakerStep =
-  | 'templates'
   | 'opening'
   | 'card'
   | 'style'
@@ -43,7 +45,7 @@ export type MakerStep =
   | 'pages'
   | 'cake'
   | 'music'
-  | 'projects'
+  | 'publish'
 
 type CanvasView = 'opening' | 'cover' | 'pages' | 'cake' | 'event'
 
@@ -52,17 +54,9 @@ const steps: {
   label: string
   title: string
   hint: string
-  icon: typeof LayoutTemplate
+  icon: typeof Mail
   view: CanvasView
 }[] = [
-  {
-    id: 'templates',
-    label: 'နမူနာ',
-    title: 'နမူနာ ရွေးပါ',
-    hint: 'အသင့်ပုံစံတစ်ခုနဲ့ စဦးနော်အောင် — နောင်မှ စိတ်ကြိုက် ပြင်နိုင်ပါတယ်။',
-    icon: LayoutTemplate,
-    view: 'cover',
-  },
   {
     id: 'opening',
     label: 'ဖိတ်စာ',
@@ -83,7 +77,7 @@ const steps: {
     id: 'style',
     label: 'အလှဆင်',
     title: 'အရောင်နဲ့ ဖောင့်',
-    hint: 'နောက်ခံပုံ၊ အရောင်တွဲနဲ့ စာလုံးပုံစံကို ကတ်နဲ့ လိုက်အောင် ဆင်ပါ။',
+    hint: 'ကတ်တစ်ခုလုံးရဲ့ အရောင်တွဲနဲ့ စာလုံးပုံစံကို လိုက်အောင် ဆင်ပါ။',
     icon: Palette,
     view: 'cover',
   },
@@ -115,16 +109,16 @@ const steps: {
     id: 'music',
     label: 'သံစဉ်',
     title: 'နောက်ခံ သံစဉ်',
-    hint: 'ကတ်ဖွင့်ချိန် တေးလေးတစ်ပုဒ် သည်းခန်းစေချင်လား။',
+    hint: 'ကတ်ဖွင့်ချိန် တေးလေးတစ်ပုဒ် သီဆိုစေချင်လား။',
     icon: Music,
     view: 'cover',
   },
   {
-    id: 'projects',
-    label: 'ဖိုင်များ',
-    title: 'သိမ်းထားတဲ့ ဖိုင်များ',
-    hint: 'လက်ရှိကတ်ကို ဆက်ပြင်ပါ၊ ဒါမှမဟုတ် အစ်စ်ပါတ်တွေကို ကွပ်ကြည့်ပါ။',
-    icon: FolderKanban,
+    id: 'publish',
+    label: 'မျှဝေမယ်',
+    title: 'စစ်ဆေး & မျှဝေမယ်',
+    hint: 'ကတ်လေးကို အစအဆုံး စစ်ဆေးပြီး Reviewer သို့မဟုတ် လက်ခံသူထံ မျှဝေလိုက်ပါ။',
+    icon: Send,
     view: 'cover',
   },
 ]
@@ -144,7 +138,6 @@ export function CreatorPage({
 }) {
   const [step, setStep] = useState<MakerStep>('card')
   const [view, setView] = useState<CanvasView>('cover')
-  const [templateFilter, setTemplateFilter] = useState('all')
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
 
@@ -164,18 +157,19 @@ export function CreatorPage({
   function goTo(target: MakerStep) {
     const def = steps.find((s) => s.id === target)
     setStep(target)
-    if (def) setView(def.view)
+    if (def) {
+      if (target === 'style' && view === 'pages') {
+        // Keep view on 'pages' so user can preview theme/font on the active page
+      } else {
+        setView(def.view)
+      }
+    }
     if (target !== 'pages') setSelectedPhotoId(null)
   }
   function go(delta: -1 | 1) {
     const next = steps[stepIndex + delta]
     if (next) goTo(next.id)
   }
-
-  const filteredTemplates =
-    templateFilter === 'all'
-      ? templateCatalog
-      : templateCatalog.filter((t) => t.occasion === templateFilter)
 
   return (
     <div className="maker">
@@ -331,46 +325,6 @@ export function CreatorPage({
           </div>
 
           <div className="panel-body">
-            {step === 'templates' && (
-              <div>
-                <div className="shelf-filter">
-                  {[
-                    { id: 'all', label: 'အားလုံး' },
-                    { id: 'birthday', label: '🎂 မွေးနေ့' },
-                    { id: 'wedding-invitation', label: '💌 မင်္ဂလာဖိတ်စာ' },
-                    { id: 'anniversary', label: '💖 နှစ်ပတ်လည်' },
-                  ].map((pill) => (
-                    <button
-                      key={pill.id}
-                      className={`filter-pill ${templateFilter === pill.id ? 'active' : ''}`}
-                      onClick={() => setTemplateFilter(pill.id)}
-                    >
-                      {pill.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="shelf-list">
-                  {filteredTemplates.map((template) => (
-                    <article key={template.id} className="shelf-item">
-                      <div>
-                        <h3>{template.name}</h3>
-                        <p>{template.description}</p>
-                        <span className="mini-badge">{template.occasion}</span>
-                      </div>
-                      <button
-                        className="button primary mini-apply-btn"
-                        onClick={() =>
-                          workspace?.createFromTemplate(template.id)
-                        }
-                      >
-                        ဒီပုံစံနဲ့ စမယ်
-                      </button>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {step === 'opening' && (
               <OpeningFields card={card} onChange={onChange} />
             )}
@@ -440,47 +394,48 @@ export function CreatorPage({
               <MusicFields card={card} onChange={onChange} />
             )}
 
-            {step === 'projects' && (
-              <div>
-                <button
-                  className="button primary new-project-btn"
-                  onClick={() => workspace?.create('birthday')}
-                >
-                  + အစကတ် အသစ်
-                </button>
-                <div className="stack-list">
-                  {workspace?.projects
-                    .filter((p) => !p.deleted)
-                    .map((p) => {
-                      const isActive = p.id === workspace.project.id
-                      return (
-                        <div
-                          key={p.id}
-                          className={`stack-item ${isActive ? 'active' : ''}`}
-                        >
-                          <div
-                            className="stack-item-click"
-                            onClick={() => workspace.open(p.id)}
-                          >
-                            <h4>{p.name}</h4>
-                            <span className="stack-item-time">
-                              {new Date(p.updatedAt).toLocaleDateString()}
-                            </span>
-                            {isActive && (
-                              <span className="current-badge">ပြင်နေတယ်</span>
-                            )}
-                          </div>
-                          <button
-                            className="icon-button"
-                            title="ဖျက်မယ်"
-                            aria-label="ဖျက်မယ်"
-                            onClick={() => workspace.trash(p.id, true)}
-                          >
-                            🗑
-                          </button>
-                        </div>
-                      )
-                    })}
+            {step === 'publish' && (
+              <div className="publish-step-panel">
+                <div className="publish-summary-card">
+                  <div className="publish-summary-header">
+                    <Sparkles size={20} className="publish-summary-sparkle" />
+                    <div>
+                      <h4 className="publish-card-title">
+                        {card.title || 'အမှတ်တရ ကတ်'}
+                      </h4>
+                      <p className="publish-card-meta">
+                        {occasions.find((o) => o.id === card.occasion)?.name ??
+                          'အမှတ်တရ'}{' '}
+                        ·{' '}
+                        {card.pages.length
+                          ? `အဖုံးအပြင် စာမျက်နှာ ${card.pages.length} မျက်နှာ`
+                          : 'အဖုံးစာမျက်နှာ'}{' '}
+                        · ဓာတ်ပုံ {card.photos.length} ပုံ
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="publish-quick-actions">
+                    <Link
+                      to="/preview"
+                      className="button ghost preview-full-btn"
+                    >
+                      <Eye size={15} /> လက်ခံသူ မြင်ရမယ့်ပုံစံ အစအဆုံး စစ်ဆေးမယ်
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="publish-cloud-section">
+                  <div className="publish-section-head">
+                    <Share2 size={16} />
+                    <h4>Cloud ထုတ်ဝေမှုနှင့် လင့်ခ်မျှဝေရန်</h4>
+                  </div>
+                  <p className="field-hint">
+                    ကတ်ကို Cloud ပေါ်သို့ တင်ပြီး လုံခြုံသော Link သို့မဟုတ် QR
+                    ဖိတ်စာကတ်ပြားဖြင့် Reviewer များ၊ မိတ်ဆွေများထံ တိုက်ရိုက်
+                    ပေးပို့နိုင်ပါသည်။
+                  </p>
+                  {workspace && <CloudConnection workspace={workspace} />}
                 </div>
               </div>
             )}
@@ -499,13 +454,15 @@ export function CreatorPage({
                 <span key={s.id} className={i === stepIndex ? 'on' : ''} />
               ))}
             </div>
-            <button
-              className="button primary"
-              onClick={() => go(1)}
-              disabled={isLast}
-            >
-              နောက်အဆင့် <ArrowRight size={15} />
-            </button>
+            {isLast ? (
+              <Link to="/preview" className="button primary publish-action-btn">
+                <Eye size={15} /> ကတ်ကို စစ်ဆေးမယ် 🚀
+              </Link>
+            ) : (
+              <button className="button primary" onClick={() => go(1)}>
+                နောက်အဆင့် <ArrowRight size={15} />
+              </button>
+            )}
           </div>
         </section>
       </div>

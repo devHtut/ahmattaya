@@ -116,35 +116,65 @@ export function PagesFields({
     })
   return (
     <div className="pages-editor">
-      <label>
-        ပြင်မယ့် စာမျက်နှာ
-        <select
-          disabled={busy}
-          value={pageId}
-          onChange={(e) => onSelectPage(e.target.value)}
+      <div className="page-nav-section">
+        <div className="page-nav-header">
+          <label className="page-nav-label">ပြင်မယ့် စာမျက်နှာ ရွေးပါ</label>
+          <span className="page-count-badge">
+            {card.pages.length} / {MAX_PAGES} မျက်နှာ
+          </span>
+        </div>
+        <div
+          className="page-pills-scroll"
+          role="tablist"
+          aria-label="စာမျက်နှာများ"
         >
-          <option value="cover">အဖုံးစာမျက်နှာ</option>
-          {card.pages.map((item, index) => (
-            <option key={item.id} value={item.id}>
-              {index + 2}. {item.title || 'စာမျက်နှာအသစ်'}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button
-        className="button secondary"
-        disabled={busy || card.pages.length >= MAX_PAGES}
-        onClick={() => {
-          const next = createPage(crypto.randomUUID())
-          onChange({ ...card, pages: [...card.pages, next] })
-          onSelectPage(next.id)
-        }}
-      >
-        <Plus size={16} /> စာမျက်နှာ ထပ်ထည့်မယ်
-      </button>
-      <p className="field-hint">
-        အဖုံးအပြင် စာမျက်နှာ {MAX_PAGES} မျက်နှာအထိ ထည့်နိုင်ပါတယ်။
-      </p>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={pageId === 'cover'}
+            className={`page-pill ${pageId === 'cover' ? 'is-active' : ''}`}
+            onClick={() => onSelectPage('cover')}
+          >
+            <span className="page-pill-icon">📇</span>
+            <span>အဖုံး</span>
+          </button>
+          {card.pages.map((item, index) => {
+            const isActive = pageId === item.id
+            const title = item.title.trim()
+              ? item.title
+              : `စာမျက်နှာ ${index + 1}`
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`page-pill ${isActive ? 'is-active' : ''}`}
+                onClick={() => onSelectPage(item.id)}
+                title={title}
+              >
+                <span className="page-pill-icon">📄</span>
+                <span className="page-pill-title">{title}</span>
+              </button>
+            )
+          })}
+          {card.pages.length < MAX_PAGES && (
+            <button
+              type="button"
+              className="page-pill-add"
+              disabled={busy}
+              onClick={() => {
+                const next = createPage(crypto.randomUUID())
+                onChange({ ...card, pages: [...card.pages, next] })
+                onSelectPage(next.id)
+              }}
+              title="စာမျက်နှာအသစ် ထပ်ပေါင်းမယ်"
+            >
+              <Plus size={14} /> <span>စာမျက်နှာသစ်</span>
+            </button>
+          )}
+        </div>
+      </div>
       {page && (
         <div className="fields page-fields">
           <label>
