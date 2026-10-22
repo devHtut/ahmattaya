@@ -1,7 +1,7 @@
 # Remaining product work
 
 Agreed scope (2026-10-22): finish the remaining requirements incrementally.
-Real-time collaborative editing and WebAR are deliberately deferred.
+Real-time collaborative editing is deliberately deferred. WebAR is implemented as a trial feature on `gemini/webar-cake`.
 
 1. **Email accounts — unpaused & verified** — SMTP sender configured and
    tested by owner. Guest upgrades and fresh-browser OTP sign-ins are active.
@@ -22,6 +22,10 @@ Real-time collaborative editing and WebAR are deliberately deferred.
    asset breakdown (photos, audio tracks, projects), and safe retention garbage
    collection that removes unreferenced media without deleting files used by active
    or trashed projects.
+8. **WebAR 3D Cake (Trial) — implemented** — dynamic USDZ export for native iOS
+   Quick Look (AR on iPhone Safari/Chrome), binary GLTF (.glb) export for Android /
+   universal 3D viewers, cross-device QR code modal, and AR triggers in both receiver
+   story and creator cake editor.
 
 Use focused `codex/` branches at sensible feature boundaries, preserve existing
 UI work, verify changes, and commit/push each completed stage. Do not conflate

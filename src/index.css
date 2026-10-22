@@ -4514,3 +4514,224 @@ footer {
     transform: rotate(360deg);
   }
 }
+
+/* --------------------------------------------------------------------------
+   WebAR (Augmented Reality) Styles
+   -------------------------------------------------------------------------- */
+
+.cake-ar-action {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.webar-trigger-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-m, 12px);
+  background: var(--card, #ffffff);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1.5px solid var(--line, #e2e8f0);
+}
+
+.webar-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.webar-modal-window {
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-l, 20px);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  animation: webar-pop 0.25s ease-out;
+}
+
+@keyframes webar-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.webar-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.webar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+  color: #6b21a8;
+  border: 1px solid #d8b4fe;
+}
+
+.webar-modal-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text, #1a202c);
+}
+
+.webar-modal-desc {
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted, #4a5568);
+}
+
+.webar-platform-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--paper-soft, #f7fafc);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-m, 12px);
+  font-size: 13px;
+  margin-bottom: 18px;
+  color: var(--text, #2d3748);
+}
+
+.webar-status-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: var(--radius-m, 10px);
+  color: #22543d;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.webar-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.webar-platform-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.webar-main-btn {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.webar-hint-text {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted, #718096);
+}
+
+.webar-desktop-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.webar-qr-box {
+  text-align: center;
+  padding: 16px;
+  background: var(--paper-soft, #f7fafc);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-m, 14px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.webar-qr-frame {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.webar-qr-img {
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.webar-qr-caption {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted, #4a5568);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.webar-download-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.webar-download-grid button {
+  font-size: 12px;
+  padding: 10px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.webar-footer-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted, #a0aec0);
+  padding-top: 14px;
+  border-top: 1px solid var(--line-light, #edf2f7);
+}

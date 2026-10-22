@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import type { CardConfig } from '../../../shared/models/card'
 import { cakeFlavors, type CakeRecipe } from '../../../shared/models/cake'
 import { cakeFromPreset, cakePresets } from '../lib/presets'
 import type { CakeEditorSession } from '../lib/useCakeEditor'
 import { CakeDecorationFields } from './CakeDecorationFields'
 import { CakeIllustration } from './CakeIllustration'
+import { WebARModal } from './WebARModal'
 
 export function CakeFields({
   card,
@@ -14,6 +16,7 @@ export function CakeFields({
   onChange: (card: CardConfig) => void
   editor: CakeEditorSession
 }) {
+  const [arModalOpen, setArModalOpen] = useState(false)
   const update = (change: Partial<CakeRecipe>) =>
     onChange({ ...card, cake: { ...card.cake, ...change } })
   return (
@@ -135,7 +138,30 @@ export function CakeFields({
             </label>
           </div>
           <CakeDecorationFields recipe={card.cake} editor={editor} />
+          <div className="cake-ar-section" style={{ marginTop: '12px' }}>
+            <button
+              type="button"
+              className="button secondary cake-ar-test-btn"
+              onClick={() => setArModalOpen(true)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              📱 လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် စမ်းကြည့်မည် (WebAR)
+            </button>
+          </div>
         </>
+      )}
+      {arModalOpen && (
+        <WebARModal
+          recipe={card.cake}
+          cakeTitle={card.receiverName || 'Cake'}
+          onClose={() => setArModalOpen(false)}
+        />
       )}
     </div>
   )

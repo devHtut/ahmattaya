@@ -8,6 +8,7 @@ import { CardPreview } from '../../shared/ui/CardPreview'
 import { ConfettiBurst } from '../../shared/ui/ConfettiBurst'
 import { useReveal } from '../../shared/ui/useReveal'
 import { CakePreview } from '../cake/components/CakePreview'
+import { WebARModal } from '../cake/components/WebARModal'
 import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 import { FloatingEmojis } from '../../shared/ui/FloatingEmojis'
 import { WeddingEventCard } from './components/WeddingEventCard'
@@ -55,6 +56,7 @@ export function PreviewPage({
   const [musicEnabled, setMusicEnabled] = useState(true)
   const [musicBlocked, setMusicBlocked] = useState(false)
   const [extinguishedCandles, setExtinguishedCandles] = useState<string[]>([])
+  const [arModalOpen, setArModalOpen] = useState(false)
   const audio = useRef<HTMLAudioElement>(null)
   const pageRoot = useRef<HTMLElement>(null)
   const replayRequested = useRef(false)
@@ -349,7 +351,23 @@ export function PreviewPage({
                       : 'ဖယောင်းတိုင်လေးများကို နှိပ်၍လည်း မီးငြိမ်းနိုင်ပါတယ် ✨'
                     : 'ကိတ်လေးကို လှည့်ကြည့်ရင်း ဆုတောင်းလေး တောင်းလိုက်ပါ ✨'}
                 </p>
+                <div className="cake-ar-action">
+                  <button
+                    type="button"
+                    className="button secondary webar-trigger-button"
+                    onClick={() => setArModalOpen(true)}
+                  >
+                    📱 လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် Cake ကြည့်မယ် (WebAR)
+                  </button>
+                </div>
               </Reveal>
+              {arModalOpen && (
+                <WebARModal
+                  recipe={card.cake}
+                  cakeTitle={card.receiverName || 'Cake'}
+                  onClose={() => setArModalOpen(false)}
+                />
+              )}
             </section>
           )}
 
