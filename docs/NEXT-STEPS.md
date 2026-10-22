@@ -3,11 +3,12 @@
 Agreed scope (2026-10-22): finish the remaining requirements incrementally.
 Real-time collaborative editing and WebAR are deliberately deferred.
 
-1. **Finish email accounts** — SMTP/templates configured; verify an actual guest
-   upgrade, retained private drafts/media/share links, and fresh-browser sign-in.
-2. **QR invitation / ticket** — generate a QR from an active published URL;
-   download a readable invitation image. This is an invitation link, not an
-   admission/check-in credential. Disabled links must remain disabled when scanned.
+1. **Email accounts — paused by request** — code is deployed, but Brevo rejected
+   the unverified sender. Resume after sender validation, then verify guest upgrade
+   and fresh-browser sign-in. Do not retry email codes while this is deferred.
+2. **QR invitation / ticket — implemented** — active published URLs generate
+   downloadable invitation/QR PNGs. Actual downloaded files decode correctly;
+   unpublished draft edits are excluded and disabled links cannot be exported.
 3. **Receiver cake interactions** — individual click/touch/keyboard candle
    extinguishing, optional microphone blow detection, wish/confetti, replay and
    microphone cleanup. Then extend cream decoration to selectable tiers/sides.

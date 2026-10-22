@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { Copy, ExternalLink, Link2, Link2Off } from 'lucide-react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { Copy, ExternalLink, Link2, Link2Off, QrCode } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { getCloudClient } from '../../shared/cloud/client'
 import {
@@ -11,6 +11,7 @@ import {
   type Publication,
 } from '../../shared/cloud/publishing'
 import type { TransferProgress } from '../../shared/cloud/media'
+const QrInvitation = lazy(() => import('./qr/QrInvitation'))
 export function PublishCard({
   workspace: w,
   ownerId,
@@ -25,6 +26,7 @@ export function PublishCard({
   onBusy: (busy: boolean) => void
 }) {
   const [publication, setPublication] = useState<Publication | null>(null)
+  const [qrOpened, setQrOpened] = useState(false)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -175,6 +177,25 @@ export function PublishCard({
               <Link2Off size={14} /> Link ပိတ်မယ်
             </button>
           </div>
+          <button
+            className="button secondary"
+            disabled={disabled || busy}
+            onClick={() => setQrOpened((value) => !value)}
+            aria-expanded={qrOpened}
+          >
+            <QrCode size={16} />{' '}
+            {qrOpened ? 'QR ဖိတ်စာ ပိတ်မယ်' : 'QR ဖိတ်စာ ယူမယ်'}
+          </button>
+          {qrOpened && publication && (
+            <Suspense fallback={<p role="status">QR ပြင်ဆင်နေပါတယ်…</p>}>
+              <QrInvitation
+                key={`${publication.id}:${publication.revision}`}
+                id={publication.id}
+                revision={publication.revision}
+                disabled={disabled || busy}
+              />
+            </Suspense>
+          )}
           <p className="field-hint">
             {publication?.published_at &&
               new Date(publication.published_at).toLocaleString()}{' '}

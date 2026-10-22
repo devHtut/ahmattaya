@@ -3501,3 +3501,25 @@ footer {
   gap: 0.6rem;
   font-size: 0.85rem;
 }
+
+.qr-invitation {
+  padding: 1rem;
+  background: var(--paper-soft);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+.qr-invitation h4,
+.qr-invitation p {
+  margin: 0;
+}
+.qr-ticket-preview {
+  display: block;
+  width: min(100%, 280px);
+  height: auto;
+  margin: 0.2rem auto 0.7rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px #332a1d14;
+}

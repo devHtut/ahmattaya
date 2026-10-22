@@ -26,7 +26,7 @@ npm run build
 - React Router routes: `/`, `/templates`, `/projects`, `/create`, `/preview`, and not-found.
 - Versioned Zod card schema (v8), v1–v7 draft migration, TypeScript strict mode, shared design tokens.
 
-Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Private cloud storage, receiver publishing and email accounts are described below. QR tickets, RSVP, interactive candles and AR remain future milestones. Local editing requires no backend configuration. Preview URLs are local previews, not published cards.
+Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Private cloud storage, receiver publishing and email accounts are described below. RSVP, interactive candles and AR remain future milestones. Local editing requires no backend configuration. Preview URLs are local previews, not published cards.
 
 ## Structure
 
@@ -201,3 +201,12 @@ Configure the three OTP email templates and manual linking using
 [Account setup](docs/ACCOUNT-SETUP.md). No schema migration or secret server key is
 required. Unit tests cover identity preservation, code/email validation, stale
 identity rejection, local sign-out and friendly errors.
+
+### QR invitations
+
+After publishing, Share → QR invitation offers an invitation PNG (1080×1440) and
+a standalone QR PNG (630×630). The preview/export uses published text, keeping
+unpublished draft edits private. Downloads recheck that the publication is active;
+republishing keeps the URL, while disabling it also disables the QR destination.
+QR generation stays local and loads on demand. See [QR invitations](docs/QR-INVITATIONS.md)
+for verification, download checks and text/scan behavior.
