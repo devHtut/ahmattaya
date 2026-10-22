@@ -22,11 +22,11 @@ Current branch: `codex/private-cloud-media`, based on the completed receiver UI 
 
 ## Limits and next stages
 
-Guest access is tied to the saved session on this browser/origin. Another device or preview URL creates a different Guest; losing the session can lose access to its cloud drafts. Account linking/recovery is not implemented yet, so this UI does not claim cross-device sign-in. Local trash does not delete remote drafts.
+Guest access is tied to the saved session on this browser/origin. Another device or preview URL creates a different Guest; losing the session can lose access to its cloud drafts. Email linking and cross-device account sign-in are now implemented; see [Account setup](ACCOUNT-SETUP.md). Unlinked guests still cannot recover a lost session. Local trash does not delete remote drafts.
 
 Cloud storage is private. `/preview` still reads the local workspace, including in-memory edits, and is not a recipient URL. Share Link stays disabled until publishing is implemented.
 
-Next: published snapshots and recipient routes; then account linking/recovery, unpublish/delete, quotas/cleanup and QR tickets. Collaboration/RSVP/AR remain later work.
+Published snapshots, recipient routes, unpublish and email account linking are now implemented. Remaining work includes cloud delete/cleanup, quotas and QR tickets. Collaboration/RSVP/AR remain later work.
 
 For a new environment, run the checked-in migration once in that project's SQL Editor; do not rerun it on an already-initialized table. No database password or privileged key belongs in frontend variables or Git.
 
@@ -60,7 +60,7 @@ private until another successful Publish; republishing retains the address.
 
 The owner can disable the link. New snapshot/file requests then fail. Previously
 downloaded copies cannot be recalled. Anonymous guest ownership is still tied to
-that browser's session; account linking and collaborative editing remain future
+that browser's session until email linking; collaborative editing remains future
 work. There is no public directory or list of cards.
 
 The receiver route uses a separate non-persistent anonymous API client and never

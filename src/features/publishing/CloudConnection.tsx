@@ -1,3 +1,6 @@
+import { AccountPanel } from './AccountPanel'
+import { useCloudIdentity } from './useCloudIdentity'
+import { isPermanentAccount } from '../../shared/cloud/account'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { cloudConfig, getCloudClient } from '../../shared/cloud/client'
 import { guestAuthMessage } from '../../shared/cloud/auth-errors'
@@ -13,40 +16,14 @@ export function CloudConnection({
   workspace: ProjectWorkspace
   onRestored?: () => void
 }) {
-  const [ownerId, setOwnerId] = useState<string | null>(null)
-  const [status, setStatus] = useState<
-    'idle' | 'loading' | 'connected' | 'error'
-  >('loading')
+  const identity = useCloudIdentity()
   const [feedback, setFeedback] = useState('')
-  const alive = useRef(false)
-  const busy = useRef(false)
+  const [authBusy, setAuthBusy] = useState(false)
+  const [draftBusy, setDraftBusy] = useState(false)
+  const alive = useRef(false),
+    busy = useRef(false)
   useEffect(() => {
     alive.current = true
-    if (cloudConfig.status !== 'configured')
-      return () => {
-        alive.current = false
-      }
-    getCloudClient()
-      .then(async (client) => {
-        const { data, error } = await client.auth.getSession()
-        if (error) throw error
-        if (data.session) {
-          const verified = await client.auth.getUser()
-          if (verified.error) throw verified.error
-          if (alive.current) {
-            setOwnerId(verified.data.user?.id ?? null)
-            setStatus(verified.data.user ? 'connected' : 'idle')
-          }
-        } else if (alive.current) setStatus('idle')
-      })
-      .catch(() => {
-        if (alive.current) {
-          setStatus('error')
-          setFeedback(
-            'သိမ်းထားတဲ့ Guest session ကို ပြန်ဖွင့်မရပါ။ ပြန်ချိတ်ကြည့်နိုင်ပါတယ်။',
-          )
-        }
-      })
     return () => {
       alive.current = false
     }
@@ -54,7 +31,7 @@ export function CloudConnection({
   async function connect() {
     if (busy.current) return
     busy.current = true
-    setStatus('loading')
+    setAuthBusy(true)
     setFeedback('')
     try {
       const client = await getCloudClient()
@@ -67,18 +44,17 @@ export function CloudConnection({
       if (result.error) throw result.error
       if (!result.data.user) throw new Error('No user returned')
       if (alive.current) {
-        setOwnerId(result.data.user.id)
-        setStatus('connected')
+        setFeedback('ချိတ်ဆက်ပြီးပါပြီ။')
       }
     } catch (error) {
       if (alive.current) {
-        setStatus('error')
         setFeedback(
           guestAuthMessage(error && typeof error === 'object' ? error : {}),
         )
       }
     } finally {
       busy.current = false
+      if (alive.current) setAuthBusy(false)
     }
   }
   if (cloudConfig.status !== 'configured')
@@ -92,32 +68,51 @@ export function CloudConnection({
   return (
     <section className="cloud-connection" aria-label="Cloud ချိတ်ဆက်မှု">
       <p role="status" className="share-dialog-desc">
-        {status === 'connected'
-          ? '✓ Guest session ချိတ်ပြီးပါပြီ။'
-          : status === 'loading'
+        {identity.user
+          ? isPermanentAccount(identity.user)
+            ? '✓ Account ချိတ်ပြီးပါပြီ။'
+            : '✓ Guest session ချိတ်ပြီးပါပြီ။'
+          : identity.loading
             ? 'Cloud session ကို စစ်ဆေးနေပါတယ်…'
             : 'Account မဖွင့်ဘဲ Guest အဖြစ် စတင်ချိတ်ဆက်နိုင်ပါတယ်။'}
       </p>
+      {identity.failed && (
+        <p className="music-error" role="alert">
+          Cloud session ကို စစ်မရပါ။{' '}
+          <button className="button secondary" onClick={identity.retry}>
+            ပြန်စစ်မယ်
+          </button>
+        </p>
+      )}
+      <AccountPanel
+        key={identity.user?.id ?? 'signed-out'}
+        user={identity.user}
+        disabled={identity.loading || identity.failed || draftBusy}
+        onBusy={setAuthBusy}
+      />
       {feedback && (
         <p className="music-error" role="alert">
           {feedback}
         </p>
       )}
-      {status !== 'connected' && (
+      {!identity.user && !identity.failed && (
         <button
           className="button secondary"
-          disabled={status === 'loading'}
+          disabled={identity.loading || authBusy || draftBusy}
           onClick={() => void connect()}
         >
           Guest အဖြစ် ချိတ်မယ်
         </button>
       )}
-      {status === 'connected' && ownerId && (
+      {identity.user && (
         <Suspense fallback={<p role="status">Cloud ကတ်များ ပြင်ဆင်နေပါတယ်…</p>}>
           <CloudDrafts
-            key={ownerId}
+            key={identity.user.id}
             workspace={workspace}
-            ownerId={ownerId}
+            ownerId={identity.user.id}
+            externalDisabled={authBusy}
+            onBusy={setDraftBusy}
+            account={isPermanentAccount(identity.user)}
             onRestored={onRestored}
           />
         </Suspense>

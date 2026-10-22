@@ -19,10 +19,16 @@ export function CloudDrafts({
   workspace: w,
   ownerId,
   onRestored,
+  externalDisabled = false,
+  onBusy,
+  account = false,
 }: {
   workspace: ProjectWorkspace
   ownerId: string
   onRestored?: () => void
+  externalDisabled?: boolean
+  onBusy?: (busy: boolean) => void
+  account?: boolean
 }) {
   const [items, setItems] = useState<CloudDraftSummary[]>([])
   const [loading, setLoading] = useState(true)
@@ -70,8 +76,9 @@ export function CloudDrafts({
   }
 
   async function refresh(append = false) {
-    if (busy.current || loading || publishing) return
+    if (busy.current || loading || publishing || externalDisabled) return
     busy.current = true
+    onBusy?.(true)
     setLoading(true)
     setError('')
     try {
@@ -96,12 +103,15 @@ export function CloudDrafts({
       if (alive.current) setError(cloudDraftMessage(err))
     } finally {
       busy.current = false
+      onBusy?.(false)
       if (alive.current) setLoading(false)
     }
   }
   async function save() {
-    if (busy.current || loading || publishing || mediaIssue) return
+    if (busy.current || loading || publishing || externalDisabled || mediaIssue)
+      return
     busy.current = true
+    onBusy?.(true)
     setAction('save')
     setTransfer(null)
     setFeedback('')
@@ -134,13 +144,15 @@ export function CloudDrafts({
       if (alive.current) setError(cloudDraftMessage(err))
     } finally {
       busy.current = false
+      onBusy?.(false)
       if (alive.current) setAction('')
       if (alive.current) setTransfer(null)
     }
   }
   async function restore(id: string) {
-    if (busy.current || loading || publishing) return
+    if (busy.current || loading || publishing || externalDisabled) return
     busy.current = true
+    onBusy?.(true)
     setAction(id)
     setTransfer(null)
     setFeedback('')
@@ -156,11 +168,12 @@ export function CloudDrafts({
       if (alive.current) setError(cloudDraftMessage(err))
     } finally {
       busy.current = false
+      onBusy?.(false)
       if (alive.current) setAction('')
       if (alive.current) setTransfer(null)
     }
   }
-  const disabled = loading || Boolean(action) || publishing
+  const disabled = loading || Boolean(action) || publishing || externalDisabled
   const receipt =
     w.project.cloud?.ownerId === ownerId ? w.project.cloud : undefined
   return (
@@ -169,9 +182,12 @@ export function CloudDrafts({
         key={w.project.id}
         workspace={w}
         ownerId={ownerId}
-        disabled={loading || Boolean(action)}
+        disabled={loading || Boolean(action) || externalDisabled}
         publishBlocked={Boolean(mediaIssue)}
-        onBusy={setPublishing}
+        onBusy={(value) => {
+          setPublishing(value)
+          onBusy?.(value)
+        }}
       />
       <h3>ကိုယ့်အတွက် Cloud ကတ်များ</h3>
       <p className="field-hint">
@@ -269,9 +285,10 @@ export function CloudDrafts({
       <p className="field-hint">
         Cloud မှ ပြန်ယူရင် browser ကတ်အသစ်တစ်ခုအဖြစ် ဖွင့်ပေးပါတယ်။ အဲဒီကတ်ကို
         Cloud ပြန်သိမ်းရင် မူရင်း Cloud ကတ်ကို update လုပ်ပေးပါတယ်။ လက်ရှိ
-        browser ကတ်တွေကို အစားမထိုးပါ။ Guest session ပျောက်သွားရင် Cloud
-        ကတ်တွေကို ပြန်ဝင်မရနိုင်သေးပါ။ Account ချိတ်ခြင်းကို နောက်အဆင့်မှာ
-        ထည့်ပါမယ်။
+        browser ကတ်တွေကို အစားမထိုးပါ။{' '}
+        {account
+          ? 'Account email နဲ့ တခြားစက်မှာ ဝင်ပြီး Cloud ကတ်ကို မိတ္တူယူ၊ ဆက်ပြင်နိုင်ပါတယ်။'
+          : 'Guest session မပျောက်ခင် အပေါ်မှာ Email account နဲ့ ချိတ်ထားပေးပါ။'}
       </p>
     </div>
   )

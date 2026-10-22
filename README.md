@@ -26,7 +26,7 @@ npm run build
 - React Router routes: `/`, `/templates`, `/projects`, `/create`, `/preview`, and not-found.
 - Versioned Zod card schema (v8), v1–v7 draft migration, TypeScript strict mode, shared design tokens.
 
-Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Publishing, authentication, cloud storage, QR tickets, RSVP, interactive candles and AR are future milestones. No backend credentials are required. Do not present preview URLs as published cards.
+Drafts save after each edit in this browser and recover on refresh. They are not synced between devices or accounts. Storage failures appear in the editor; invalid or future-version drafts remain untouched until the creator explicitly replaces them. Editing a draft in multiple tabs is not coordinated yet; the last saved edit wins. Private cloud storage, receiver publishing and email accounts are described below. QR tickets, RSVP, interactive candles and AR remain future milestones. Local editing requires no backend configuration. Preview URLs are local previews, not published cards.
 
 ## Structure
 
@@ -172,7 +172,7 @@ and publishing stages.
 
 ### Private Cloud drafts
 
-Cloud toolbar icon / Projects page → Guest connection → explicit Cloud Save. Owner-only drafts include embedded photos, background images, preset/custom music and cake settings. Background/audio files upload into private owner-only storage before a snapshot is saved, and are verified/cached locally before restore. Missing/corrupt files or partial uploads never produce a successful backup. A cloud restore creates a new local working copy and never replaces an existing browser draft. Updates protect against stale revisions. Guest access remains tied to this browser session; account recovery/cross-device sign-in is not implemented yet. Receiver links use a separate published snapshot, described below. See [Cloud setup](docs/CLOUD-SETUP.md) for the applied SQL migration and validation.
+Cloud toolbar icon / Projects page → Guest connection → explicit Cloud Save. Owner-only drafts include embedded photos, background images, preset/custom music and cake settings. Background/audio files upload into private owner-only storage before a snapshot is saved, and are verified/cached locally before restore. Missing/corrupt files or partial uploads never produce a successful backup. A cloud restore creates a new local working copy and never replaces an existing browser draft. Updates protect against stale revisions. Guests can now link an unused email to retain their ownership and sign in on another device with an email code. Unlinked guest access remains tied to this browser session. Receiver links use a separate published snapshot, described below. See [Cloud setup](docs/CLOUD-SETUP.md) for the applied SQL migration and validation.
 
 ### Receiver Publish / Share
 
@@ -187,3 +187,17 @@ Public routes never initialize the editor workspace or use local drafts/media as
 a fallback. Recipient media is verified and loaded into memory without signing
 into an owner session. Direct receiver URLs work through the Vercel SPA rewrite.
 See [Cloud setup](docs/CLOUD-SETUP.md) for migrations and live verification.
+
+### Email accounts
+
+Cloud/Share → Account → Email code. An existing guest upgrades in place after
+email confirmation, retaining its owner ID, cloud drafts, media and share URLs.
+Signed-out browsers can create/sign into an email account without a password and
+restore cloud cards on another device. Local drafts are not uploaded automatically.
+Sign-out affects this device, with an explicit reminder that browser copies remain.
+The app blocks guest sign-out and never silently merges two existing identities.
+
+Configure the three OTP email templates and manual linking using
+[Account setup](docs/ACCOUNT-SETUP.md). No schema migration or secret server key is
+required. Unit tests cover identity preservation, code/email validation, stale
+identity rejection, local sign-out and friendly errors.
