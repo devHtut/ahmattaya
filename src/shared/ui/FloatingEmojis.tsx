@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 
 const CELEBRATION_EMOJIS = ['✨', '🌸', '💖', '⭐', '🕊️', '🎉', '💫', '💌']
 
@@ -11,6 +11,13 @@ interface Particle {
   delay: number // seconds
   size: number // rem
   opacity: number
+}
+
+interface TapParticle {
+  id: number
+  x: number
+  y: number
+  emoji: string
 }
 
 function generateParticles(primaryEmoji?: string): Particle[] {
@@ -53,6 +60,43 @@ export function FloatingEmojis({
   active?: boolean
 }) {
   const particles = useMemo(() => generateParticles(emoji), [emoji])
+  const [tapParticles, setTapParticles] = useState<TapParticle[]>([])
+
+  useEffect(() => {
+    if (!active) return
+
+    let nextId = 0
+    const handlePointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null
+      if (!target) return
+      // Ignore clicks on buttons, inputs, links, canvas, or dialogs
+      if (
+        target.closest(
+          'button, a, input, textarea, select, canvas, dialog, [role="button"]',
+        )
+      ) {
+        return
+      }
+
+      const clientX = e.clientX
+      const clientY = e.clientY
+      if (clientX === undefined || clientY === undefined) return
+
+      const tapEmoji = emoji || '💖'
+      const id = ++nextId
+      setTapParticles((prev) => [
+        ...prev.slice(-5),
+        { id, x: clientX, y: clientY, emoji: tapEmoji },
+      ])
+
+      setTimeout(() => {
+        setTapParticles((prev) => prev.filter((p) => p.id !== id))
+      }, 1400)
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    return () => window.removeEventListener('pointerdown', handlePointerDown)
+  }, [active, emoji])
 
   if (!active) return null
 
@@ -77,6 +121,18 @@ export function FloatingEmojis({
           </span>
         )
       })}
+      {tapParticles.map((t) => (
+        <span
+          key={t.id}
+          className="tap-emoji-reaction"
+          style={{
+            left: `${t.x}px`,
+            top: `${t.y}px`,
+          }}
+        >
+          {t.emoji}
+        </span>
+      ))}
     </div>
   )
 }

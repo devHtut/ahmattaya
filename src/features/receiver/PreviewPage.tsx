@@ -213,7 +213,7 @@ export function PreviewPage({
           <section id="story-cover" className="story-scene scene-cover">
             <Reveal className="reveal-cover">
               <h1
-                className="receiver-content-heading"
+                className="receiver-content-heading reveal-step-1"
                 ref={contentsHeading}
                 tabIndex={-1}
               >
@@ -242,7 +242,7 @@ export function PreviewPage({
               aria-label={`စာမျက်နှာ ${index + 2}`}
             >
               <Reveal>
-                <p className="scene-kicker">
+                <p className="scene-kicker reveal-step-1">
                   အမှတ်တရ {index + 1} / {card.pages.length}
                 </p>
                 <div className="story-card">
@@ -317,12 +317,12 @@ export function PreviewPage({
 
           <section id="story-end" className="story-scene scene-end">
             <Reveal>
-              <p className="end-mark">အမှတ်တရ · AhMatTaYa</p>
-              <p className="end-line">
+              <p className="end-mark reveal-step-1">အမှတ်တရ · AhMatTaYa</p>
+              <p className="end-line reveal-step-2">
                 ဒီကတ်လေးကို {card.senderName || 'သင့်ချစ်ရသူ'} က သင့်အတွက်သာ
                 လက်နဲ့ဖန်တီးပေးထားတာပါ။
               </p>
-              <div className="end-actions">
+              <div className="end-actions reveal-step-3">
                 <button className="button secondary" onClick={replay}>
                   <RotateCcw size={14} /> ဖိတ်စာ ပြန်ကြည့်မယ်
                 </button>

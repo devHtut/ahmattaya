@@ -60,3 +60,28 @@ test('every candle style has valid geometry and named toggleable flame', () => {
     assert.equal(flame.visible, false)
   }
 })
+
+test('toggle candle extinguishing set tracks state properly', () => {
+  const candleIds = ['c1', 'c2', 'c3']
+  let extinguished = []
+
+  const toggle = (id) => {
+    extinguished = extinguished.includes(id)
+      ? extinguished.filter((item) => item !== id)
+      : [...extinguished, id]
+  }
+
+  toggle('c1')
+  assert.deepEqual(extinguished, ['c1'])
+  toggle('c2')
+  assert.deepEqual(extinguished, ['c1', 'c2'])
+  toggle('c1')
+  assert.deepEqual(extinguished, ['c2'])
+
+  // Extinguishing all
+  extinguished = [...candleIds]
+  assert.equal(
+    candleIds.every((id) => extinguished.includes(id)),
+    true,
+  )
+})
