@@ -4304,7 +4304,7 @@ footer {
 /* Anniversary Timeline */
 .anniversary-timeline-container {
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -4318,6 +4318,7 @@ footer {
   margin: 10px 0 0;
   font-size: 20px;
   font-weight: 800;
+  color: var(--ink, var(--text, #2d3748));
 }
 
 .anniversary-milestone-highlight {
@@ -4326,22 +4327,26 @@ footer {
   gap: 8px;
   margin-top: 14px;
   padding: 8px 18px;
-  background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%);
-  border: 1px solid #fbd38d;
+  background: color-mix(
+    in srgb,
+    var(--accent, #c05621) 12%,
+    var(--card, #fffaf0)
+  );
+  border: 1px solid color-mix(in srgb, var(--accent, #c05621) 35%, transparent);
   border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(221, 107, 32, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
 .years-number {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
-  color: #c05621;
+  color: var(--accent, #c05621);
 }
 
 .years-text {
   font-size: 13px;
   font-weight: 700;
-  color: #7b341e;
+  color: var(--ink, #7b341e);
 }
 
 .anniversary-date-line {
@@ -4366,11 +4371,58 @@ footer {
   top: 10px;
   bottom: 20px;
   left: 9px;
-  width: 2px;
-  background: linear-gradient(180deg, var(--accent, #c05621) 0%, #cbd5e0 100%);
-  border-radius: 2px;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--accent, #c05621) 0%,
+    rgba(192, 86, 33, 0.25) 100%
+  );
+  border-radius: 3px;
 }
 
+/* Zig-Zag Timeline */
+.anniversary-timeline-tree.is-zigzag {
+  padding: 24px 8px;
+  gap: 24px;
+}
+
+.anniversary-timeline-tree.is-zigzag .timeline-vertical-stem {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+}
+
+.anniversary-timeline-tree.is-zigzag .timeline-card-node {
+  width: calc(50% - 20px);
+}
+
+.anniversary-timeline-tree.is-zigzag .timeline-card-node.is-left {
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.anniversary-timeline-tree.is-zigzag .timeline-card-node.is-right {
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.anniversary-timeline-tree.is-zigzag
+  .timeline-card-node.is-left
+  .timeline-node-pin {
+  left: auto;
+  right: -30px;
+  top: 16px;
+}
+
+.anniversary-timeline-tree.is-zigzag
+  .timeline-card-node.is-right
+  .timeline-node-pin {
+  left: -30px;
+  right: auto;
+  top: 16px;
+}
+
+/* Milestone Card Content */
 .timeline-card-node {
   position: relative;
 }
@@ -4384,6 +4436,7 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
 }
 
 .pin-dot {
@@ -4392,7 +4445,8 @@ footer {
   border-radius: 50%;
   background: var(--card, #ffffff);
   border: 3px solid var(--accent, #c05621);
-  box-shadow: 0 0 0 3px rgba(192, 86, 33, 0.2);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--accent, #c05621) 25%, transparent);
 }
 
 .timeline-node-content {
@@ -4400,32 +4454,76 @@ footer {
   border: 1px solid var(--line, #e2e8f0);
   border-radius: var(--radius-m, 14px);
   padding: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
 .timeline-year-tag {
   display: inline-block;
-  padding: 2px 8px;
-  background: #edf2f7;
-  color: #4a5568;
+  padding: 3px 10px;
+  background: color-mix(in srgb, var(--accent, #c05621) 12%, transparent);
+  color: var(--accent, #c05621);
   font-size: 11px;
-  font-weight: 700;
-  border-radius: 6px;
-  margin-bottom: 6px;
+  font-weight: 800;
+  border-radius: 999px;
+  margin-bottom: 8px;
 }
 
 .timeline-node-title {
   margin: 0 0 6px;
   font-size: 16px;
-  font-weight: 700;
-  color: var(--text, #2d3748);
+  font-weight: 800;
+  color: var(--ink, var(--text, #2d3748));
+}
+
+.timeline-photo-wrap {
+  margin: 10px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line, #e2e8f0);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.timeline-milestone-photo {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.timeline-milestone-photo:hover {
+  transform: scale(1.02);
 }
 
 .timeline-node-desc {
   margin: 0;
   font-size: 13px;
   line-height: 1.6;
-  color: var(--muted, #4a5568);
+  color: color-mix(in srgb, var(--ink, #4a5568) 80%, transparent);
+}
+
+/* Mobile & narrow artboard fallback */
+@media (max-width: 460px) {
+  .anniversary-timeline-tree.is-zigzag .timeline-vertical-stem {
+    left: 12px;
+    transform: none;
+  }
+  .anniversary-timeline-tree.is-zigzag .timeline-card-node {
+    width: calc(100% - 32px);
+    align-self: flex-end !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+  .anniversary-timeline-tree.is-zigzag
+    .timeline-card-node.is-left
+    .timeline-node-pin,
+  .anniversary-timeline-tree.is-zigzag
+    .timeline-card-node.is-right
+    .timeline-node-pin {
+    left: -28px !important;
+    right: auto !important;
+  }
 }
 
 /* Creator RSVP Table & Stats */

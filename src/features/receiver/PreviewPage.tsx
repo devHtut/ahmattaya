@@ -295,6 +295,7 @@ export function PreviewPage({
                 <AnniversaryTimeline
                   anniversary={card.event?.anniversary}
                   coupleNames={card.title}
+                  colors={card.appearance.colors}
                 />
               </Reveal>
               <ScrollHint target={getNextScene('story-anniversary')} />

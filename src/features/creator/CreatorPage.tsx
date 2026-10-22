@@ -252,7 +252,21 @@ export function CreatorPage({
               <button
                 key={v.id}
                 aria-pressed={view === v.id}
-                onClick={() => setView(v.id)}
+                onClick={() => {
+                  setView(v.id)
+                  if (v.id === 'event') {
+                    setStep('event')
+                  } else if (v.id === 'cake') {
+                    setStep('cake')
+                  } else if (v.id === 'opening') {
+                    setStep('opening')
+                  } else if (
+                    v.id === 'pages' &&
+                    (step === 'event' || step === 'cake' || step === 'opening')
+                  ) {
+                    setStep('pages')
+                  }
+                }}
               >
                 {v.label}
               </button>
@@ -323,6 +337,7 @@ export function CreatorPage({
                     <AnniversaryTimeline
                       anniversary={card.event?.anniversary}
                       coupleNames={card.title}
+                      colors={card.appearance.colors}
                     />
                   ) : (
                     <div className="bench-event-empty">

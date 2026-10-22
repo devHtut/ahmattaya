@@ -1,33 +1,49 @@
 import { Heart, Sparkles, Clock } from 'lucide-react'
 import type { AnniversaryEvent } from '../../../shared/models/event'
+import type { CardAppearance } from '../../../shared/models/card'
 
 export function AnniversaryTimeline({
   anniversary,
   coupleNames,
+  colors,
 }: {
   anniversary?: AnniversaryEvent
   coupleNames?: string
+  colors?: CardAppearance['colors']
 }) {
   if (!anniversary) return null
 
   const hasTimeline = anniversary.timeline && anniversary.timeline.length > 0
-  const hasDateOrYears = anniversary.date || anniversary.yearsCount
+  const durationLabel = anniversary.durationText?.trim()
+    ? anniversary.durationText
+    : anniversary.yearsCount
+      ? `${anniversary.yearsCount} နှစ်ပြည့်`
+      : null
+  const hasDateOrYears = Boolean(anniversary.date || durationLabel)
 
   if (!hasTimeline && !hasDateOrYears) return null
 
+  const containerStyle = colors
+    ? ({
+        '--accent': colors.accent,
+        '--card': colors.surface,
+        '--ink': colors.text,
+      } as React.CSSProperties)
+    : undefined
+
   return (
-    <div className="anniversary-timeline-container">
+    <div className="anniversary-timeline-container" style={containerStyle}>
       <div className="anniversary-header">
         <span className="anniversary-badge">
           <Heart size={14} className="heart-icon" /> နှစ်ပတ်လည် အမှတ်တရ
         </span>
         {coupleNames && <h3 className="anniversary-couple">{coupleNames}</h3>}
 
-        {anniversary.yearsCount ? (
+        {durationLabel ? (
           <div className="anniversary-milestone-highlight">
             <Sparkles size={20} className="sparkle-icon" />
-            <span className="years-number">{anniversary.yearsCount}</span>
-            <span className="years-text">နှစ်ပြည့် ချစ်သက်တမ်း မှတ်တိုင်</span>
+            <span className="years-number">{durationLabel}</span>
+            <span className="years-text">ချစ်သက်တမ်း မှတ်တိုင်</span>
           </div>
         ) : null}
 
@@ -41,29 +57,41 @@ export function AnniversaryTimeline({
 
       {hasTimeline && (
         <div
-          className="anniversary-timeline-tree"
+          className="anniversary-timeline-tree is-zigzag"
           role="feed"
           aria-label="အမှတ်တရ မှတ်တိုင်များ"
         >
           <div className="timeline-vertical-stem" aria-hidden="true" />
-          {anniversary.timeline.map((item, index) => (
-            <article
-              key={item.id}
-              className={`timeline-card-node reveal-step-${Math.min(index + 1, 5)}`}
-            >
-              <div className="timeline-node-pin" aria-hidden="true">
-                <span className="pin-dot" />
-              </div>
+          {anniversary.timeline.map((item, index) => {
+            const isLeft = index % 2 === 0
+            return (
+              <article
+                key={item.id}
+                className={`timeline-card-node ${isLeft ? 'is-left' : 'is-right'} reveal-step-${Math.min(index + 1, 5)}`}
+              >
+                <div className="timeline-node-pin" aria-hidden="true">
+                  <span className="pin-dot" />
+                </div>
 
-              <div className="timeline-node-content">
-                <span className="timeline-year-tag">{item.year}</span>
-                <h4 className="timeline-node-title">{item.title}</h4>
-                {item.description && (
-                  <p className="timeline-node-desc">{item.description}</p>
-                )}
-              </div>
-            </article>
-          ))}
+                <div className="timeline-node-content">
+                  <span className="timeline-year-tag">{item.year}</span>
+                  <h4 className="timeline-node-title">{item.title}</h4>
+                  {item.photo && (
+                    <div className="timeline-photo-wrap">
+                      <img
+                        src={item.photo}
+                        alt={item.title}
+                        className="timeline-milestone-photo"
+                      />
+                    </div>
+                  )}
+                  {item.description && (
+                    <p className="timeline-node-desc">{item.description}</p>
+                  )}
+                </div>
+              </article>
+            )
+          })}
         </div>
       )}
     </div>

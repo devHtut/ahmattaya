@@ -16,10 +16,12 @@ export const timelineItemSchema = z.object({
   year: z.string().max(40),
   title: z.string().max(100),
   description: z.string().max(500),
+  photo: z.string().max(300000).optional(),
 })
 
 export const anniversaryEventSchema = z.object({
   yearsCount: z.number().int().min(1).max(100).default(1),
+  durationText: z.string().max(80).optional(),
   date: z.string().max(80).default(''),
   timeline: z.array(timelineItemSchema).max(12).default([]),
 })

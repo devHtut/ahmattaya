@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Calendar,
+  Camera,
   Check,
   Copy,
   Download,
@@ -23,6 +24,7 @@ import {
   listRsvpResponses,
   type RsvpResponse,
 } from '../../../shared/rsvp/rsvp-storage'
+import { compressPhoto } from '../lib/compress-photo'
 
 export function EventFields({
   card,
@@ -49,6 +51,10 @@ export function EventFields({
   const [timelineYear, setTimelineYear] = useState('')
   const [timelineTitle, setTimelineTitle] = useState('')
   const [timelineDesc, setTimelineDesc] = useState('')
+  const [timelinePhoto, setTimelinePhoto] = useState<string | undefined>(
+    undefined,
+  )
+  const [compressing, setCompressing] = useState(false)
 
   const wedding = card.event?.wedding ?? createWeddingEvent()
   const anniversary = card.event?.anniversary ?? createAnniversaryEvent()
@@ -80,6 +86,7 @@ export function EventFields({
       year: timelineYear.trim() || 'အမှတ်တရ',
       title: timelineTitle.trim(),
       description: timelineDesc.trim(),
+      photo: timelinePhoto,
     }
     updateAnniversary({
       timeline: [...anniversary.timeline, newItem],
@@ -87,11 +94,36 @@ export function EventFields({
     setTimelineYear('')
     setTimelineTitle('')
     setTimelineDesc('')
+    setTimelinePhoto(undefined)
   }
 
   function removeTimelineItem(id: string) {
     updateAnniversary({
       timeline: anniversary.timeline.filter((item) => item.id !== id),
+    })
+  }
+
+  async function handleItemPhotoUpload(itemId: string, file: File) {
+    try {
+      setCompressing(true)
+      const { src } = await compressPhoto(file)
+      updateAnniversary({
+        timeline: anniversary.timeline.map((item) =>
+          item.id === itemId ? { ...item, photo: src } : item,
+        ),
+      })
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'ပုံထည့်မရပါ။')
+    } finally {
+      setCompressing(false)
+    }
+  }
+
+  function handleItemPhotoRemove(itemId: string) {
+    updateAnniversary({
+      timeline: anniversary.timeline.map((item) =>
+        item.id === itemId ? { ...item, photo: undefined } : item,
+      ),
     })
   }
 
@@ -417,17 +449,69 @@ export function EventFields({
       {isAnniversary && (
         <div className="anniversary-form-group">
           <label>
-            နှစ်ပတ်လည် အရေအတွက် (နှစ်)
+            နှစ်ပတ်လည် သက်တမ်း / ကာလ
             <input
-              type="number"
-              min={1}
-              max={100}
-              value={anniversary.yearsCount}
+              type="text"
+              maxLength={80}
+              placeholder="ဥပမာ — ၁ နှစ်နဲ့ ၃ လ၊ ၃ နှစ်ပြည့်၊ ၆ လပြည့်"
+              value={anniversary.durationText || ''}
               onChange={(e) =>
-                updateAnniversary({ yearsCount: Number(e.target.value) || 1 })
+                updateAnniversary({ durationText: e.target.value })
               }
             />
+            <small className="field-hint">
+              ၁ နှစ်ပြည့် သာမက “၁ နှစ်နဲ့ ၃ လ”၊ “၆ လပြည့်” စသဖြင့် လွတ်လပ်စွာ
+              ရေးသားနိုင်ပါသည်။
+            </small>
           </label>
+
+          <div
+            className="duration-preset-pills"
+            role="group"
+            aria-label="အမြန်ရွေးချယ်နိုင်သော ကာလများ"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '6px',
+              margin: '4px 0 16px',
+            }}
+          >
+            {[
+              '၆ လပြည့်',
+              '၁ နှစ်ပြည့်',
+              '၁ နှစ်နဲ့ ၃ လ',
+              '၂ နှစ်ပြည့်',
+              '၃ နှစ်ပြည့်',
+              '၃ နှစ်နဲ့ ၆ လ',
+              '၅ နှစ်ပြည့်',
+              '၁၀ နှစ်ပြည့်',
+            ].map((preset) => {
+              const currentVal =
+                anniversary.durationText?.trim() ||
+                (anniversary.yearsCount
+                  ? `${anniversary.yearsCount} နှစ်ပြည့်`
+                  : '')
+              const isActive = currentVal === preset
+              return (
+                <button
+                  key={preset}
+                  type="button"
+                  className={`filter-pill ${isActive ? 'active' : ''}`}
+                  onClick={() => {
+                    const match = preset.match(/(\d+)\s*နှစ်/)
+                    updateAnniversary({
+                      durationText: preset,
+                      yearsCount: match
+                        ? parseInt(match[1], 10)
+                        : anniversary.yearsCount,
+                    })
+                  }}
+                >
+                  {preset}
+                </button>
+              )
+            })}
+          </div>
 
           <label>
             နှစ်ပတ်လည် ရက်စွဲ
@@ -477,6 +561,95 @@ export function EventFields({
                 />
               </label>
 
+              <div
+                className="timeline-photo-input-section"
+                style={{ margin: '10px 0' }}
+              >
+                <span
+                  className="field-hint"
+                  style={{ display: 'block', marginBottom: '6px' }}
+                >
+                  အမှတ်တရ ဓာတ်ပုံ (ရွေးချယ်နိုင်သည်)
+                </span>
+                {timelinePhoto ? (
+                  <div
+                    className="timeline-form-photo-preview"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      background: 'var(--paper-soft, #f7fafc)',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid var(--line, #e2e8f0)',
+                    }}
+                  >
+                    <img
+                      src={timelinePhoto}
+                      alt="ရွေးချယ်ထားသော ပုံ"
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '6px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <span
+                      style={{ fontSize: '12px', color: 'var(--ink-soft)' }}
+                    >
+                      ဓာတ်ပုံ ရွေးချယ်ပြီးပါပြီ
+                    </span>
+                    <button
+                      type="button"
+                      className="button ghost"
+                      onClick={() => setTimelinePhoto(undefined)}
+                      style={{
+                        marginLeft: 'auto',
+                        color: 'var(--error, #ef4444)',
+                        padding: '4px 8px',
+                      }}
+                    >
+                      <X size={13} /> ဖယ်ရှားမယ်
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    className="button secondary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      cursor: compressing ? 'wait' : 'pointer',
+                    }}
+                  >
+                    <Camera size={14} />
+                    {compressing ? 'ပုံချုံ့နေပါသည်...' : '📷 ဓာတ်ပုံ ထည့်မယ်'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={compressing}
+                      style={{ display: 'none' }}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        try {
+                          setCompressing(true)
+                          const { src } = await compressPhoto(file)
+                          setTimelinePhoto(src)
+                        } catch (err) {
+                          alert(
+                            err instanceof Error ? err.message : 'ပုံထည့်မရပါ။',
+                          )
+                        } finally {
+                          setCompressing(false)
+                          e.target.value = ''
+                        }
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+
               <button
                 type="button"
                 className="button primary"
@@ -495,16 +668,86 @@ export function EventFields({
                   <div className="timeline-builder-content">
                     <span className="timeline-builder-year">{item.year}</span>
                     <strong>{item.title}</strong>
-                    <p>{item.description}</p>
+                    {item.photo && (
+                      <div
+                        className="timeline-builder-photo-preview"
+                        style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          margin: '6px 0',
+                        }}
+                      >
+                        <img
+                          src={item.photo}
+                          alt={item.title}
+                          style={{
+                            width: '64px',
+                            height: '64px',
+                            objectFit: 'cover',
+                            borderRadius: '8px',
+                            border: '1px solid var(--line, #e2e8f0)',
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="icon-button"
+                          onClick={() => handleItemPhotoRemove(item.id)}
+                          title="ဓာတ်ပုံ ဖြုတ်မယ်"
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            width: '20px',
+                            height: '20px',
+                            background: 'var(--card, #fff)',
+                            border: '1px solid var(--line, #cbd5e0)',
+                            borderRadius: '50%',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                            padding: 0,
+                          }}
+                        >
+                          <X size={11} />
+                        </button>
+                      </div>
+                    )}
+                    {item.description && <p>{item.description}</p>}
                   </div>
-                  <button
-                    type="button"
-                    className="icon-button"
-                    onClick={() => removeTimelineItem(item.id)}
-                    title="ဖျက်မယ်"
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      marginLeft: 'auto',
+                    }}
                   >
-                    <Trash2 size={14} />
-                  </button>
+                    {!item.photo && (
+                      <label
+                        className="icon-button"
+                        title="ဓာတ်ပုံ ထည့်မယ်"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <Camera size={14} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) void handleItemPhotoUpload(item.id, file)
+                            e.target.value = ''
+                          }}
+                        />
+                      </label>
+                    )}
+                    <button
+                      type="button"
+                      className="icon-button"
+                      onClick={() => removeTimelineItem(item.id)}
+                      title="ဖျက်မယ်"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
