@@ -11,15 +11,36 @@ Projects, photos, backgrounds and music remain local to this browser/origin.
 it is not a recipient URL. The Share dialog explains this and does not offer a
 Copy Link action. Vercel hosting alone does not publish individual projects.
 
-## New Supabase project required
+## Project configuration received
 
-The owner confirmed that a new Supabase project is needed. Before live backend
-implementation, create/select that project in the owner's Supabase account and
-provide its project URL and public publishable key (or legacy anon key). Database
-passwords and service-role/secret keys must not be placed in frontend variables
-or committed. Choose the project region and plan in the account before creating
-billable resources. No Supabase project or database has been created by this
-change, and no cloud requests are made by this frontend yet.
+The owner supplied the new project URL and legacy public `anon` key. They are
+stored only in ignored `.env.local`; `.env.example` documents the variable names.
+Both `VITE_SUPABASE_PUBLISHABLE_KEY` and `VITE_SUPABASE_ANON_KEY` are supported.
+Configuration validation rejects secret/service-role keys, insecure URLs and
+legacy keys for a different Supabase project. This is a configuration guard, not
+server-side authentication validation. The official SDK is dynamically imported
+only when the Share dialog's cloud panel is opened.
+
+The public Auth settings endpoint responded successfully. The first guest sign-in
+attempt returned `anonymous_provider_disabled`; the owner then enabled Anonymous
+Sign-Ins. A real browser guest sign-in and server-verified restoration after reload
+both succeeded. The public key cannot change administrative project settings. No database
+schema, media bucket or cloud draft has been created by this change.
+
+The Share dialog exposes an explicit Guest connection action; it never creates
+anonymous users during page loads. Existing sessions are restored and checked
+with `getUser()` instead of being treated as verified solely from local storage.
+The SDK persists and refreshes the session, while the UI continues to identify
+projects as browser-local. Closing/reopening the panel rechecks the session.
+Provider-disabled, CAPTCHA and rate-limit errors receive readable messages.
+Guest creation and reload restoration are verified. Private-draft/RLS migrations
+are the next stage.
+
+Database passwords and service-role/secret keys must not be placed in frontend
+variables or committed. Do not confuse a connected guest session with a completed
+cloud save or a published recipient link. Vercel public environment configuration is managed separately from Git. Production and Preview public variables are configured. The production deployment
+is ready at https://ahmattaya.vercel.app; guest sign-in and server-verified session
+restoration after reload both passed on the hosted site.
 
 ## Implementation sequence
 

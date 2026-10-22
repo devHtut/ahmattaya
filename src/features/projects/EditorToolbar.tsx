@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { CloudConnection } from '../publishing/CloudConnection'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Check,
@@ -28,6 +29,7 @@ export function EditorToolbar({
   }
 
   const shareDialog = useRef<HTMLDialogElement>(null)
+  const [cloudOpened, setCloudOpened] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -178,7 +180,10 @@ export function EditorToolbar({
         <button
           className="button primary"
           style={{ padding: '9px 16px', fontSize: 12 }}
-          onClick={() => shareDialog.current?.showModal()}
+          onClick={() => {
+            setCloudOpened(true)
+            shareDialog.current?.showModal()
+          }}
         >
           <Share2 size={15} />
           <span>မျှဝေရန်</span>
@@ -187,6 +192,9 @@ export function EditorToolbar({
 
       <dialog
         ref={shareDialog}
+        onClose={() => {
+          if (!shareDialog.current?.open) setCloudOpened(false)
+        }}
         className="share-dialog"
         aria-labelledby="share-heading"
       >
@@ -214,6 +222,7 @@ export function EditorToolbar({
             ပြန်စစ်ပေးပါ။
           </p>
         )}
+        {cloudOpened && <CloudConnection />}
         <div className="share-dialog-actions">
           <Link
             className="button primary"

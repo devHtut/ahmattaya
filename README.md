@@ -164,6 +164,9 @@ The toolbar now explicitly labels browser-local saving, removes the misleading
 publishing. Preview stays in the current app session so unsaved edits can still
 be inspected. The existing UI design is retained.
 
-A new Supabase project is required; none has been created or connected yet. See
-[Cloud setup and implementation sequence](docs/CLOUD-SETUP.md) for the prerequisites
-and owner/guest, media, RLS and publishing stages.
+Supabase client configuration and a Guest connection panel are now implemented.
+The owner enabled Anonymous Sign-Ins; real guest creation and server-verified
+session restoration after reload have succeeded. Keys stay in ignored `.env.local`; no cloud drafts,
+media buckets or published links exist yet. See [Cloud setup](docs/CLOUD-SETUP.md)
+for the current verification results and the remaining owner/guest, media, RLS
+and publishing stages.
