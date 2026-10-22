@@ -43,7 +43,7 @@ function TemplatePreview({
     >
       <div className="template-dialog-heading">
         <div>
-          <span className="eyebrow">TEMPLATE PREVIEW</span>
+          <span className="eyebrow">နမူနာ ကြည့်ရန်</span>
           <h2 id="template-preview-title">{template.name}</h2>
         </div>
         <button
@@ -135,11 +135,11 @@ export function TemplatesPage({
     if (w.createFromTemplate(id)) navigate('/create')
   }
   return (
-    <main id="main-content" className="page-width templates-page">
-      <div className="studio-heading">
+    <main id="main-content" className="page-width album">
+      <div className="page-head">
         <div>
-          <span className="eyebrow">TEMPLATE GALLERY</span>
-          <h1>Choose a Template</h1>
+          <span className="eyebrow">နမူနာများ</span>
+          <h1>နမူနာ စာမျက်နှာများ</h1>
           <p className="muted">
             အသင့်ပြင်ထားသော ပုံစံကို ရွေးချယ်ပြီး စိတ်ကြိုက် ပြင်ဆင်ဖန်တီးပါ။
           </p>
@@ -151,19 +151,19 @@ export function TemplatesPage({
             navigate('/create')
           }}
         >
-          <Plus size={17} /> Blank Project
+          <Plus size={17} /> ဗလာကတ်
         </button>
       </div>
       {['error', 'blocked'].includes(w.saveStatus) && (
         <DraftStatus status={w.saveStatus} onRetry={w.retrySave} />
       )}
       <div
-        className="template-filters"
+        className="album-filter"
         role="group"
-        aria-label="Filter templates by occasion"
+        aria-label="အခမ်းအနားအလိုက် စစ်ထုတ်ရန်"
       >
         <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
-          All
+          အားလုံး
         </button>
         {occasions.map((item) => (
           <button
@@ -175,18 +175,18 @@ export function TemplatesPage({
           </button>
         ))}
       </div>
-      <p className="template-count" role="status">
-        Templates: {templates.length} ခု
+      <p className="album-count" role="status">
+        နမူနာ {templates.length} ခု
       </p>
-      <div className="template-grid">
+      <div className="album-grid">
         {templates.map((template) => {
           const card = createTemplateCard(template.id)!
           return (
-            <article className="template-tile" key={template.id}>
-              <div className="template-thumbnail" aria-hidden="true">
+            <article className="album-card" key={template.id}>
+              <div className="album-thumb" aria-hidden="true">
                 <CardPreview card={card} />
               </div>
-              <div className="template-tile-body">
+              <div className="album-body">
                 <span className="eyebrow">
                   {
                     occasions.find((item) => item.id === template.occasion)
@@ -195,25 +195,25 @@ export function TemplatesPage({
                 </span>
                 <h2>{template.name}</h2>
                 <p>{template.description}</p>
-                <div className="template-badges">
-                  <span>{card.pages.length + 1} Pages</span>
-                  {card.cake.enabled && <span>🎂 Cake</span>}
-                  {card.music.trackId !== 'none' && <span>🎵 Music</span>}
+                <div className="album-badges">
+                  <span>{card.pages.length + 1} စာမျက်နှာ</span>
+                  {card.cake.enabled && <span>🎂 ကိတ်မုန့်</span>}
+                  {card.music.trackId !== 'none' && <span>🎵 သံစဉ်</span>}
                 </div>
-                <div className="template-tile-actions">
+                <div className="album-actions">
                   <button
                     className="button secondary"
                     aria-label={`Preview ${template.name}`}
                     onClick={() => setSelected(template.id)}
                   >
-                    <Eye size={15} /> Preview
+                    <Eye size={15} /> ကြည့်မယ်
                   </button>
                   <button
                     className="button primary"
                     aria-label={`Use ${template.name}`}
                     onClick={() => startTemplate(template.id)}
                   >
-                    Use Template <ArrowRight size={15} />
+                    ဒီပုံစံနဲ့ စမယ် <ArrowRight size={15} />
                   </button>
                 </div>
               </div>

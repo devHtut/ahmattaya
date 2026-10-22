@@ -1,4 +1,5 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
+import { HomePage } from '../features/home/HomePage'
 import { TemplatesPage } from '../features/templates/TemplatesPage'
 import { CreatorPage } from '../features/creator/CreatorPage'
 import { PreviewPage } from '../features/receiver/PreviewPage'
@@ -10,30 +11,18 @@ export default function App() {
   const workspace = useCreatorDraft()
   const { card, onChange, saveStatus, retrySave } = workspace
   const location = useLocation()
-  const isPreview = location.pathname === '/preview'
+  const isReceiver = location.pathname === '/preview'
 
   return (
     <>
       <a className="skip-link" href="#main-content">
         အကြောင်းအရာသို့ သွားရန်
       </a>
-      {!isPreview && (
+      {!isReceiver && (
         <EditorToolbar key={workspace.project.id} workspace={workspace} />
       )}
       <Routes>
-        <Route
-          path="/"
-          element={
-            <CreatorPage
-              key={workspace.project.id}
-              workspace={workspace}
-              card={card}
-              onChange={onChange}
-              saveStatus={saveStatus}
-              onRetrySave={retrySave}
-            />
-          }
-        />
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/create"
           element={
@@ -60,9 +49,9 @@ export default function App() {
           path="*"
           element={
             <main id="main-content" className="empty-page">
-              <h1>Page Not Found</h1>
+              <h1>စာမျက်နှာ မတွေ့ပါ</h1>
               <Link className="button primary" to="/">
-                Back to Studio
+                ပြန်သွားမယ်
               </Link>
             </main>
           }

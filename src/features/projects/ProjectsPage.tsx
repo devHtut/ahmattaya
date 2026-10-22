@@ -17,14 +17,13 @@ export function ProjectsPage({
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 
   return (
-    <main id="main-content" className="page-width projects-page">
-      <div className="studio-heading">
+    <main id="main-content" className="page-width shelf-page">
+      <div className="page-head">
         <div>
-          <span className="eyebrow">PROJECTS LIBRARY</span>
-          <h1>My Projects</h1>
+          <span className="eyebrow">ကတ်များ စာ/စာ</span>
+          <h1>ကျွန်တော့် ကတ်များ</h1>
           <p className="muted">
-            Saved locally in this browser · ဒီ browser တွင် သိမ်းဆည်းထားသော
-            အမှတ်တရများ
+            ဒီ browser ထဲမှာ သိမ်းထားတဲ့ ကတ်များ · ပြင်ဆင်နေဆဲအမှတ်တရများ
           </p>
         </div>
         <button
@@ -34,40 +33,41 @@ export function ProjectsPage({
             navigate('/create')
           }}
         >
-          <Plus size={18} /> New Project
+          <Plus size={18} /> ကတ်အသစ်
         </button>
       </div>
       {['error', 'blocked'].includes(w.saveStatus) && (
         <DraftStatus status={w.saveStatus} onRetry={w.retrySave} />
       )}
-      <div className="project-tabs">
+      <div className="shelf-tabs">
         <button aria-pressed={!trash} onClick={() => setTrash(false)}>
-          Active Projects ({w.projects.filter((p) => !p.deleted).length})
+          ကတ်များ ({w.projects.filter((p) => !p.deleted).length})
         </button>
         <button aria-pressed={trash} onClick={() => setTrash(true)}>
-          Trash ({w.projects.filter((p) => p.deleted).length})
+          ဖျက်ထားတာ ({w.projects.filter((p) => p.deleted).length})
         </button>
       </div>
-      <div className="projects-grid">
+      <div className="shelf-grid">
         {items.map((project) => (
-          <article className="project-tile" key={project.id}>
-            <div className="project-thumbnail" aria-hidden="true">
+          <article className="shelf-card" key={project.id}>
+            <div className="shelf-thumb" aria-hidden="true">
               <div>
                 <CardPreview card={project.card} />
               </div>
             </div>
-            <div className="project-tile-body">
+            <div className="shelf-card-body">
               <h2>{project.name}</h2>
               <p className="muted">
-                Last edited: {new Date(project.updatedAt).toLocaleString()}
+                နောက်ဆုံး ပြင်တာ ·{' '}
+                {new Date(project.updatedAt).toLocaleString()}
               </p>
-              <div className="project-tile-actions">
+              <div className="shelf-card-actions">
                 {trash ? (
                   <button
                     className="button secondary"
                     onClick={() => w.trash(project.id, false)}
                   >
-                    <RotateCcw size={16} /> Restore
+                    <RotateCcw size={16} /> ပြန်ယူမယ်
                   </button>
                 ) : (
                   <>
@@ -76,26 +76,26 @@ export function ProjectsPage({
                       to="/create"
                       onClick={() => w.open(project.id)}
                     >
-                      Open Project
+                      ဆက်ပြင်မယ်
                     </Link>
                     <button
                       className="icon-button"
-                      aria-label="Duplicate"
-                      title="Duplicate"
+                      aria-label="မော်ကွန်းထုတ်မယ်"
+                      title="မော်ကွန်းထုတ်မယ်"
                       onClick={() => {
                         w.duplicate(project.id)
                         navigate('/create')
                       }}
                     >
-                      <Copy size={17} />
+                      <Copy size={16} />
                     </button>
                     <button
                       className="icon-button"
-                      aria-label="Move to Trash"
-                      title="Move to Trash"
+                      aria-label="ဖျက်မယ်"
+                      title="ဖျက်မယ်"
                       onClick={() => w.trash(project.id, true)}
                     >
-                      <Trash2 size={17} />
+                      <Trash2 size={16} />
                     </button>
                   </>
                 )}
@@ -105,7 +105,7 @@ export function ProjectsPage({
         ))}
       </div>
       {items.length === 0 && (
-        <p className="empty-page">ဒီနေရာတွင် Project မရှိသေးပါ။</p>
+        <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
       )}
     </main>
   )

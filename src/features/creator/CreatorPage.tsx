@@ -1,16 +1,15 @@
 import { useState } from 'react'
 import {
+  ArrowLeft,
+  ArrowRight,
   Cake,
-  ChevronLeft,
-  ChevronRight,
+  Check,
   FolderKanban,
   Images,
   LayoutTemplate,
   Mail,
   Music,
   Palette,
-  Plus,
-  Trash2,
   Type,
 } from 'lucide-react'
 import type { CardConfig, Occasion } from '../../shared/models/card'
@@ -31,7 +30,7 @@ import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
 import type { ProjectWorkspace } from './hooks/useCreatorDraft'
 
-export type ToolTab =
+export type MakerStep =
   | 'templates'
   | 'opening'
   | 'card'
@@ -41,70 +40,79 @@ export type ToolTab =
   | 'music'
   | 'projects'
 
-export type CanvasViewMode = 'opening' | 'cover' | 'pages' | 'cake'
+type CanvasView = 'opening' | 'cover' | 'pages' | 'cake'
 
-const toolTabs: {
-  id: ToolTab
+const steps: {
+  id: MakerStep
   label: string
-  sublabel: string
+  title: string
+  hint: string
   icon: typeof LayoutTemplate
-  defaultView: CanvasViewMode
+  view: CanvasView
 }[] = [
   {
     id: 'templates',
-    label: 'Templates',
-    sublabel: 'နမူနာ ပုံစံများ',
+    label: 'နမူနာ',
+    title: 'နမူနာ ရွေးပါ',
+    hint: 'အသင့်ပုံစံတစ်ခုနဲ့ စဦးနော်အောင် — နောင်မှ စိတ်ကြိုက် ပြင်နိုင်ပါတယ်။',
     icon: LayoutTemplate,
-    defaultView: 'cover',
+    view: 'cover',
   },
   {
     id: 'opening',
-    label: 'Invitation',
-    sublabel: 'အဖွင့်ဖိတ်စာ',
+    label: 'ဖိတ်စာ',
+    title: 'အဖွင့်ဖိတ်စာ',
+    hint: 'လက်ခံသူ ပထမဆုံး တွေ့ရမယ့် စာအိတ် သို့မဟုတ် လက်ဆောင်ဘူးလေး။',
     icon: Mail,
-    defaultView: 'opening',
+    view: 'opening',
   },
   {
     id: 'card',
-    label: 'Text',
-    sublabel: 'စာသားနှင့် အခမ်းအနား',
+    label: 'စာသား',
+    title: 'ကတ်ထဲက စာသား',
+    hint: 'လက်ခံသူအမည်၊ ခေါင်းစဉ်နဲ့ ရင်ထဲက စကားလေးတွေ ရေးပါ။',
     icon: Type,
-    defaultView: 'cover',
+    view: 'cover',
   },
   {
     id: 'style',
-    label: 'Design',
-    sublabel: 'အရောင်နှင့် ဖောင့်',
+    label: 'အလှဆင်',
+    title: 'အရောင်နဲ့ ဖောင့်',
+    hint: 'နောက်ခံပုံ၊ အရောင်တွဲနဲ့ စာလုံးပုံစံကို ကတ်နဲ့ လိုက်အောင် ဆင်ပါ။',
     icon: Palette,
-    defaultView: 'cover',
+    view: 'cover',
   },
   {
     id: 'pages',
-    label: 'Photos',
-    sublabel: 'စာမျက်နှာနှင့် ဓာတ်ပုံ',
+    label: 'စာမျက်နှာ',
+    title: 'စာမျက်နှာနဲ့ ဓာတ်ပုံ',
+    hint: 'မှတ်တမ်းပုံလေးတွေ ကပ်ပါ၊ စာမျက်နှာ ထပ်ပေါင်းပါ။',
     icon: Images,
-    defaultView: 'pages',
+    view: 'pages',
   },
   {
     id: 'cake',
-    label: 'Cake Studio',
-    sublabel: 'ကိတ်မုန့် အလှဆင်',
+    label: 'ကိတ်မုန့်',
+    title: 'ကိတ်မုန့် အလှဆင်',
+    hint: 'မွေးနေ့အတွက် ကိတ်မုန့်လေး ပုံဖော်ပြီး ဖယောင်းတိုင် ထားပါ။',
     icon: Cake,
-    defaultView: 'cake',
+    view: 'cake',
   },
   {
     id: 'music',
-    label: 'Music',
-    sublabel: 'သီချင်းနှင့် အသံ',
+    label: 'သံစဉ်',
+    title: 'နောက်ခံ သံစဉ်',
+    hint: 'ကတ်ဖွင့်ချိန် တေးလေးတစ်ပုဒ် သည်းခန်းစေချင်လား။',
     icon: Music,
-    defaultView: 'cover',
+    view: 'cover',
   },
   {
     id: 'projects',
-    label: 'Projects',
-    sublabel: 'သိမ်းထားသော ဖိုင်များ',
+    label: 'ဖိုင်များ',
+    title: 'သိမ်းထားတဲ့ ဖိုင်များ',
+    hint: 'လက်ရှိကတ်ကို ဆက်ပြင်ပါ၊ ဒါမှမဟုတ် အစ်စ်ပါတ်တွေကို ကွပ်ကြည့်ပါ။',
     icon: FolderKanban,
-    defaultView: 'cover',
+    view: 'cover',
   },
 ]
 
@@ -121,36 +129,35 @@ export function CreatorPage({
   onRetrySave: () => void
   workspace?: ProjectWorkspace
 }) {
-  const [activeTab, setActiveTab] = useState<ToolTab>('card')
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true)
-  const [canvasView, setCanvasView] = useState<CanvasViewMode>('cover')
-  const [templateFilter, setTemplateFilter] = useState<string>('all')
+  const [step, setStep] = useState<MakerStep>('card')
+  const [view, setView] = useState<CanvasView>('cover')
+  const [templateFilter, setTemplateFilter] = useState('all')
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
+  const [selectedPageId, setSelectedPageId] = useState('cover')
 
   const cakeEditor = useCakeEditor(card.cake, (cake) =>
     onChange({ ...card, cake }),
   )
-  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
-  const [selectedPageId, setSelectedPageId] = useState('cover')
 
   const previewPageId = card.pages.some((page) => page.id === selectedPageId)
     ? selectedPageId
     : 'cover'
 
-  const handleSelectTab = (tab: ToolTab) => {
-    if (activeTab === tab && isDrawerOpen) {
-      // Toggle drawer if same tab clicked
-      setIsDrawerOpen(false)
-      return
-    }
-    setActiveTab(tab)
-    setIsDrawerOpen(true)
-    const tabDef = toolTabs.find((t) => t.id === tab)
-    if (tabDef) {
-      setCanvasView(tabDef.defaultView)
-    }
-  }
+  const stepIndex = steps.findIndex((s) => s.id === step)
+  const stepDef = steps[stepIndex]
+  const isFirst = stepIndex <= 0
+  const isLast = stepIndex >= steps.length - 1
 
-  const activeToolDef = toolTabs.find((t) => t.id === activeTab)
+  function goTo(target: MakerStep) {
+    const def = steps.find((s) => s.id === target)
+    setStep(target)
+    if (def) setView(def.view)
+    if (target !== 'pages') setSelectedPhotoId(null)
+  }
+  function go(delta: -1 | 1) {
+    const next = steps[stepIndex + delta]
+    if (next) goTo(next.id)
+  }
 
   const filteredTemplates =
     templateFilter === 'all'
@@ -158,322 +165,98 @@ export function CreatorPage({
       : templateCatalog.filter((t) => t.occasion === templateFilter)
 
   return (
-    <div className="canva-studio-app">
+    <div className="maker">
       {['error', 'blocked'].includes(saveStatus) && (
         <DraftStatus status={saveStatus} onRetry={onRetrySave} />
       )}
 
-      {/* Main Workspace: Left Tool Rail + Drawer + Canvas Stage */}
-      <div className="studio-workspace-container">
-        {/* 1. Left Vertical Tool Rail (Canva-style) */}
-        <aside className="studio-tool-rail" aria-label="Tool Rail">
-          {toolTabs.map((item) => {
-            const Icon = item.icon
-            const isActive = activeTab === item.id && isDrawerOpen
-            return (
-              <button
-                key={item.id}
-                className={`tool-rail-btn ${isActive ? 'active' : ''}`}
-                onClick={() => handleSelectTab(item.id)}
-                aria-pressed={isActive}
-                title={`${item.label} (${item.sublabel})`}
-              >
-                <Icon size={20} className="tool-rail-icon" />
-                <span className="tool-rail-label">{item.label}</span>
-              </button>
-            )
-          })}
-        </aside>
+      {/* Step journey */}
+      <nav className="maker-journey" aria-label="ဖန်တီးမှု အဆင့်များ">
+        <div className="journey-track" role="list">
+          {steps.map((s, i) => (
+            <button
+              key={s.id}
+              className={`journey-step ${i < stepIndex ? 'is-done' : ''}`}
+              onClick={() => goTo(s.id)}
+              aria-current={i === stepIndex ? 'step' : undefined}
+              role="listitem"
+            >
+              <span className="step-index">
+                {i < stepIndex ? <Check size={13} /> : i + 1}
+              </span>
+              <span className="step-text">{s.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
 
-        {/* 2. Slide-out Drawer Panel (Properties & Settings) */}
-        {isDrawerOpen && (
-          <aside className="studio-drawer-panel" aria-label="Tool Settings">
-            <div className="drawer-header">
-              <div>
-                <h2>{activeToolDef?.label}</h2>
-                <p className="drawer-sublabel">{activeToolDef?.sublabel}</p>
-              </div>
-              <button
-                className="icon-button drawer-collapse-btn"
-                onClick={() => setIsDrawerOpen(false)}
-                title="Collapse Panel"
-                aria-label="Collapse Panel"
-              >
-                <ChevronLeft size={18} />
-              </button>
-            </div>
-
-            <div className="drawer-content">
-              {/* Templates Drawer */}
-              {activeTab === 'templates' && (
-                <div className="drawer-templates-list">
-                  <div className="template-filter-pills">
-                    {[
-                      { id: 'all', label: 'All' },
-                      { id: 'birthday', label: '🎂 Birthday' },
-                      { id: 'wedding-invitation', label: '💌 Wedding' },
-                      { id: 'anniversary', label: '💖 Anniversary' },
-                    ].map((pill) => (
-                      <button
-                        key={pill.id}
-                        className={`filter-pill ${templateFilter === pill.id ? 'active' : ''}`}
-                        onClick={() => setTemplateFilter(pill.id)}
-                      >
-                        {pill.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="templates-mini-grid">
-                    {filteredTemplates.map((template) => (
-                      <article key={template.id} className="template-mini-card">
-                        <div className="template-mini-info">
-                          <h3>{template.name}</h3>
-                          <p>{template.description}</p>
-                          <span className="template-mini-tag">
-                            {template.occasion}
-                          </span>
-                        </div>
-                        <button
-                          className="button primary mini-apply-btn"
-                          onClick={() => {
-                            if (workspace) {
-                              workspace.createFromTemplate(template.id)
-                            }
-                          }}
-                        >
-                          Use Template
-                        </button>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Invitation / Opening Drawer */}
-              {activeTab === 'opening' && (
-                <OpeningFields card={card} onChange={onChange} />
-              )}
-
-              {/* Text & Occasion Drawer */}
-              {activeTab === 'card' && (
-                <div className="fields">
-                  <label>
-                    Occasion (အခမ်းအနား ရွေးချယ်ရန်)
-                    <select
-                      value={card.occasion}
-                      onChange={(e) =>
-                        onChange(
-                          changeOccasion(
-                            card,
-                            occasionSchema.parse(e.target.value as Occasion),
-                          ),
-                        )
-                      }
-                    >
-                      {occasions.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.icon} {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <WordsFields card={card} onChange={onChange} />
-                </div>
-              )}
-
-              {/* Design & Appearance Drawer */}
-              {activeTab === 'style' && (
-                <StyleFields card={card} onChange={onChange} />
-              )}
-
-              {/* Photos & Pages Drawer */}
-              {activeTab === 'pages' && (
-                <PagesFields
-                  card={card}
-                  onChange={onChange}
-                  pageId={previewPageId}
-                  onSelectPage={(id) => {
-                    setSelectedPageId(id)
-                    setSelectedPhotoId(null)
-                    setCanvasView('pages')
-                  }}
-                  selectedPhotoId={selectedPhotoId}
-                  onSelectPhoto={setSelectedPhotoId}
-                />
-              )}
-
-              {/* Cake Studio Drawer */}
-              {activeTab === 'cake' && (
-                <CakeFields
-                  card={card}
-                  onChange={(next) => cakeEditor.changeRecipe(next.cake)}
-                  editor={cakeEditor}
-                />
-              )}
-
-              {/* Music Drawer */}
-              {activeTab === 'music' && (
-                <MusicFields card={card} onChange={onChange} />
-              )}
-
-              {/* Projects Drawer */}
-              {activeTab === 'projects' && (
-                <div className="drawer-projects-list">
-                  <button
-                    className="button primary new-project-btn"
-                    onClick={() => {
-                      if (workspace) {
-                        workspace.create('birthday')
-                      }
-                    }}
-                  >
-                    <Plus size={16} /> New Blank Project
-                  </button>
-
-                  <div className="projects-mini-list">
-                    {workspace?.projects
-                      .filter((p) => !p.deleted)
-                      .map((p) => {
-                        const isActive = p.id === workspace.project.id
-                        return (
-                          <div
-                            key={p.id}
-                            className={`project-mini-item ${isActive ? 'active' : ''}`}
-                          >
-                            <div
-                              className="project-mini-clickable"
-                              onClick={() => workspace.open(p.id)}
-                            >
-                              <h4>{p.name}</h4>
-                              <span className="project-mini-time">
-                                {new Date(p.updatedAt).toLocaleDateString()}
-                              </span>
-                              {isActive && (
-                                <span className="current-badge">Editing</span>
-                              )}
-                            </div>
-                            <div className="project-mini-actions">
-                              <button
-                                className="icon-button mini"
-                                title="Delete Project"
-                                onClick={() => workspace.trash(p.id, true)}
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </div>
-                          </div>
-                        )
-                      })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
-
-        {/* Collapsed Drawer Expand Button */}
-        {!isDrawerOpen && (
-          <button
-            className="drawer-expand-tab"
-            onClick={() => setIsDrawerOpen(true)}
-            title="Expand Tools Panel"
-            aria-label="Expand Tools Panel"
-          >
-            <ChevronRight size={18} />
-          </button>
-        )}
-
-        {/* 3. Center Live Canvas Stage */}
-        <main className="studio-canvas-stage" id="main-content">
-          {/* Floating Canvas View Switcher */}
+      <div className="maker-body">
+        {/* The bench — live preview */}
+        <section className="maker-stage" aria-label="ကတ် နမူနာ">
           <div
-            className="canvas-view-switcher"
-            role="tablist"
-            aria-label="Canvas Preview Views"
+            className="preview-switch"
+            role="group"
+            aria-label="ကြည့်မယ့် အပိုင်း"
           >
-            <button
-              className={`view-pill ${canvasView === 'opening' ? 'active' : ''}`}
-              onClick={() => setCanvasView('opening')}
-              role="tab"
-              aria-selected={canvasView === 'opening'}
-            >
-              💌 Invitation
-            </button>
-            <button
-              className={`view-pill ${canvasView === 'cover' ? 'active' : ''}`}
-              onClick={() => setCanvasView('cover')}
-              role="tab"
-              aria-selected={canvasView === 'cover'}
-            >
-              🎴 Card Cover
-            </button>
-            {card.pages.length > 0 && (
+            {(
+              [
+                { id: 'opening', label: 'ဖိတ်စာ' },
+                { id: 'cover', label: 'အဖုံး' },
+                {
+                  id: 'pages',
+                  label: `စာမျက်နှာ${card.pages.length ? ` (${card.pages.length})` : ''}`,
+                },
+                { id: 'cake', label: 'ကိတ်မုန့်' },
+              ] as { id: CanvasView; label: string }[]
+            ).map((v) => (
               <button
-                className={`view-pill ${canvasView === 'pages' ? 'active' : ''}`}
-                onClick={() => setCanvasView('pages')}
-                role="tab"
-                aria-selected={canvasView === 'pages'}
+                key={v.id}
+                aria-pressed={view === v.id}
+                onClick={() => setView(v.id)}
               >
-                📄 Pages ({card.pages.length})
+                {v.label}
               </button>
-            )}
-            <button
-              className={`view-pill ${canvasView === 'cake' ? 'active' : ''}`}
-              onClick={() => setCanvasView('cake')}
-              role="tab"
-              aria-selected={canvasView === 'cake'}
-            >
-              🎂 Cake Studio
-            </button>
+            ))}
           </div>
 
-          {/* Canvas Card Frame */}
-          <div className="canvas-frame-wrapper">
-            <div className="canvas-phone-frame">
-              {canvasView === 'opening' ? (
-                <div className="stage-opening-view">
-                  <OpeningInvitation
-                    opening={card.opening}
-                    receiverName={card.receiverName}
-                    senderName={card.senderName}
-                  />
-                </div>
-              ) : canvasView === 'cake' ? (
-                <div className="stage-cake-view">
-                  <CakePreview recipe={card.cake} editor={cakeEditor} />
-                </div>
-              ) : canvasView === 'pages' && activeTab === 'pages' ? (
-                <div className="stage-pages-view">
-                  <CanvasWorkspace
-                    card={card}
-                    pageId={previewPageId}
-                    selectedId={selectedPhotoId}
-                    onSelect={setSelectedPhotoId}
-                    onCommit={(id, frame) =>
-                      onChange({
-                        ...card,
-                        photos: card.photos.map((photo) =>
-                          photo.id === id ? { ...photo, frame } : photo,
-                        ),
-                      })
-                    }
-                  />
-                </div>
+          <div className="bench">
+            <div className="artboard">
+              {view === 'opening' ? (
+                <OpeningInvitation
+                  opening={card.opening}
+                  receiverName={card.receiverName}
+                  senderName={card.senderName}
+                />
+              ) : view === 'cake' ? (
+                <CakePreview recipe={card.cake} editor={cakeEditor} />
               ) : (
-                <div className="stage-card-view">
+                <>
+                  {view === 'pages' && step === 'pages' && (
+                    <CanvasWorkspace
+                      card={card}
+                      pageId={previewPageId}
+                      selectedId={selectedPhotoId}
+                      onSelect={setSelectedPhotoId}
+                      onCommit={(id, frame) =>
+                        onChange({
+                          ...card,
+                          photos: card.photos.map((photo) =>
+                            photo.id === id ? { ...photo, frame } : photo,
+                          ),
+                        })
+                      }
+                    />
+                  )}
                   <CardPreview
                     key={previewPageId}
                     card={card}
-                    pageId={canvasView === 'pages' ? previewPageId : 'cover'}
-                    selectedPhotoId={
-                      canvasView === 'pages' ? selectedPhotoId : null
-                    }
+                    pageId={view === 'pages' ? previewPageId : 'cover'}
+                    selectedPhotoId={view === 'pages' ? selectedPhotoId : null}
                     onSelectPhoto={
-                      canvasView === 'pages' ? setSelectedPhotoId : undefined
+                      view === 'pages' ? setSelectedPhotoId : undefined
                     }
                     onCommitPhoto={
-                      canvasView === 'pages'
+                      view === 'pages'
                         ? (id, frame) =>
                             onChange({
                               ...card,
@@ -484,11 +267,199 @@ export function CreatorPage({
                         : undefined
                     }
                   />
-                </div>
+                </>
               )}
             </div>
           </div>
-        </main>
+          <p className="stage-caption">
+            {view === 'opening'
+              ? 'လက်ခံသူ ပထမဆုံး ဖွင့်တွေ့ရမယ့် အထုပ်'
+              : view === 'cake'
+                ? 'ကိတ်မုန့် ပုံစံ'
+                : 'ကတ်ရဲ့ လက်ရှိပုံစံ'}
+          </p>
+        </section>
+
+        {/* The working sheet */}
+        <section className="maker-panel" aria-labelledby="step-heading">
+          <div className="panel-head">
+            <span className="step-kicker">
+              အဆင့် {stepIndex + 1} / {steps.length}
+            </span>
+            <h2 id="step-heading">{stepDef.title}</h2>
+            <p>{stepDef.hint}</p>
+          </div>
+
+          <div className="panel-body">
+            {step === 'templates' && (
+              <div>
+                <div className="shelf-filter">
+                  {[
+                    { id: 'all', label: 'အားလုံး' },
+                    { id: 'birthday', label: '🎂 မွေးနေ့' },
+                    { id: 'wedding-invitation', label: '💌 မင်္ဂလာဖိတ်စာ' },
+                    { id: 'anniversary', label: '💖 နှစ်ပတ်လည်' },
+                  ].map((pill) => (
+                    <button
+                      key={pill.id}
+                      className={`filter-pill ${templateFilter === pill.id ? 'active' : ''}`}
+                      onClick={() => setTemplateFilter(pill.id)}
+                    >
+                      {pill.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="shelf-list">
+                  {filteredTemplates.map((template) => (
+                    <article key={template.id} className="shelf-item">
+                      <div>
+                        <h3>{template.name}</h3>
+                        <p>{template.description}</p>
+                        <span className="mini-badge">{template.occasion}</span>
+                      </div>
+                      <button
+                        className="button primary mini-apply-btn"
+                        onClick={() =>
+                          workspace?.createFromTemplate(template.id)
+                        }
+                      >
+                        ဒီပုံစံနဲ့ စမယ်
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {step === 'opening' && (
+              <OpeningFields card={card} onChange={onChange} />
+            )}
+
+            {step === 'card' && (
+              <div className="fields">
+                <label>
+                  အခမ်းအနား
+                  <select
+                    value={card.occasion}
+                    onChange={(e) =>
+                      onChange(
+                        changeOccasion(
+                          card,
+                          occasionSchema.parse(e.target.value as Occasion),
+                        ),
+                      )
+                    }
+                  >
+                    {occasions.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.icon} {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <WordsFields card={card} onChange={onChange} />
+              </div>
+            )}
+
+            {step === 'style' && (
+              <StyleFields card={card} onChange={onChange} />
+            )}
+
+            {step === 'pages' && (
+              <PagesFields
+                card={card}
+                onChange={onChange}
+                pageId={previewPageId}
+                onSelectPage={(id) => {
+                  setSelectedPageId(id)
+                  setSelectedPhotoId(null)
+                  setView('pages')
+                }}
+                selectedPhotoId={selectedPhotoId}
+                onSelectPhoto={setSelectedPhotoId}
+              />
+            )}
+
+            {step === 'cake' && (
+              <CakeFields
+                card={card}
+                onChange={(next) => cakeEditor.changeRecipe(next.cake)}
+                editor={cakeEditor}
+              />
+            )}
+
+            {step === 'music' && (
+              <MusicFields card={card} onChange={onChange} />
+            )}
+
+            {step === 'projects' && (
+              <div>
+                <button
+                  className="button primary new-project-btn"
+                  onClick={() => workspace?.create('birthday')}
+                >
+                  + အစကတ် အသစ်
+                </button>
+                <div className="stack-list">
+                  {workspace?.projects
+                    .filter((p) => !p.deleted)
+                    .map((p) => {
+                      const isActive = p.id === workspace.project.id
+                      return (
+                        <div
+                          key={p.id}
+                          className={`stack-item ${isActive ? 'active' : ''}`}
+                        >
+                          <div
+                            className="stack-item-click"
+                            onClick={() => workspace.open(p.id)}
+                          >
+                            <h4>{p.name}</h4>
+                            <span className="stack-item-time">
+                              {new Date(p.updatedAt).toLocaleDateString()}
+                            </span>
+                            {isActive && (
+                              <span className="current-badge">ပြင်နေတယ်</span>
+                            )}
+                          </div>
+                          <button
+                            className="icon-button"
+                            title="ဖျက်မယ်"
+                            aria-label="ဖျက်မယ်"
+                            onClick={() => workspace.trash(p.id, true)}
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      )
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="panel-foot">
+            <button
+              className="button ghost"
+              onClick={() => go(-1)}
+              disabled={isFirst}
+            >
+              <ArrowLeft size={15} /> အရင်အဆင့်
+            </button>
+            <div className="step-dots" aria-hidden="true">
+              {steps.map((s, i) => (
+                <span key={s.id} className={i === stepIndex ? 'on' : ''} />
+              ))}
+            </div>
+            <button
+              className="button primary"
+              onClick={() => go(1)}
+              disabled={isLast}
+            >
+              နောက်အဆင့် <ArrowRight size={15} />
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   )

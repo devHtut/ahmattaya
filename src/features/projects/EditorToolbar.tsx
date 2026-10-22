@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import {
   Check,
   Eye,
   FolderKanban,
-  HardDrive,
   LayoutTemplate,
   Pencil,
   Redo2,
   Share2,
-  Sparkles,
   Undo2,
   X,
 } from 'lucide-react'
@@ -22,6 +20,7 @@ export function EditorToolbar({
 }) {
   const [prevProjectName, setPrevProjectName] = useState(w.project.name)
   const [name, setName] = useState(w.project.name)
+  const location = useLocation()
 
   if (prevProjectName !== w.project.name) {
     setPrevProjectName(w.project.name)
@@ -31,7 +30,6 @@ export function EditorToolbar({
   const [copied, setCopied] = useState(false)
   const shareDialog = useRef<HTMLDialogElement>(null)
 
-  // Keyboard shortcuts for Undo and Redo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -71,49 +69,53 @@ export function EditorToolbar({
     })
   }
 
+  const closeMenu = (e: React.SyntheticEvent) => {
+    ;(e.target as HTMLElement).closest('details')?.removeAttribute('open')
+  }
+
   return (
-    <header className="editor-toolbar">
-      <Link to="/" className="toolbar-brand" aria-label="AhMatTaYa Studio">
-        <span className="toolbar-brand-icon">
-          <Sparkles size={18} />
+    <header className="atelier-bar">
+      <Link to="/" className="atelier-brand" aria-label="AhMatTaYa">
+        <span className="brand-seal" aria-hidden="true">
+          A
         </span>
-        <span className="toolbar-brand-text">
-          အမှတ်တရ <small>Studio</small>
+        <span className="brand-word">
+          အမှတ်တရ
+          <small>Atelier</small>
         </span>
       </Link>
 
       <details className="file-menu">
-        <summary>File</summary>
+        <summary>ဖိုင်</summary>
         <div className="file-menu-items">
           <button
             onClick={(e) => {
               w.create('birthday')
-              ;(e.target as HTMLElement)
-                .closest('details')
-                ?.removeAttribute('open')
+              closeMenu(e)
             }}
           >
-            + New Project (Blank)
+            + ကတ်အသစ်
           </button>
-          <Link to="/templates">Template Gallery</Link>
+          <Link to="/templates">နမူနာများ</Link>
           <button
             onClick={(e) => {
               w.duplicate()
-              ;(e.target as HTMLElement)
-                .closest('details')
-                ?.removeAttribute('open')
+              closeMenu(e)
             }}
           >
-            Duplicate Project
+            မော်ကွန်းထုတ်မယ်
           </button>
-          <Link to="/projects">All Projects</Link>
+          <Link to="/projects">ကတ်များ အားလုံး</Link>
         </div>
       </details>
 
-      <div className="project-name-wrapper">
+      <div
+        className="name-wrap"
+        style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+      >
         <input
-          className="project-name-input"
-          aria-label="Project Name"
+          className="atelier-name"
+          aria-label="ကတ်အမည်"
           maxLength={100}
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -125,23 +127,22 @@ export function EditorToolbar({
             if (e.key === 'Enter') e.currentTarget.blur()
           }}
         />
-        <Pencil size={12} className="edit-indicator" aria-hidden="true" />
+        <Pencil size={11} className="name-hint" aria-hidden="true" />
       </div>
 
-      <span className={`toolbar-save ${w.saveStatus}`} role="status">
-        <HardDrive size={15} />
+      <span className={`save-state ${w.saveStatus}`} role="status">
         {w.saveStatus === 'saved' ? (
           <>
-            <Check size={13} /> <span>Saved to device</span>
+            <Check size={13} /> <span>သိမ်းပြီးပါပြီ</span>
           </>
         ) : w.saveStatus === 'idle' ? (
-          <span>Local draft</span>
+          <span>ပြင်ဆင်နေဆဲ</span>
         ) : (
-          <span>Unsaved changes</span>
+          <span>မသိမ်းရသေးပါ</span>
         )}
       </span>
 
-      <div className="toolbar-history">
+      <div className="bar-history">
         <button
           className="icon-button"
           aria-label="Undo"
@@ -149,7 +150,7 @@ export function EditorToolbar({
           disabled={!w.canUndo}
           onClick={w.undo}
         >
-          <Undo2 size={17} />
+          <Undo2 size={16} />
         </button>
         <button
           className="icon-button"
@@ -158,38 +159,43 @@ export function EditorToolbar({
           disabled={!w.canRedo}
           onClick={w.redo}
         >
-          <Redo2 size={17} />
+          <Redo2 size={16} />
         </button>
       </div>
 
-      <div className="toolbar-actions">
+      <div className="bar-actions">
         <Link
           to="/templates"
-          className="toolbar-nav-link"
-          title="Template Gallery"
+          className={`bar-link ${location.pathname === '/templates' ? 'active' : ''}`}
+          title="နမူနာများ"
         >
           <LayoutTemplate size={16} />
-          <span>Templates</span>
-        </Link>
-        <Link to="/projects" className="toolbar-nav-link" title="My Projects">
-          <FolderKanban size={16} />
-          <span>Projects</span>
+          <span>နမူနာ</span>
         </Link>
         <Link
-          className="button secondary toolbar-preview-btn"
+          to="/projects"
+          className={`bar-link ${location.pathname === '/projects' ? 'active' : ''}`}
+          title="ကတ်များ"
+        >
+          <FolderKanban size={16} />
+          <span>ကတ်များ</span>
+        </Link>
+        <Link
+          className="button ghost bar-link"
           to="/preview"
           target="_blank"
           rel="noopener noreferrer"
         >
           <Eye size={16} />
-          <span>Preview</span>
+          <span>ကြည့်မယ်</span>
         </Link>
         <button
-          className="button primary toolbar-share-btn"
+          className="button primary"
+          style={{ padding: '9px 16px', fontSize: 12 }}
           onClick={() => shareDialog.current?.showModal()}
         >
-          <Share2 size={16} />
-          <span>Share</span>
+          <Share2 size={15} />
+          <span>ပို့မယ်</span>
         </button>
       </div>
 
@@ -199,10 +205,10 @@ export function EditorToolbar({
         aria-labelledby="share-heading"
       >
         <div className="share-dialog-header">
-          <h2 id="share-heading">Share Project Link</h2>
+          <h2 id="share-heading">ကတ်ကို ပို့မယ်</h2>
           <button
             className="icon-button"
-            aria-label="Close"
+            aria-label="ပိတ်မယ်"
             onClick={() => shareDialog.current?.close()}
           >
             <X size={16} />
@@ -213,7 +219,6 @@ export function EditorToolbar({
           ဖြစ်ပါသည်။ လောလောဆယ် browser local data အနေဖြင့် သိမ်းဆည်းထားပြီး
           တိုက်ရိုက် စမ်းသပ်ကြည့်ရှုနိုင်ပါသည်။
         </p>
-
         <div className="share-link-box">
           <input
             readOnly
@@ -238,7 +243,6 @@ export function EditorToolbar({
             )}
           </button>
         </div>
-
         <div className="share-dialog-actions">
           <Link
             className="button primary"
@@ -247,7 +251,7 @@ export function EditorToolbar({
             rel="noopener noreferrer"
             onClick={() => shareDialog.current?.close()}
           >
-            <Eye size={16} /> Open Recipient Preview
+            <Eye size={16} /> ကြည့်ရန် ဖွင့်မယ်
           </Link>
         </div>
       </dialog>
