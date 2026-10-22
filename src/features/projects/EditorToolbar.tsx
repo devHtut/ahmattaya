@@ -27,7 +27,6 @@ export function EditorToolbar({
     setName(w.project.name)
   }
 
-  const [copied, setCopied] = useState(false)
   const shareDialog = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
@@ -60,14 +59,6 @@ export function EditorToolbar({
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [w])
-
-  const handleCopyLink = () => {
-    const previewUrl = `${window.location.origin}/preview`
-    navigator.clipboard?.writeText(previewUrl).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
 
   const closeMenu = (e: React.SyntheticEvent) => {
     ;(e.target as HTMLElement).closest('details')?.removeAttribute('open')
@@ -133,10 +124,10 @@ export function EditorToolbar({
       <span className={`save-state ${w.saveStatus}`} role="status">
         {w.saveStatus === 'saved' ? (
           <>
-            <Check size={13} /> <span>သိမ်းပြီးပါပြီ</span>
+            <Check size={13} /> <span>ဒီ browser မှာ သိမ်းပြီး</span>
           </>
         ) : w.saveStatus === 'idle' ? (
-          <span>ပြင်ဆင်နေဆဲ</span>
+          <span>ဒီ browser မှာ သိမ်းပါမယ်</span>
         ) : (
           <span>မသိမ်းရသေးပါ</span>
         )}
@@ -180,12 +171,7 @@ export function EditorToolbar({
           <FolderKanban size={16} />
           <span>ကတ်များ</span>
         </Link>
-        <Link
-          className="button ghost bar-link"
-          to="/preview"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <Link className="button ghost bar-link" to="/preview">
           <Eye size={16} />
           <span>ကြည့်မယ်</span>
         </Link>
@@ -195,7 +181,7 @@ export function EditorToolbar({
           onClick={() => shareDialog.current?.showModal()}
         >
           <Share2 size={15} />
-          <span>ပို့မယ်</span>
+          <span>မျှဝေရန်</span>
         </button>
       </div>
 
@@ -205,7 +191,7 @@ export function EditorToolbar({
         aria-labelledby="share-heading"
       >
         <div className="share-dialog-header">
-          <h2 id="share-heading">ကတ်ကို ပို့မယ်</h2>
+          <h2 id="share-heading">ကတ်ကို မျှဝေရန်</h2>
           <button
             className="icon-button"
             aria-label="ပိတ်မယ်"
@@ -215,44 +201,30 @@ export function EditorToolbar({
           </button>
         </div>
         <p className="share-dialog-desc">
-          ဒီကတ်လေးကို လက်ခံမည့်သူ မြင်တွေ့ရမည့် Recipient Preview Link
-          ဖြစ်ပါသည်။ လောလောဆယ် browser local data အနေဖြင့် သိမ်းဆည်းထားပြီး
-          တိုက်ရိုက် စမ်းသပ်ကြည့်ရှုနိုင်ပါသည်။
+          ဒီကတ်ကို လောလောဆယ် ဒီ browser ထဲမှာပဲ သိမ်းထားပါတယ်။ တခြားသူ သို့မဟုတ်
+          တခြားစက်မှာ ဖွင့်ကြည့်နိုင်တဲ့ Share link မရသေးပါ။
         </p>
-        <div className="share-link-box">
-          <input
-            readOnly
-            value={
-              typeof window !== 'undefined'
-                ? `${window.location.origin}/preview`
-                : ''
-            }
-            onClick={(e) => (e.target as HTMLInputElement).select()}
-          />
-          <button
-            className="button secondary"
-            onClick={handleCopyLink}
-            type="button"
-          >
-            {copied ? (
-              <>
-                <Check size={14} /> Copied!
-              </>
-            ) : (
-              'Copy Link'
-            )}
-          </button>
-        </div>
+        <p className="share-dialog-desc">
+          Cloud မှာ သိမ်းပြီး Publish လုပ်နိုင်တဲ့အခါ ဒီကတ်အတွက် သီးခြား link
+          ရပါမယ်။ အခုတော့ ကိုယ့်ကတ်ကို ဒီနေရာမှာပဲ နမူနာကြည့်နိုင်ပါတယ်။
+        </p>
+        {(w.saveStatus === 'error' || w.saveStatus === 'blocked') && (
+          <p role="alert" className="music-error">
+            လက်ရှိပြင်ထားတာတွေ မသိမ်းရသေးပါ။ Editor မှာ သိမ်းဆည်းမှုအခြေအနေကို
+            ပြန်စစ်ပေးပါ။
+          </p>
+        )}
         <div className="share-dialog-actions">
           <Link
             className="button primary"
             to="/preview"
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={() => shareDialog.current?.close()}
           >
-            <Eye size={16} /> ကြည့်ရန် ဖွင့်မယ်
+            <Eye size={16} /> ကိုယ့်ကတ် နမူနာကြည့်မယ်
           </Link>
+          <button className="button secondary" disabled>
+            Share link မရသေးပါ
+          </button>
         </div>
       </dialog>
     </header>

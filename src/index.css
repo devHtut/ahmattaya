@@ -2161,6 +2161,7 @@ legend {
    -------------------------------------------------------------------------- */
 
 .share-dialog {
+  margin: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius-l);
   max-width: 500px;
@@ -2205,6 +2206,8 @@ legend {
 }
 .share-dialog-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: flex-end;
 }
 

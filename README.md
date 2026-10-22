@@ -154,3 +154,16 @@ The mobile-testing site is https://ahmattaya.vercel.app (Vercel project `ahmatta
 Verified on the public URL: direct `/templates`, creating a starter and refreshing `/create` with the project restored. Hosting does not sync localhost/mobile drafts, and it does not publish individual cards. Each browser/origin retains its own localStorage and IndexedDB data. Use the stable production domain when testing persistence.
 
 GitHub auto-deployment is not connected: Vercel reported that the account needs a GitHub Login Connection. CLI deployment succeeded independently. Future preview deployments can use `vercel deploy`; update the stable production site with `vercel deploy --prod` after checking the current feature branch.
+
+## Publishing foundation
+
+The latest refined Atelier UI was preserved at `0822734` and all existing local
+branches pushed to origin. `codex/publishing-foundation` starts from that checkpoint.
+The toolbar now explicitly labels browser-local saving, removes the misleading
+`/preview` Copy Link action, and explains that recipient sharing requires cloud
+publishing. Preview stays in the current app session so unsaved edits can still
+be inspected. The existing UI design is retained.
+
+A new Supabase project is required; none has been created or connected yet. See
+[Cloud setup and implementation sequence](docs/CLOUD-SETUP.md) for the prerequisites
+and owner/guest, media, RLS and publishing stages.
