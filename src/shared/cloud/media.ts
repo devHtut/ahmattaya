@@ -58,7 +58,7 @@ export class CloudMediaError extends Error {
     this.code = code
   }
 }
-const browserCache: MediaCache = {
+export const browserCache: MediaCache = {
   load: (kind, id) =>
     kind === 'image' ? loadImageAsset(id) : loadAudioAsset(id),
   put: (asset, blob) =>
@@ -117,7 +117,7 @@ export function mediaPath(
     throw new CloudMediaError('media-invalid')
   return `${ownerId}/${asset.kind}/${asset.id}`
 }
-async function checkedBlob(asset: MediaAsset, blob: Blob) {
+export async function checkedBlob(asset: MediaAsset, blob: Blob) {
   if (blob.size !== asset.bytes || blob.type !== asset.mime)
     throw new CloudMediaError('media-corrupt')
   try {

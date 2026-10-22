@@ -222,11 +222,12 @@ export function EditorToolbar({
         </div>
         <p className="share-dialog-desc">
           ဒီ browser မှာ အလိုအလျောက် သိမ်းပေးပါတယ်။ Cloud မိတ္တူအတွက် အောက်က
-          သိမ်းမယ်ကို နှိပ်ပါ။ တခြားသူကို ပို့နိုင်တဲ့ Share link မရသေးပါ။
+          သိမ်းမယ်ကို နှိပ်ပါ။ ချစ်ရသူဆီ ပို့ဖို့ Publish နှိပ်ပြီး link
+          ယူနိုင်ပါတယ်။
         </p>
         <p className="share-dialog-desc">
-          Cloud မှာ သိမ်းပြီး Publish လုပ်နိုင်တဲ့အခါ ဒီကတ်အတွက် သီးခြား link
-          ရပါမယ်။ အခုတော့ ကိုယ့်ကတ်ကို ဒီနေရာမှာပဲ နမူနာကြည့်နိုင်ပါတယ်။
+          Publish လုပ်ရင် ဒီကတ်အတွက် သီးခြား receiver link ရပါမယ်။ အတူပြင်ဆင်သူ
+          ဖိတ်ခေါ်တဲ့ link နဲ့ သီးခြားဖြစ်ပါတယ်။
         </p>
         {(w.saveStatus === 'error' || w.saveStatus === 'blocked') && (
           <p role="alert" className="music-error">
@@ -248,9 +249,6 @@ export function EditorToolbar({
           >
             <Eye size={16} /> ကိုယ့်ကတ် နမူနာကြည့်မယ်
           </Link>
-          <button className="button secondary" disabled>
-            Share link မရသေးပါ
-          </button>
         </div>
       </dialog>
     </header>

@@ -25,3 +25,30 @@ export function getCloudClient(): Promise<SupabaseClient> {
   )
   return client
 }
+
+let receiverClient: Promise<SupabaseClient> | undefined
+// Recipients never restore or create the editor's guest session.
+export function getReceiverClient(): Promise<SupabaseClient> {
+  if (cloudConfig.status !== 'configured')
+    return Promise.reject(new Error('Cloud configuration missing'))
+  const { url, publicKey } = cloudConfig
+  receiverClient ??= import('@supabase/supabase-js').then(({ createClient }) =>
+    createClient(url, publicKey, {
+      global: {
+        fetch: (input, init) =>
+          fetch(input, {
+            ...init,
+            cache: 'no-store',
+            signal: init?.signal ?? AbortSignal.timeout(120_000),
+          }),
+      },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storageKey: 'ahmattaya.receiver',
+      },
+    }),
+  )
+  return receiverClient
+}

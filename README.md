@@ -151,7 +151,7 @@ Tests validate every starter, occasion coverage, identity/reference constraints,
 
 The mobile-testing site is https://ahmattaya.vercel.app (Vercel project `ahmattaya`, scope `devhtutkhaung-7649s-projects`). The first CLI deployment was assigned to production automatically. `vercel.json` selects Vite, builds with `npm run build`, serves `dist`, and rewrites client routes to `index.html` so direct visits/refreshes work. `.vercel` is untracked; deployment ignores local dependencies, generated output, docs/tests and environment files.
 
-Verified on the public URL: direct `/templates`, creating a starter and refreshing `/create` with the project restored. Hosting does not sync localhost/mobile drafts, and it does not publish individual cards. Each browser/origin retains its own localStorage and IndexedDB data. Use the stable production domain when testing persistence.
+Verified on the public URL: direct `/templates`, creating a starter and refreshing `/create` with the project restored. Hosting alone does not sync localhost/mobile drafts. Receiver links now use explicit cloud publishing as described below. Each browser/origin retains its own localStorage and IndexedDB data. Use the stable production domain when testing persistence.
 
 GitHub auto-deployment is not connected: Vercel reported that the account needs a GitHub Login Connection. CLI deployment succeeded independently. Future preview deployments can use `vercel deploy`; update the stable production site with `vercel deploy --prod` after checking the current feature branch.
 
@@ -166,11 +166,24 @@ be inspected. The existing UI design is retained.
 
 Supabase client configuration and a Guest connection panel are now implemented.
 The owner enabled Anonymous Sign-Ins; real guest creation and server-verified
-session restoration after reload have succeeded. Keys stay in ignored `.env.local`; no cloud drafts,
-media buckets or published links exist yet. See [Cloud setup](docs/CLOUD-SETUP.md)
+session restoration after reload have succeeded. Keys stay in ignored `.env.local`; private drafts, media and published receiver links are implemented below. See [Cloud setup](docs/CLOUD-SETUP.md)
 for the current verification results and the remaining owner/guest, media, RLS
 and publishing stages.
 
 ### Private Cloud drafts
 
-Cloud toolbar icon / Projects page → Guest connection → explicit Cloud Save. Owner-only drafts include embedded photos, background images, preset/custom music and cake settings. Background/audio files upload into private owner-only storage before a snapshot is saved, and are verified/cached locally before restore. Missing/corrupt files or partial uploads never produce a successful backup. A cloud restore creates a new local working copy and never replaces an existing browser draft. Updates protect against stale revisions. Guest access remains tied to this browser session; account recovery/cross-device sign-in and public Share links are not implemented yet. See [Cloud setup](docs/CLOUD-SETUP.md) for the applied SQL migration and validation.
+Cloud toolbar icon / Projects page → Guest connection → explicit Cloud Save. Owner-only drafts include embedded photos, background images, preset/custom music and cake settings. Background/audio files upload into private owner-only storage before a snapshot is saved, and are verified/cached locally before restore. Missing/corrupt files or partial uploads never produce a successful backup. A cloud restore creates a new local working copy and never replaces an existing browser draft. Updates protect against stale revisions. Guest access remains tied to this browser session; account recovery/cross-device sign-in is not implemented yet. Receiver links use a separate published snapshot, described below. See [Cloud setup](docs/CLOUD-SETUP.md) for the applied SQL migration and validation.
+
+### Receiver Publish / Share
+
+Cloud/Share → Guest connection → Publish saves a private draft, copies referenced
+media to a separate private bucket and activates a read-only snapshot at
+`https://ahmattaya.vercel.app/r/<UUID>`. Anyone with the link can view it without an
+account. Later draft edits do not appear until republished. Republish keeps the
+same URL; the owner can disable the link. Previously downloaded copies cannot be
+recalled. This is a receiver link, not a collaboration invitation.
+
+Public routes never initialize the editor workspace or use local drafts/media as
+a fallback. Recipient media is verified and loaded into memory without signing
+into an owner session. Direct receiver URLs work through the Vercel SPA rewrite.
+See [Cloud setup](docs/CLOUD-SETUP.md) for migrations and live verification.

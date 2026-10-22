@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { MediaDeliveryContext } from './MediaDeliveryContext'
+import { useContext, useEffect, useState } from 'react'
 import { loadImageAsset } from './image-assets'
 export function useImageAsset(assetId: string | undefined) {
+  const delivery = useContext(MediaDeliveryContext)
   const [state, setState] = useState<{
     id?: string
     url?: string
     failed?: boolean
   }>({})
   useEffect(() => {
-    if (!assetId) return
+    if (!assetId || delivery) return
     let cancelled = false
     let url: string | undefined
     loadImageAsset(assetId)
@@ -27,6 +29,7 @@ export function useImageAsset(assetId: string | undefined) {
       cancelled = true
       if (url) URL.revokeObjectURL(url)
     }
-  }, [assetId])
+  }, [assetId, delivery])
+  if (delivery) return { id: assetId, ...delivery['image:' + assetId] }
   return state.id === assetId ? state : {}
 }

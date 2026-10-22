@@ -3431,3 +3431,35 @@ footer {
   width: 100%;
   accent-color: var(--accent);
 }
+
+.publish-card {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border, #e7e2ee);
+}
+.publish-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.published-link {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.7rem;
+  min-width: 0;
+}
+.published-link input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid #ded8ea;
+  border-radius: 0.65rem;
+  background: #faf8ff;
+  color: #41334f;
+  font: inherit;
+}
+.publish-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

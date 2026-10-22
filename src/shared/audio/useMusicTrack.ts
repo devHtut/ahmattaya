@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { MediaDeliveryContext } from '../media/MediaDeliveryContext'
+import { useContext, useEffect, useState } from 'react'
 import type { MusicConfig } from '../models/music'
 import { loadAudioAsset } from '../media/audio-assets'
 import { findMusicTrack } from './tracks'
@@ -8,6 +9,7 @@ export interface PlayableTrack {
   src: string
 }
 export function useMusicTrack(music: MusicConfig) {
+  const delivery = useContext(MediaDeliveryContext)
   const assetId = music.trackId === 'custom' ? music.custom?.assetId : undefined
   const revision = music.custom?.revision
   const requestId = assetId ? `${assetId}:${revision ?? 0}` : undefined
@@ -17,7 +19,7 @@ export function useMusicTrack(music: MusicConfig) {
     failed?: boolean
   }>({})
   useEffect(() => {
-    if (!assetId) return
+    if (!assetId || delivery) return
     let cancelled = false
     let url: string | undefined
     loadAudioAsset(assetId)
@@ -37,8 +39,12 @@ export function useMusicTrack(music: MusicConfig) {
       cancelled = true
       if (url) URL.revokeObjectURL(url)
     }
-  }, [assetId, requestId])
-  const current = asset.id === requestId ? asset : {}
+  }, [assetId, requestId, delivery])
+  const current = delivery
+    ? (delivery['audio:' + assetId] ?? {})
+    : asset.id === requestId
+      ? asset
+      : {}
   const custom = music.custom
   const track: PlayableTrack | undefined =
     music.trackId === 'custom'

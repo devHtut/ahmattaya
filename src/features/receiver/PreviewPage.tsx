@@ -38,7 +38,13 @@ function Reveal({
   )
 }
 
-export function PreviewPage({ card }: { card: CardConfig }) {
+export function PreviewPage({
+  card,
+  published = false,
+}: {
+  card: CardConfig
+  published?: boolean
+}) {
   const [opened, setOpened] = useState(false)
   const [burst, setBurst] = useState(0)
   const [musicEnabled, setMusicEnabled] = useState(true)
@@ -127,7 +133,9 @@ export function PreviewPage({ card }: { card: CardConfig }) {
       )}
       {!opened && (
         <section className="story-scene scene-opening">
-          <p className="pill">နမူနာသာ ဖြစ်ပါတယ် · Publish မလုပ်ရသေးပါ</p>
+          {!published && (
+            <p className="pill">နမူနာသာ ဖြစ်ပါတယ် · Publish မလုပ်ရသေးပါ</p>
+          )}
           <OpeningInvitation
             opening={card.opening}
             receiverName={card.receiverName}
@@ -146,6 +154,13 @@ export function PreviewPage({ card }: { card: CardConfig }) {
             </p>
           )}
         </section>
+      )}
+      {opened && (audioMissing || audioLoading) && (
+        <p role="status" className="music-start-hint">
+          {audioMissing
+            ? 'သီချင်းဖိုင်ကို ဖွင့်မရပါ။ ကတ်ကို ဆက်ဖတ်နိုင်ပါတယ်။'
+            : 'သီချင်း ပြင်ဆင်နေပါတယ်။ ပြီးရင် Play ကို နှိပ်ပေးပါ။'}
+        </p>
       )}
       {opened && (
         <>
@@ -240,7 +255,7 @@ export function PreviewPage({ card }: { card: CardConfig }) {
                   <RotateCcw size={14} /> ဖိတ်စာ ပြန်ကြည့်မယ်
                 </button>
                 <Link className="button primary" to="/create">
-                  ကတ်ကို ပြန်ပြင်မယ်
+                  {published ? 'ကိုယ်ပိုင်ကတ် ဖန်တီးမယ်' : 'ကတ်ကို ပြန်ပြင်မယ်'}
                 </Link>
               </div>
             </Reveal>

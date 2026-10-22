@@ -1,3 +1,4 @@
+import { PublishCard } from './PublishCard'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CloudDownload, CloudUpload, RefreshCw } from 'lucide-react'
@@ -26,6 +27,7 @@ export function CloudDrafts({
   const [items, setItems] = useState<CloudDraftSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [more, setMore] = useState(false)
+  const [publishing, setPublishing] = useState(false)
   const [action, setAction] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
@@ -68,7 +70,7 @@ export function CloudDrafts({
   }
 
   async function refresh(append = false) {
-    if (busy.current || loading) return
+    if (busy.current || loading || publishing) return
     busy.current = true
     setLoading(true)
     setError('')
@@ -98,7 +100,7 @@ export function CloudDrafts({
     }
   }
   async function save() {
-    if (busy.current || loading || mediaIssue) return
+    if (busy.current || loading || publishing || mediaIssue) return
     busy.current = true
     setAction('save')
     setTransfer(null)
@@ -137,7 +139,7 @@ export function CloudDrafts({
     }
   }
   async function restore(id: string) {
-    if (busy.current || loading) return
+    if (busy.current || loading || publishing) return
     busy.current = true
     setAction(id)
     setTransfer(null)
@@ -158,16 +160,24 @@ export function CloudDrafts({
       if (alive.current) setTransfer(null)
     }
   }
-  const disabled = loading || Boolean(action)
+  const disabled = loading || Boolean(action) || publishing
   const receipt =
     w.project.cloud?.ownerId === ownerId ? w.project.cloud : undefined
   return (
     <div className="cloud-drafts">
+      <PublishCard
+        key={w.project.id}
+        workspace={w}
+        ownerId={ownerId}
+        disabled={loading || Boolean(action)}
+        publishBlocked={Boolean(mediaIssue)}
+        onBusy={setPublishing}
+      />
       <h3>ကိုယ့်အတွက် Cloud ကတ်များ</h3>
       <p className="field-hint">
         ကိုယ်တိုင် သိမ်းမယ်နှိပ်မှ Cloud ပေါ်တင်ပေးပါတယ်။ ဓာတ်ပုံ၊ စာသား၊
-        နောက်ခံပုံ၊ ကိုယ်ပိုင်သီချင်း၊ အလှဆင်နဲ့ Cake ပါဝင်ပြီး Share link
-        မဟုတ်သေးပါ။
+        နောက်ခံပုံ၊ ကိုယ်ပိုင်သီချင်း၊ အလှဆင်နဲ့ Cake ပါဝင်ပါတယ်။ ဒီမိတ္တူကို
+        ကိုယ်တိုင်ပဲ ပြန်ပြင်နိုင်ပါတယ်။
       </p>
       <button
         className="button primary"

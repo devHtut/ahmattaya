@@ -42,3 +42,57 @@ References: [Supabase row-level security](https://supabase.com/docs/guides/datab
 - Cloud draft code is loaded only after connecting, keeping the main bundle below 500 kB. The existing CakeScene chunk warning remains.
 - `scripts/verify-cloud-media.mjs` passed against the live project using two isolated guests, one private fixture draft, a tiny PNG and the app's original WAV. It verifies fresh-cache downloads, duplicate reuse after a new SDK session, other-Guest/unsigned/public URL denial, forbidden foreign paths/overwrites, and rejection of incomplete manifests. Test data stays private and no existing user files are changed.
 - Browser QA imports a generated gradient PNG and the app's original melody through the actual file pickers, then saves/restores a separate test card. No credentials or browser storage are extracted for verification.
+
+### Receiver publishing
+
+Run `202610220003_receiver_publishing.sql`, then
+`202610220004_receiver_download_context.sql` and
+`202610220005_receiver_exact_download.sql`, then
+`202610220006_receiver_uncached_download.sql` in Supabase SQL Editor after the
+private draft/media migrations. The public key cannot perform this admin setup.
+
+Publish captures a private draft revision, copies its referenced background/audio
+files into the separate private `published-media` bucket, and activates the public
+snapshot only after all files are present. The receiver address is
+`https://ahmattaya.vercel.app/r/<random UUID>`. Anyone with that link can view the
+published snapshot. It grants no editing or collaboration access. Draft edits stay
+private until another successful Publish; republishing retains the address.
+
+The owner can disable the link. New snapshot/file requests then fail. Previously
+downloaded copies cannot be recalled. Anonymous guest ownership is still tied to
+that browser's session; account linking and collaborative editing remain future
+work. There is no public directory or list of cards.
+
+The receiver route uses a separate non-persistent anonymous API client and never
+loads the editor workspace or local draft/media caches. Files are checked against
+their content hash, MIME and byte length, and kept in memory-only object URLs.
+Missing links never fall back to a local card. Music may require a Play gesture,
+particularly if its file finishes loading after the invitation opens.
+
+`npm test` covers RLS, publication state transitions, private edit isolation,
+revocation, stale builds, safe links, manifest validation and incomplete uploads.
+The opt-in `node --experimental-strip-types scripts/verify-publishing.mjs` checks
+isolated live guests and fixture media; it does not read existing user projects.
+Test fixtures remain under those isolated guests because client deletion is denied.
+
+Storage compatibility: the final helper checks a GET request's exact
+`/published-media/<share UUID>/<kind>/<hash>` suffix, independent of the server's
+route prefix/operation label. Every visible object must match that requested path
+and an active publication manifest (owners also verify unfinished copies).
+Bucket listing/signing requests do not match file GETs, and listing cannot reveal
+unknown share IDs. Anonymous table access, object updates/deletes, private draft
+file access and other-owner publication controls remain denied.
+
+Recipient downloads use a unique `cacheNonce` and `cache: no-store`; newly
+published uploads use `cacheControl: 0`. This avoids an old authenticated Storage
+cache response masking revocation. The final SQL strips the query before matching
+the exact file path. Copies/URLs already obtained by a recipient or intermediary
+may remain cached and cannot be recalled.
+
+Live verification (2026-10-22): unsigned receivers downloaded and verified both
+image and custom WAV bytes; root/folder listing and signed-URL creation were denied.
+Another guest could not disable the publication. Private edits stayed absent from
+the published snapshot; republishing retained the share ID and updated content.
+Disabling the link denied both the snapshot and fresh media downloads. Browser QA
+covered the invitation, music playback, background, continuous pages and cake;
+390px, 768px and 1366px iframe viewports were visually checked (not physical devices).
