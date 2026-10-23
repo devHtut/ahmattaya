@@ -1,18 +1,17 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Copy, HardDrive, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { Copy, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from '../creator/components/DraftStatus'
 import { CloudConnection } from '../publishing/CloudConnection'
-import { StorageManager } from './components/StorageManager'
 
 export function ProjectsPage({
   workspace: w,
 }: {
   workspace: ProjectWorkspace
 }) {
-  const [tab, setTab] = useState<'projects' | 'trash' | 'storage'>('projects')
+  const [tab, setTab] = useState<'projects' | 'trash'>('projects')
   const [selected, setSelected] = useState<string[]>([])
   const confirmation = useRef<HTMLDialogElement>(null)
   const navigate = useNavigate()
@@ -67,26 +66,8 @@ export function ProjectsPage({
         >
           ဖျက်ထားတာ ({w.projects.filter((p) => p.deleted).length})
         </button>
-        <button
-          aria-pressed={tab === 'storage'}
-          onClick={() => {
-            setTab('storage')
-            setSelected([])
-          }}
-        >
-          <HardDrive
-            size={14}
-            style={{ verticalAlign: 'middle', marginRight: '4px' }}
-          />
-          သိုလှောင်မှု
-        </button>
       </div>
-
-      {tab === 'storage' ? (
-        <StorageManager projects={w.projects} />
-      ) : (
-        <>
-          {isTrash && items.length > 0 && (
+      {isTrash && items.length > 0 && (
             <div className="trash-selection-bar">
               <label>
                 <input
@@ -221,10 +202,8 @@ export function ProjectsPage({
               </article>
             ))}
           </div>
-          {items.length === 0 && (
-            <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
-          )}
-        </>
+      {items.length === 0 && (
+        <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
       )}
       <CloudConnection workspace={w} />
     </main>
