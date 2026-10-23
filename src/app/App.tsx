@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { FolderKanban, LayoutTemplate, Pencil, Plus } from 'lucide-react'
 import { HomePage } from '../features/home/HomePage'
 import { TemplatesPage } from '../features/templates/TemplatesPage'
 import { CreatorPage } from '../features/creator/CreatorPage'
@@ -32,6 +33,7 @@ function EditorApp() {
   const { card, onChange, saveStatus, retrySave } = workspace
   const location = useLocation()
   const isReceiver = location.pathname === '/preview'
+  const isEditor = location.pathname === '/create'
 
   return (
     <>
@@ -39,17 +41,70 @@ function EditorApp() {
         အကြောင်းအရာသို့ သွားရန်
       </a>
       {!isReceiver &&
-        (workspace.hasActiveProject ? (
+        (isEditor && workspace.hasActiveProject ? (
           <EditorToolbar key={workspace.project.id} workspace={workspace} />
         ) : (
           <header className="atelier-bar">
-            <Link to="/">အမှတ်တရ</Link>
-            <Link to="/templates" className="button primary">
-              ကတ်အသစ်
+            <Link to="/" className="atelier-brand" aria-label="AhMatTaYa">
+              <span className="brand-seal" aria-hidden="true">
+                A
+              </span>
+              <span className="brand-word">
+                အမှတ်တရ
+                <small>Atelier</small>
+              </span>
             </Link>
-            <Link to="/projects" className="button secondary">
-              ကတ်များ
-            </Link>
+
+            <div className="bar-actions" style={{ marginLeft: 'auto' }}>
+              <Link
+                to="/templates"
+                className={`bar-link ${location.pathname === '/templates' ? 'active' : ''}`}
+                title="နမူနာများ"
+              >
+                <LayoutTemplate size={16} />
+                <span>နမူနာ</span>
+              </Link>
+              <Link
+                to="/projects"
+                className={`bar-link ${location.pathname === '/projects' ? 'active' : ''}`}
+                title="ကတ်များ"
+              >
+                <FolderKanban size={16} />
+                <span>ကတ်များ</span>
+              </Link>
+              {workspace.hasActiveProject ? (
+                <Link
+                  to="/create"
+                  className="button primary"
+                  style={{
+                    padding: '8px 14px',
+                    fontSize: '12px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  title="လက်ရှိ ပြင်ဆင်နေသော ကတ်သို့ သွားရန်"
+                >
+                  <Pencil size={13} />
+                  <span>ကတ် ဆက်ပြင်မယ်</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/templates"
+                  className="button primary"
+                  style={{
+                    padding: '8px 14px',
+                    fontSize: '12px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>ကတ်အသစ် ဖန်တီးမယ်</span>
+                </Link>
+              )}
+            </div>
           </header>
         ))}
       <Routes>
