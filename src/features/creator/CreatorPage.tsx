@@ -16,18 +16,14 @@ import {
   Send,
   Share2,
   Sparkles,
-  Type,
 } from 'lucide-react'
 import {
   MAX_PAGES,
   type CardConfig,
-  type Occasion,
 } from '../../shared/models/card'
-import { occasionSchema } from '../../shared/models/card'
-import { changeOccasion, occasions } from '../../shared/templates/templates'
+import { occasions } from '../../shared/templates/templates'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from './components/DraftStatus'
-import { WordsFields } from './components/WordsFields'
 import { EventFields } from './components/EventFields'
 import { CanvasWorkspace } from './components/CanvasWorkspace'
 import { useCakeEditor } from '../cake/lib/useCakeEditor'
@@ -44,7 +40,7 @@ import { createPage } from './lib/pages'
 import type { ProjectWorkspace } from './hooks/useCreatorDraft'
 
 export type MakerStep =
-  'opening' | 'card' | 'pages' | 'event' | 'cake' | 'music' | 'publish'
+  'opening' | 'pages' | 'event' | 'cake' | 'music' | 'publish'
 
 type CanvasView = 'opening' | 'pages' | 'cake' | 'event'
 
@@ -65,18 +61,10 @@ const steps: {
     view: 'opening',
   },
   {
-    id: 'card',
-    label: 'စာသား',
-    title: 'ကတ်ထဲက စာသား',
-    hint: 'လက်ခံသူအမည်၊ ခေါင်းစဉ်နဲ့ ရင်ထဲက စကားလေးတွေ ရေးပါ။',
-    icon: Type,
-    view: 'pages',
-  },
-  {
     id: 'pages',
-    label: 'စာမျက်နှာ / အလှဆင်',
-    title: 'စာမျက်နှာနဲ့ အလှဆင်',
-    hint: 'ကတ်အဖုံးနဲ့ စာမျက်နှာများကို နောက်ခံ၊ အရောင်၊ စာလုံးပုံစံနဲ့ ဓာတ်ပုံများ ဖြည့်စွက်ပါ။',
+    label: 'စာမျက်နှာများ',
+    title: 'ကတ်အဖုံးနှင့် စာမျက်နှာများ',
+    hint: 'ကတ်အဖုံးနှင့် စာမျက်နှာများ၏ စာသား၊ နောက်ခံ၊ အရောင်နှင့် ဓာတ်ပုံများကို ပြင်ဆင်ပါ။',
     icon: Palette,
     view: 'pages',
   },
@@ -127,7 +115,7 @@ export function CreatorPage({
   onRetrySave: () => void
   workspace?: ProjectWorkspace
 }) {
-  const [step, setStep] = useState<MakerStep>('card')
+  const [step, setStep] = useState<MakerStep>('pages')
   const [view, setView] = useState<CanvasView>('pages')
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
@@ -557,40 +545,6 @@ export function CreatorPage({
               <OpeningFields card={card} onChange={onChange} />
             )}
 
-            {step === 'card' && (
-              <div className="fields">
-                <label>
-                  အခမ်းအနား
-                  <select
-                    value={card.occasion}
-                    onChange={(e) =>
-                      onChange(
-                        changeOccasion(
-                          card,
-                          occasionSchema.parse(e.target.value as Occasion),
-                        ),
-                      )
-                    }
-                  >
-                    {occasions.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.icon} {item.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <WordsFields card={card} onChange={onChange} />
-              </div>
-            )}
-
-            {step === 'event' && (
-              <EventFields
-                card={card}
-                onChange={onChange}
-                projectId={workspace?.project.id}
-              />
-            )}
-
             {step === 'pages' && (
               <PagesFields
                 card={card}
@@ -612,6 +566,14 @@ export function CreatorPage({
                   setSelectedElementId(id)
                   if (id) setSelectedPhotoId(null)
                 }}
+              />
+            )}
+
+            {step === 'event' && (
+              <EventFields
+                card={card}
+                onChange={onChange}
+                projectId={workspace?.project.id}
               />
             )}
 

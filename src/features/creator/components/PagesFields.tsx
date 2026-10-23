@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { BackgroundFields } from './BackgroundFields'
 import { StyleFields } from './StyleFields'
+import { WordsFields } from './WordsFields'
+import { occasions, changeOccasion } from '../../../shared/templates/templates'
 import { ImagePlus, Trash2 } from 'lucide-react'
 import { ElementFields } from './ElementFields'
 import {
   MAX_PHOTOS,
   type CardConfig,
   type CardPhoto,
+  type Occasion,
+  occasionSchema,
 } from '../../../shared/models/card'
 import { compressPhoto } from '../lib/compress-photo'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry'
@@ -132,15 +136,56 @@ export function PagesFields({
           </strong>
           <span className="active-page-sub">
             {isCover
-              ? ' — အရောင်၊ ဖောင့်နှင့် အဖုံးအလှဆင်ခြင်း'
+              ? ' — ခေါင်းစဉ်၊ ရင်ထဲကစကား၊ အရောင်နှင့် အလှဆင်ခြင်း'
               : ' — စာမျက်နှာ စာသား၊ စာရွက်ပုံစံနှင့် ဓာတ်ပုံများ'}
           </span>
         </div>
       </div>
 
       {isCover && (
-        <div className="cover-style-container">
-          <StyleFields card={card} onChange={onChange} />
+        <div className="cover-content-container">
+          <div className="fields cover-fields">
+            <label>
+              အခမ်းအနား
+              <select
+                value={card.occasion}
+                onChange={(e) =>
+                  onChange(
+                    changeOccasion(
+                      card,
+                      occasionSchema.parse(e.target.value as Occasion),
+                    ),
+                  )
+                }
+              >
+                {occasions.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.icon} {item.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <WordsFields card={card} onChange={onChange} />
+          </div>
+
+          <div className="cover-style-container" style={{ marginTop: '20px' }}>
+            <h4
+              className="section-subheading"
+              style={{ fontSize: '13px', fontWeight: 600, margin: '0 0 10px', color: 'var(--ink)' }}
+            >
+              ကတ်အဖုံး ပုံစံနှင့် Theme အရောင်
+            </h4>
+            <StyleFields card={card} onChange={onChange} />
+          </div>
+
+          <div className="cover-bg-container" style={{ marginTop: '20px' }}>
+            <BackgroundFields
+              key="cover"
+              card={card}
+              pageId="cover"
+              onChange={onChange}
+            />
+          </div>
         </div>
       )}
 
