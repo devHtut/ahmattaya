@@ -204,7 +204,6 @@ p {
   color: var(--ink);
 }
 
-.danger,
 .button.danger {
   background: #dc2626;
   border-color: #dc2626;
@@ -213,7 +212,6 @@ p {
     inset 0 -2px 0 rgba(0, 0, 0, 0.2),
     0 6px 16px rgba(220, 38, 38, 0.28);
 }
-.danger:hover,
 .button.danger:hover {
   background: #b91c1c;
   border-color: #b91c1c;
@@ -254,6 +252,25 @@ p {
 .icon-button:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+.icon-button.danger {
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.28);
+  background: rgba(220, 38, 38, 0.06);
+}
+.icon-button.danger svg {
+  stroke: #dc2626 !important;
+  color: #dc2626 !important;
+}
+.icon-button.danger:hover {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+.icon-button.danger:hover svg {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .eyebrow {

@@ -13,6 +13,7 @@ const loadedFontFaces = new Set<string>()
 
 export function getCustomFonts(): FontOption[] {
   const customFonts: FontOption[] = []
+  const seen = new Set<string>()
 
   for (const [path, url] of Object.entries(customFontModules)) {
     const filename = path.split('/').pop() ?? ''
@@ -21,7 +22,8 @@ export function getCustomFonts(): FontOption[] {
       .replace(/[-_]/g, ' ')
       .trim()
 
-    if (!fontName) continue
+    if (!fontName || seen.has(fontName.toLowerCase())) continue
+    seen.add(fontName.toLowerCase())
 
     if (
       typeof document !== 'undefined' &&
@@ -30,7 +32,7 @@ export function getCustomFonts(): FontOption[] {
     ) {
       loadedFontFaces.add(fontName)
       try {
-        const fontFace = new FontFace(fontName, `url(${url})`)
+        const fontFace = new FontFace(fontName, `url("${url}")`)
         fontFace
           .load()
           .then((loaded) => {
@@ -46,7 +48,7 @@ export function getCustomFonts(): FontOption[] {
 
     customFonts.push({
       id: fontName,
-      label: `✨ ${fontName}`,
+      label: fontName,
       family: `'${fontName}', 'Noto Sans Myanmar', sans-serif`,
       isCustom: true,
     })

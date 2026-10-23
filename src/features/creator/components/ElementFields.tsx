@@ -8,8 +8,9 @@ import {
   COLOR_PALETTE,
   ELEMENT_SHAPES,
   TEXT_BACKGROUNDS,
+  TEXT_FONTS,
 } from '../../../shared/ui/ElementShapes'
-import { getAllAvailableFonts } from '../../../shared/fonts/fonts-catalog'
+import { getCustomFonts } from '../../../shared/fonts/fonts-catalog'
 import {
   STICKER_CATEGORIES,
   type StickerItem,
@@ -38,7 +39,8 @@ export function ElementFields({
   const allElements = card.elements ?? []
   const pageElements = allElements.filter((el) => el.pageId === pageId)
   const selectedElement = pageElements.find((el) => el.id === selectedElementId)
-  const availableFonts = getAllAvailableFonts()
+  const standardFonts = TEXT_FONTS
+  const customFonts = getCustomFonts()
 
   const currentCategory =
     STICKER_CATEGORIES.find((c) => c.id === selectedCatId) ??
@@ -173,7 +175,7 @@ export function ElementFields({
       <div className="elements-section-header">
         <div>
           <h3 className="elements-section-title">
-            <Sparkles size={16} /> အလှဆင် Stickers နှင့် စာတိုများ
+            အလှဆင် Stickers နှင့် စာတိုများ
           </h3>
         </div>
         <span className="elements-count-badge">{pageElements.length} ခု</span>
@@ -186,8 +188,7 @@ export function ElementFields({
           className="button primary sticker-picker-launch-btn"
           onClick={() => setStickerModalOpen(true)}
         >
-          <Sparkles size={15} />
-          <span>Stickers ရွေးမယ် (၂၁၀ ပုံ)</span>
+          <span>Stickers ရွေးမယ်</span>
         </button>
         <button
           type="button"
@@ -333,11 +334,22 @@ export function ElementFields({
                       })
                     }
                   >
-                    {availableFonts.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.label}
-                      </option>
-                    ))}
+                    <optgroup label="အခြေခံ Fonts (Standard)">
+                      {standardFonts.map((f) => (
+                        <option key={f.id} value={f.id}>
+                          {f.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                    {customFonts.length > 0 && (
+                      <optgroup label={`ထည့်ထားသော မြန်မာ Fonts (${customFonts.length})`}>
+                        {customFonts.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
                   </select>
                 </div>
 
