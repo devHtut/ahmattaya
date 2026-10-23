@@ -45,6 +45,7 @@ export function EditorToolbar({
 
   const shareDialog = useRef<HTMLDialogElement>(null)
   const exportDialog = useRef<HTMLDialogElement>(null)
+  const fileMenuRef = useRef<HTMLDetailsElement>(null)
   const [cloudOpened, setCloudOpened] = useState(false)
 
   const handleExplicitSave = useCallback(() => {
@@ -89,6 +90,30 @@ export function EditorToolbar({
   }
 
   useEffect(() => {
+    function handleClickOutside(event: globalThis.PointerEvent) {
+      if (
+        fileMenuRef.current?.open &&
+        !fileMenuRef.current.contains(event.target as Node)
+      ) {
+        fileMenuRef.current.removeAttribute('open')
+      }
+    }
+
+    function handleEsc(event: KeyboardEvent) {
+      if (event.key === 'Escape' && fileMenuRef.current?.open) {
+        fileMenuRef.current.removeAttribute('open')
+      }
+    }
+
+    document.addEventListener('pointerdown', handleClickOutside)
+    document.addEventListener('keydown', handleEsc)
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
+      document.removeEventListener('keydown', handleEsc)
+    }
+  }, [])
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
@@ -124,8 +149,12 @@ export function EditorToolbar({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [w, handleExplicitSave])
 
-  const closeMenu = (e: React.SyntheticEvent) => {
-    ;(e.target as HTMLElement).closest('details')?.removeAttribute('open')
+  const closeMenu = (e?: React.SyntheticEvent) => {
+    if (fileMenuRef.current) {
+      fileMenuRef.current.removeAttribute('open')
+    } else if (e) {
+      ;(e.target as HTMLElement).closest('details')?.removeAttribute('open')
+    }
   }
 
   return (
@@ -140,7 +169,7 @@ export function EditorToolbar({
         </span>
       </Link>
 
-      <details className="file-menu">
+      <details ref={fileMenuRef} className="file-menu">
         <summary>ဖိုင်</summary>
         <div className="file-menu-items">
           <button
@@ -151,7 +180,9 @@ export function EditorToolbar({
           >
             + ကတ်အသစ်
           </button>
-          <Link to="/templates">နမူနာများ</Link>
+          <Link to="/templates" onClick={() => closeMenu()}>
+            နမူနာများ
+          </Link>
           <button
             onClick={(e) => {
               w.duplicate()
@@ -168,7 +199,9 @@ export function EditorToolbar({
           >
             📥 ဖိုင်ထုတ်ယူရန် / Backup
           </button>
-          <Link to="/projects">ကတ်များ အားလုံး</Link>
+          <Link to="/projects" onClick={() => closeMenu()}>
+            ကတ်များ အားလုံး
+          </Link>
         </div>
       </details>
 
