@@ -61,7 +61,7 @@ export function cloudDraftMessage(error: unknown): string {
     return 'ဒီကတ်က Cloud သိမ်းဆည်းမှုအတွက် အရွယ်အစားကြီးနေပါတယ်။ ပုံအချို့ကို လျှော့ပြီး ပြန်ကြိုးစားပါ။'
   if (code === 'invalid')
     return 'ကတ်အချက်အလက်ကို အတည်ပြုမရလို့ မဖွင့်ထားပါ။ လက်ရှိကတ်ကို မပြောင်းထားပါ။'
-  return 'Cloud သိမ်းဆည်းမှု မအောင်မြင်ပါ။ လက်ရှိကတ်က browser ထဲမှာ ရှိနေဆဲပါ။ Internet နဲ့ Guest ချိတ်ဆက်မှုကို စစ်ပြီး ပြန်ကြိုးစားပါ။'
+  return 'Cloud သိမ်းဆည်းမှု မအောင်မြင်ပါ။ လက်ရှိကတ်က browser ထဲမှာ ရှိနေဆဲပါ။ Internet နဲ့ အကောင့်ချိတ်ဆက်မှုကို စစ်ပြီး ပြန်ကြိုးစားပါ။'
 }
 // File dependencies are uploaded separately before committing this payload.
 export function prepareCloudDraft(project: Project) {

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import {
   ChevronLeft,
   ChevronRight,
@@ -36,7 +36,10 @@ export function CanvasWorkspace({
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
 
-  const allPageIds = ['cover', ...card.pages.map((p) => p.id)]
+  const allPageIds = useMemo(
+    () => ['cover', ...card.pages.map((p) => p.id)],
+    [card.pages],
+  )
   const currentPageIndex = Math.max(0, allPageIds.indexOf(pageId))
   const isCover = pageId === 'cover'
   const isFirst = currentPageIndex === 0

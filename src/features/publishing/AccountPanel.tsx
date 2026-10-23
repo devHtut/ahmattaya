@@ -95,15 +95,14 @@ export function AccountPanel({
   return (
     <section className="account-panel" aria-labelledby={headingId}>
       <h3 id={headingId}>
-        {permanent ? 'ကိုယ့် Account' : 'Account နဲ့ ဆက်သိမ်းမယ်'}
+        {permanent ? 'ကိုယ့် Account' : 'အကောင့်ဝင်ရန် / အသစ်ဖွင့်ရန် (Sign In / Sign Up)'}
       </h3>
       {permanent ? (
         <>
-          <p className="account-email">{user?.email}</p>
+          <p className="account-email">✉ {user?.email}</p>
           <p className="field-hint">
-            ဒီ email နဲ့ ဖုန်း/ကွန်ပျူတာ တခြားစက်မှာ ဝင်ပြီး Cloud ကတ်တွေကို
-            ပြန်ယူနိုင်ပါတယ်။ ဒီ browser ထဲက ကတ်တွေကို Cloud မှာ သိမ်းထားမှ
-            တခြားစက်မှာ ရပါမယ်။
+            ဒီ email ဖြင့် အခြား ဖုန်း/ကွန်ပျူတာများမှလည်း Cloud ကတ်များကို
+            ပြန်လည်ဖွင့်ပြီး ဆက်လက်ပြင်ဆင်နိုင်ပါသည်။
           </p>
           {!signOutReady ? (
             <button
@@ -111,14 +110,13 @@ export function AccountPanel({
               disabled={disabled || busy}
               onClick={() => setSignOutReady(true)}
             >
-              Account ထွက်မယ်
+              Account ထွက်မယ် (Sign Out)
             </button>
           ) : (
             <div className="account-signout">
               <p>
-                Cloud မသိမ်းရသေးတဲ့ ကတ်တွေက ဒီ browser ထဲမှာပဲ ကျန်ပါမယ်။
-                အခြားသူသုံးတဲ့စက်ဖြစ်ရင် browser ထဲက မိတ္တူတွေကိုလည်း
-                သီးခြားရှင်းပေးဖို့ လိုပါတယ်။
+                အကောင့်ထွက်လိုက်ပါက Cloud ပေါ်က ကတ်များ မပျောက်သွားပါ။
+                နောက်တစ်ကြိမ် email ဖြင့် ပြန်လည်ဝင်ရောက်နိုင်ပါသည်။
               </p>
               <button
                 className="button secondary"
@@ -140,9 +138,9 @@ export function AccountPanel({
       ) : (
         <>
           <p className="field-hint">
-            {user
-              ? 'ဒီ Guest ရဲ့ Cloud ကတ်တွေ၊ ပုံ/သီချင်းနဲ့ Share links တွေကို ဒီ email Account နဲ့ ဆက်ထိန်းထားပါမယ်။ မသုံးရသေးတဲ့ email နဲ့ ချိတ်ပေးပါ။'
-              : 'Email ထဲက code နဲ့ Account ဝင်မယ်။ Account မရှိသေးရင် အသစ်ဖန်တီးပေးပါမယ်။ Password မလိုပါ။'}
+            {attempt
+              ? 'သင့် Email ထဲသို့ ပို့ထားသော 6-digit code ကို ဖြည့်သွင်းပေးပါ။'
+              : 'သင့် Email ထဲသို့ ပို့ပေးမည့် code ဖြင့် အလွယ်တကူ ဝင်ရောက်နိုင်ပါသည် (အကောင့်မရှိသေးပါက အလိုအလျောက် ဖွင့်ပေးပါမည်၊ Password မလိုပါ)။'}
           </p>
           <form
             onSubmit={(event) => {
@@ -151,9 +149,10 @@ export function AccountPanel({
             }}
           >
             <label>
-              Email
+              Email လိပ်စာ
               <input
                 type="email"
+                placeholder="name@example.com"
                 autoComplete="email"
                 value={attempt?.email ?? email}
                 disabled={disabled || busy || Boolean(attempt)}
@@ -164,9 +163,10 @@ export function AccountPanel({
             </label>
             {attempt && (
               <label>
-                Email ထဲက code
+                Email ထဲက 6-digit code
                 <input
                   type="text"
+                  placeholder="123456"
                   inputMode="numeric"
                   autoComplete="one-time-code"
                   autoFocus
@@ -185,9 +185,9 @@ export function AccountPanel({
               disabled={disabled || busy || (!attempt && cooldown > 0)}
             >
               {busy
-                ? 'ချိတ်ဆက်နေပါတယ်…'
+                ? 'လုပ်ဆောင်နေပါတယ်…'
                 : attempt
-                  ? 'Code အတည်ပြုမယ်'
+                  ? 'အတည်ပြုပြီး အကောင့်ဝင်မယ်'
                   : cooldown > 0
                     ? `${cooldown} စက္ကန့် စောင့်ပေးပါ`
                     : 'Email code ပို့မယ်'}

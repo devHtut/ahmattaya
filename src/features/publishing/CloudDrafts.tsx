@@ -21,7 +21,6 @@ export function CloudDrafts({
   onRestored,
   externalDisabled = false,
   onBusy,
-  account = false,
 }: {
   workspace: ProjectWorkspace
   ownerId: string
@@ -292,10 +291,8 @@ export function CloudDrafts({
       <p className="field-hint">
         Cloud မှ ပြန်ယူရင် browser ကတ်အသစ်တစ်ခုအဖြစ် ဖွင့်ပေးပါတယ်။ အဲဒီကတ်ကို
         Cloud ပြန်သိမ်းရင် မူရင်း Cloud ကတ်ကို update လုပ်ပေးပါတယ်။ လက်ရှိ
-        browser ကတ်တွေကို အစားမထိုးပါ။{' '}
-        {account
-          ? 'Account email နဲ့ တခြားစက်မှာ ဝင်ပြီး Cloud ကတ်ကို မိတ္တူယူ၊ ဆက်ပြင်နိုင်ပါတယ်။'
-          : 'Guest session မပျောက်ခင် အပေါ်မှာ Email account နဲ့ ချိတ်ထားပေးပါ။'}
+        browser ကတ်တွေကို အစားမထိုးပါ။ Account email ဖြင့် တခြားစက်များတွင်လည်း
+        ဝင်ရောက်ပြီး Cloud ကတ်များကို မိတ္တူယူ၊ ဆက်လက်ပြင်ဆင်နိုင်ပါသည်။
       </p>
     </div>
   )
