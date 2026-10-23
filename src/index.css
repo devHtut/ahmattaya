@@ -204,6 +204,20 @@ p {
   color: var(--ink);
 }
 
+.danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow:
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 6px 16px rgba(220, 38, 38, 0.28);
+}
+.danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: #ffffff;
+}
+
 .icon-button {
   display: inline-flex;
   align-items: center;
@@ -4192,9 +4206,21 @@ footer {
 .trash-selection-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
   margin: 18px 0;
+}
+.trash-bar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.trash-selected-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 .trash-selection-bar label,
 .trash-card-select {

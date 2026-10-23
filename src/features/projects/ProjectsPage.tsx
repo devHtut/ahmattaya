@@ -68,61 +68,65 @@ export function ProjectsPage({
         </button>
       </div>
       {isTrash && items.length > 0 && (
-            <div className="trash-selection-bar">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.length === items.length}
-                  onChange={(e) =>
-                    setSelected(e.target.checked ? items.map((p) => p.id) : [])
-                  }
-                />
-                အားလုံးရွေးမယ်
-              </label>
-              <span aria-live="polite">ရွေးထားတာ {selectedIds.length} ခု</span>
-              <button
-                className="button secondary"
-                disabled={selectedIds.length === 0}
-                onClick={() => confirmation.current?.showModal()}
-              >
-                <Trash2 size={16} /> အပြီးတိုင်ဖျက်မယ်
-              </button>
-            </div>
-          )}
-          <dialog
-            ref={confirmation}
-            className="share-dialog"
-            aria-labelledby="delete-heading"
-            aria-describedby="delete-description"
+        <div className="trash-selection-bar">
+          <label className="trash-select-all">
+            <input
+              type="checkbox"
+              checked={selectedIds.length === items.length}
+              onChange={(e) =>
+                setSelected(e.target.checked ? items.map((p) => p.id) : [])
+              }
+            />
+            အားလုံးရွေးမယ်
+          </label>
+          <div className="trash-bar-actions">
+            <span aria-live="polite" className="trash-selected-count">
+              {selectedIds.length} selected
+            </span>
+            <button
+              className="button danger"
+              disabled={selectedIds.length === 0}
+              onClick={() => confirmation.current?.showModal()}
+            >
+              <Trash2 size={16} /> အပြီးတိုင်ဖျက်မယ်
+            </button>
+          </div>
+        </div>
+      )}
+      <dialog
+        ref={confirmation}
+        className="share-dialog"
+        aria-labelledby="delete-heading"
+        aria-describedby="delete-description"
+      >
+        <h2 id="delete-heading">
+          ရွေးထားတဲ့ ကတ် {selectedIds.length} ခုကို အပြီးတိုင်ဖျက်မလား။
+        </h2>
+        <p id="delete-description">
+          ဒီ browser ထဲက ရွေးထားတဲ့ကတ်တွေကို ပြန်ယူလို့ မရတော့ပါ။ Cloud
+          မိတ္တူနဲ့ မျှဝေထားတဲ့ link တွေကို မဖျက်ပါ။
+        </p>
+        <div className="share-dialog-actions">
+          <button
+            className="button secondary"
+            autoFocus
+            onClick={() => confirmation.current?.close()}
           >
-            <h2 id="delete-heading">
-              ရွေးထားတဲ့ ကတ် {selectedIds.length} ခုကို အပြီးတိုင်ဖျက်မလား။
-            </h2>
-            <p id="delete-description">
-              ဒီ browser ထဲက ရွေးထားတဲ့ကတ်တွေကို ပြန်ယူလို့ မရတော့ပါ။ Cloud
-              မိတ္တူနဲ့ မျှဝေထားတဲ့ link တွေကို မဖျက်ပါ။
-            </p>
-            <div className="share-dialog-actions">
-              <button
-                className="button secondary"
-                autoFocus
-                onClick={() => confirmation.current?.close()}
-              >
-                မဖျက်တော့ပါ
-              </button>
-              <button
-                className="button primary"
-                disabled={selectedIds.length === 0}
-                onClick={() => {
-                  w.deletePermanently(selectedIds)
-                  setSelected([])
-                  confirmation.current?.close()
-                }}
-              >
-                အပြီးတိုင်ဖျက်မယ်
-              </button>
-            </div>
-          </dialog>
+            မဖျက်တော့ပါ
+          </button>
+          <button
+            className="button danger"
+            disabled={selectedIds.length === 0}
+            onClick={() => {
+              w.deletePermanently(selectedIds)
+              setSelected([])
+              confirmation.current?.close()
+            }}
+          >
+            အပြီးတိုင်ဖျက်မယ်
+          </button>
+        </div>
+      </dialog>
           <div className="shelf-grid">
             {items.map((project) => (
               <article className="shelf-card" key={project.id}>
