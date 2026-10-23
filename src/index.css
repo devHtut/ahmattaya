@@ -204,18 +204,31 @@ p {
   color: var(--ink);
 }
 
-.danger {
+.danger,
+.button.danger {
   background: #dc2626;
   border-color: #dc2626;
-  color: #ffffff;
+  color: #ffffff !important;
   box-shadow:
     inset 0 -2px 0 rgba(0, 0, 0, 0.2),
     0 6px 16px rgba(220, 38, 38, 0.28);
 }
-.danger:hover {
+.danger:hover,
+.button.danger:hover {
   background: #b91c1c;
   border-color: #b91c1c;
+  color: #ffffff !important;
+}
+.button.danger svg {
+  stroke: #ffffff;
   color: #ffffff;
+}
+.button.danger:disabled {
+  opacity: 0.45;
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff !important;
+  cursor: default;
 }
 
 .icon-button {
@@ -4223,19 +4236,29 @@ footer {
   color: var(--ink-soft);
 }
 .trash-selection-bar label,
+.trash-select-all,
 .trash-card-select {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
 }
 .trash-card-select {
   margin-bottom: 12px;
 }
-.trash-selection-bar input,
-.trash-card-select input {
+.trash-selection-bar input[type='checkbox'],
+.trash-card-select input[type='checkbox'] {
   width: 18px;
   height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* --------------------------------------------------------------------------

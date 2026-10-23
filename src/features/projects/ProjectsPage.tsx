@@ -77,7 +77,7 @@ export function ProjectsPage({
                 setSelected(e.target.checked ? items.map((p) => p.id) : [])
               }
             />
-            အားလုံးရွေးမယ်
+            <span>အားလုံးရွေးမယ်</span>
           </label>
           <div className="trash-bar-actions">
             <span aria-live="polite" className="trash-selected-count">
@@ -150,7 +150,7 @@ export function ProjectsPage({
                           )
                         }
                       />
-                      ရွေးမယ်
+                      <span>ရွေးမယ်</span>
                     </label>
                   )}
                   <h2>{project.name}</h2>
