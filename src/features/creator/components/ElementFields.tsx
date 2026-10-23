@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   type CardConfig,
   type CardElement,
@@ -15,7 +15,7 @@ import {
   STICKER_CATEGORIES,
   type StickerItem,
 } from '../../../shared/stickers/stickers-catalog'
-import { Copy, Trash2, Sparkles, Shapes } from 'lucide-react'
+import { Copy, Trash2, Sparkles, Type, X } from 'lucide-react'
 
 export function ElementFields({
   card,
@@ -30,7 +30,8 @@ export function ElementFields({
   selectedElementId: string | null
   onSelectElement: (id: string | null) => void
 }) {
-  const [activeTab, setActiveTab] = useState<'stickers' | 'shapes'>('stickers')
+  const [stickerModalOpen, setStickerModalOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
   const [selectedCatId, setSelectedCatId] = useState<string>(
     STICKER_CATEGORIES[0]?.id ?? '',
   )
@@ -42,6 +43,15 @@ export function ElementFields({
   const currentCategory =
     STICKER_CATEGORIES.find((c) => c.id === selectedCatId) ??
     STICKER_CATEGORIES[0]
+
+  useEffect(() => {
+    if (!stickerModalOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setStickerModalOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [stickerModalOpen])
 
   function addSticker(sticker: StickerItem) {
     if (allElements.length >= MAX_ELEMENTS) {
@@ -168,101 +178,48 @@ export function ElementFields({
       <div className="elements-section-header">
         <div>
           <h3 className="elements-section-title">
-            အလှဆင် Stickers နှင့် သင်္ကေတများ
+            <Sparkles size={16} /> အလှဆင် Stickers နှင့် စာတိုများ
           </h3>
-          <p className="field-hint" style={{ margin: 0 }}>
-            ကတ်ပေါ်တွင် စတစ်ကာများ၊ စာတို (Text Box) များနှင့် သင်္ကေတများကို
-            လွတ်လပ်စွာ နေရာချနိုင်ပါသည်
-          </p>
         </div>
         <span className="elements-count-badge">{pageElements.length} ခု</span>
       </div>
 
-      {/* Main Switcher: Stickers vs Shapes */}
-      <div className="elements-category-tabs" role="tablist">
+      {/* Clean compact trigger buttons */}
+      <div className="elements-launch-row">
         <button
           type="button"
-          className={`elements-category-tab ${activeTab === 'stickers' ? 'active' : ''}`}
-          onClick={() => setActiveTab('stickers')}
+          className="button primary sticker-picker-launch-btn"
+          onClick={() => setStickerModalOpen(true)}
         >
-          <Sparkles size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />
-          Stickers များ (၂၁၀ ပုံ)
+          <Sparkles size={15} />
+          <span>Stickers ရွေးမယ် (၂၁၀ ပုံ)</span>
         </button>
         <button
           type="button"
-          className={`elements-category-tab ${activeTab === 'shapes' ? 'active' : ''}`}
-          onClick={() => setActiveTab('shapes')}
+          className="button ghost add-textbox-launch-btn"
+          onClick={() => addShape('text')}
+          title="စာတို (Sticky Text Box) ထည့်မယ်"
         >
-          <Shapes size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />
-          Text Box & Shapes
+          <Type size={14} />
+          <span>စာတို ထည့်မယ်</span>
         </button>
       </div>
 
-      {/* Stickers Tab Content */}
-      {activeTab === 'stickers' && (
-        <div className="stickers-tab-container">
-          {/* Subcategory horizontal chips */}
-          <div
-            className="sticker-subcategories-chips"
-            role="tablist"
-            aria-label="Stickers အမျိုးအစားများ"
+      {/* Quick shapes row (Washi, Pin, Paperclip, Heart, Star) */}
+      <div className="quick-shapes-row" aria-label="အမြန် ထည့်နိုင်သော ပစ္စည်းများ">
+        {ELEMENT_SHAPES.filter((s) => s.id !== 'text').map((shape) => (
+          <button
+            key={shape.id}
+            type="button"
+            className="quick-shape-btn"
+            title={`${shape.label} ထည့်မယ်`}
+            onClick={() => addShape(shape.id)}
           >
-            {STICKER_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`sticker-subcat-chip ${selectedCatId === cat.id ? 'active' : ''}`}
-                onClick={() => setSelectedCatId(cat.id)}
-              >
-                <span>{cat.icon}</span>
-                <span>{cat.name}</span>
-                <small style={{ opacity: 0.6 }}>({cat.stickers.length})</small>
-              </button>
-            ))}
-          </div>
-
-          {/* Sticker Images Grid */}
-          <div
-            className="stickers-picker-grid"
-            role="group"
-            aria-label={`${currentCategory.name} Stickers`}
-          >
-            {currentCategory.stickers.map((stk) => (
-              <button
-                key={stk.id}
-                type="button"
-                className="sticker-picker-btn"
-                title={`${stk.name} ထည့်မယ်`}
-                onClick={() => addSticker(stk)}
-              >
-                <img src={stk.src} alt={stk.name} loading="lazy" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Shapes & Text Box Tab Content */}
-      {activeTab === 'shapes' && (
-        <div
-          className="elements-picker-grid"
-          role="group"
-          aria-label="Shapes ရွေးချယ်ရန်"
-        >
-          {ELEMENT_SHAPES.map((shape) => (
-            <button
-              key={shape.id}
-              type="button"
-              className="element-picker-item"
-              title={`${shape.label} ထည့်မယ်`}
-              onClick={() => addShape(shape.id)}
-            >
-              <span className="element-picker-icon">{shape.icon}</span>
-              <span className="element-picker-label">{shape.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
+            <span>{shape.icon}</span>
+            <span className="quick-shape-text">{shape.label}</span>
+          </button>
+        ))}
+      </div>
 
       {/* Chips for items currently placed on this page */}
       {pageElements.length > 0 && (
@@ -523,6 +480,102 @@ export function ElementFields({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Stickers Library Modal Dialog */}
+      {stickerModalOpen && (
+        <dialog
+          className="stickers-library-dialog"
+          open
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setStickerModalOpen(false)
+          }}
+        >
+          <div className="stickers-library-modal">
+            <div className="stickers-library-header">
+              <div className="stickers-library-titles">
+                <h3>
+                  <Sparkles size={18} /> Stickers & တံဆိပ်ခေါင်းများ (၂၁၀ ပုံ)
+                </h3>
+                <p>
+                  ကြိုက်နှစ်သက်ရာ စတစ်ကာကို နှိပ်လိုက်ရုံဖြင့် ကတ်ပေါ်သို့ ချက်ချင်း ရောက်ရှိပါမည်
+                </p>
+              </div>
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="ပိတ်မယ်"
+                onClick={() => setStickerModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Subcategory horizontal chips */}
+            <div
+              className="stickers-category-pill-bar"
+              role="tablist"
+              aria-label="Stickers အမျိုးအစားများ"
+            >
+              {STICKER_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={`sticker-cat-pill ${selectedCatId === cat.id ? 'active' : ''}`}
+                  onClick={() => setSelectedCatId(cat.id)}
+                >
+                  <span className="pill-icon">{cat.icon}</span>
+                  <span className="pill-name">{cat.name}</span>
+                  <span className="pill-count">({cat.stickers.length})</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Sticker Images Grid */}
+            <div
+              className="stickers-library-grid"
+              role="group"
+              aria-label={`${currentCategory.name} Stickers`}
+            >
+              {currentCategory.stickers.map((stk) => (
+                <button
+                  key={stk.id}
+                  type="button"
+                  className="sticker-library-card"
+                  title={`${stk.name} ထည့်မယ်`}
+                  onClick={() => {
+                    addSticker(stk)
+                    setToastMessage(`✓ "${stk.name}" စတစ်ကာ ထည့်ပြီးပါပြီ ✨`)
+                    setTimeout(() => setToastMessage(''), 2200)
+                  }}
+                >
+                  <div className="sticker-img-box">
+                    <img src={stk.src} alt={stk.name} loading="lazy" />
+                  </div>
+                  <span className="sticker-name-label">{stk.name}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="stickers-library-footer">
+              <div className="stickers-toast-area">
+                {toastMessage && (
+                  <span className="sticker-toast-msg">{toastMessage}</span>
+                )}
+                <span className="stickers-help-note">
+                  💡 စတစ်ကာများကို တစ်ခုထက်မက ဆက်လက်ရွေးချယ်နိုင်ပါသည်။
+                </span>
+              </div>
+              <button
+                type="button"
+                className="button primary"
+                onClick={() => setStickerModalOpen(false)}
+              >
+                ပြီးပါပြီ (Done)
+              </button>
+            </div>
+          </div>
+        </dialog>
       )}
     </div>
   )

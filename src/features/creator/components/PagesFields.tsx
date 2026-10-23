@@ -3,7 +3,7 @@ import { BackgroundFields } from './BackgroundFields'
 import { StyleFields } from './StyleFields'
 import { WordsFields } from './WordsFields'
 import { occasions, changeOccasion } from '../../../shared/templates/templates'
-import { ImagePlus, Trash2 } from 'lucide-react'
+import { ImagePlus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { ElementFields } from './ElementFields'
 import {
   MAX_PHOTOS,
@@ -15,7 +15,7 @@ import {
 import { compressPhoto } from '../lib/compress-photo'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry'
 import { PhotoProperties } from './PhotoProperties'
-import { moveItem, removePage } from '../lib/pages'
+import { removePage } from '../lib/pages'
 
 export function PagesFields({
   card,
@@ -39,6 +39,7 @@ export function PagesFields({
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [draggingOver, setDraggingOver] = useState(false)
+  const [mediaTab, setMediaTab] = useState<'photos' | 'background'>('photos')
   const latest = useRef(card)
   const mounted = useRef(false)
   const uploading = useRef(false)
@@ -124,6 +125,10 @@ export function PagesFields({
         item.id === pageId ? { ...item, ...change } : item,
       ),
     })
+  const hasBackground = isCover
+    ? Boolean(card.background?.assetId)
+    : Boolean(page?.background?.assetId)
+
   return (
     <div className="pages-editor">
       <div className="active-page-banner">
@@ -140,6 +145,23 @@ export function PagesFields({
               : ' — စာမျက်နှာ စာသား၊ စာရွက်ပုံစံနှင့် ဓာတ်ပုံများ'}
           </span>
         </div>
+        {!isCover && (
+          <button
+            type="button"
+            disabled={busy}
+            className="active-page-delete-btn"
+            title="ဒီစာမျက်နှာကို ဖျက်မယ်"
+            onClick={() => {
+              if (window.confirm('ဒီစာမျက်နှာနဲ့ သူ့ပုံတွေကို ဖျက်မလား?')) {
+                onChange(removePage(card, pageId))
+                onSelectPage('cover')
+              }
+            }}
+          >
+            <Trash2 size={13} />
+            <span>ဖျက်မယ်</span>
+          </button>
+        )}
       </div>
 
       {isCover && (
@@ -168,7 +190,7 @@ export function PagesFields({
             <WordsFields card={card} onChange={onChange} />
           </div>
 
-          <div className="cover-style-container" style={{ marginTop: '20px' }}>
+          <div className="cover-style-container" style={{ marginTop: '14px' }}>
             <h4
               className="section-subheading"
               style={{ fontSize: '13px', fontWeight: 600, margin: '0 0 10px', color: 'var(--ink)' }}
@@ -176,15 +198,6 @@ export function PagesFields({
               ကတ်အဖုံး ပုံစံနှင့် Theme အရောင်
             </h4>
             <StyleFields card={card} onChange={onChange} />
-          </div>
-
-          <div className="cover-bg-container" style={{ marginTop: '20px' }}>
-            <BackgroundFields
-              key="cover"
-              card={card}
-              pageId="cover"
-              onChange={onChange}
-            />
           </div>
         </div>
       )}
@@ -216,129 +229,129 @@ export function PagesFields({
             <label>
               စာမျက်နှာ စာသား
               <textarea
-                rows={5}
+                rows={4}
                 maxLength={2000}
                 placeholder="ဒီစာမျက်နှာအတွက် ဆုတောင်းစကား သို့မဟုတ် ရင်ဖွင့်စကား..."
                 value={page.message}
                 onChange={(e) => updatePage({ message: e.target.value })}
               />
             </label>
-            <div className="item-actions">
-              <button
-                disabled={busy || pageIndex === 0}
-                onClick={() =>
-                  onChange({
-                    ...card,
-                    pages: moveItem(card.pages, pageIndex, pageIndex - 1),
-                  })
-                }
-              >
-                စာမျက်နှာ ↑
-              </button>
-              <button
-                disabled={busy || pageIndex === card.pages.length - 1}
-                onClick={() =>
-                  onChange({
-                    ...card,
-                    pages: moveItem(card.pages, pageIndex, pageIndex + 1),
-                  })
-                }
-              >
-                စာမျက်နှာ ↓
-              </button>
-              <button
-                disabled={busy}
-                className="danger"
-                onClick={() => {
-                  if (window.confirm('ဒီစာမျက်နှာနဲ့ သူ့ပုံတွေကို ဖျက်မလား?')) {
-                    onChange(removePage(card, pageId))
-                    onSelectPage('cover')
-                  }
-                }}
-              >
-                <Trash2 size={14} /> ဖျက်မယ်
-              </button>
-            </div>
           </div>
-          <BackgroundFields
-            key={pageId}
-            card={card}
-            pageId={pageId}
-            onChange={onChange}
-          />
         </div>
       )}
-      <div
-        className={`photo-dropzone ${draggingOver ? 'is-over' : ''}`}
-        onDragOver={(e) => {
-          e.preventDefault()
-          if (!busy) setDraggingOver(true)
-        }}
-        onDragLeave={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node | null))
-            setDraggingOver(false)
-        }}
-        onDrop={(e) => {
-          e.preventDefault()
-          setDraggingOver(false)
-          void addPhotos(Array.from(e.dataTransfer.files))
-        }}
-      >
-        <ImagePlus size={28} aria-hidden="true" />
-        <p>ဒီစာမျက်နှာအတွက် ပုံတွေကို ဒီနေရာမှာ ဆွဲထည့်ပါ</p>
-        <label className="photo-file-label">
-          သို့မဟုတ် ပုံရွေးမယ်
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            disabled={busy || card.photos.length >= MAX_PHOTOS}
-            onChange={(e) => {
-              const files = Array.from(e.target.files ?? [])
-              e.target.value = ''
-              void addPhotos(files)
-            }}
-          />
-        </label>
-        <p className="field-hint">
-          JPG / PNG / WebP · မူရင်းတစ်ပုံ 15 MB အထိ
-          <br />
-          Card တစ်ခုလုံး {card.photos.length} / {MAX_PHOTOS} ပုံ · တစ်ပုံ 200 KB
-          အောက် ချုံ့ပေးပါတယ်
-        </p>
-      </div>
-      <p className="upload-feedback" role="status" aria-live="polite">
-        {feedback}
-      </p>
-      <p className="field-hint">
-        Preview ပေါ်က ပုံကို ဆွဲရွှေ့ပါ။ ရွေးထားတဲ့ပုံရဲ့ ↘ ထောင့်ကို ဆွဲပြီး
-        အရွယ်ပြောင်း၊ ↻ ကို ဆွဲပြီး လှည့်နိုင်ပါတယ်။ Keyboard
-        မြားခလုတ်တွေနဲ့လည်း ရွှေ့နိုင်ပါတယ်။
-      </p>
-      <div className="photo-layer-list" role="group" aria-label="ပုံ အလွှာများ">
-        {photos.map((photo, index) => (
+
+      {/* Unified Media Section (Photos + Background) with Tabs */}
+      <div className="media-section-card">
+        <div className="media-tabs-header" role="tablist">
           <button
-            key={photo.id}
-            className="photo-layer-choice"
-            aria-pressed={selectedPhotoId === photo.id}
-            onClick={() => onSelectPhoto(photo.id)}
+            type="button"
+            className={`media-tab-btn ${mediaTab === 'photos' ? 'active' : ''}`}
+            onClick={() => setMediaTab('photos')}
           >
-            <img src={photo.src} alt="" />
-            <span>
-              ပုံ {index + 1}
-              {photo.caption ? ` · ${photo.caption}` : ''}
-            </span>
+            <ImagePlus size={14} />
+            <span>ကတ်ဓာတ်ပုံများ ({photos.length}/{MAX_PHOTOS})</span>
           </button>
-        ))}
+          <button
+            type="button"
+            className={`media-tab-btn ${mediaTab === 'background' ? 'active' : ''}`}
+            onClick={() => setMediaTab('background')}
+          >
+            <ImageIcon size={14} />
+            <span>နောက်ခံပုံ {hasBackground ? '✓' : ''}</span>
+          </button>
+        </div>
+
+        <div className="media-tab-content">
+          {mediaTab === 'photos' && (
+            <div className="photos-tab-pane">
+              <div
+                className={`photo-dropzone compact ${draggingOver ? 'is-over' : ''}`}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  if (!busy) setDraggingOver(true)
+                }}
+                onDragLeave={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+                    setDraggingOver(false)
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  setDraggingOver(false)
+                  void addPhotos(Array.from(e.dataTransfer.files))
+                }}
+              >
+                <div className="compact-dropzone-content">
+                  <ImagePlus size={22} aria-hidden="true" />
+                  <div className="compact-dropzone-text">
+                    <label className="button ghost compact-file-btn">
+                      ပုံရွေးမယ် / ဆွဲထည့်မယ်
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        multiple
+                        disabled={busy || card.photos.length >= MAX_PHOTOS}
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files ?? [])
+                          e.target.value = ''
+                          void addPhotos(files)
+                        }}
+                      />
+                    </label>
+                    <span className="compact-file-badge">
+                      JPG, PNG, WebP · 15 MB အထိ (တစ်ကတ်လုံး {card.photos.length}/{MAX_PHOTOS} ပုံ)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {feedback && (
+                <p className="upload-feedback" role="status" aria-live="polite">
+                  {feedback}
+                </p>
+              )}
+
+              {photos.length > 0 && (
+                <div className="photo-layer-list" role="group" aria-label="ပုံ အလွှာများ">
+                  {photos.map((photo, index) => (
+                    <button
+                      key={photo.id}
+                      className="photo-layer-choice"
+                      aria-pressed={selectedPhotoId === photo.id}
+                      onClick={() => onSelectPhoto(photo.id)}
+                    >
+                      <img src={photo.src} alt="" />
+                      <span>
+                        ပုံ {index + 1}
+                        {photo.caption ? ` · ${photo.caption}` : ''}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {photos.find((photo) => photo.id === selectedPhotoId) && (
+                <PhotoProperties
+                  card={card}
+                  photoId={selectedPhotoId!}
+                  onChange={onChange}
+                  onSelect={onSelectPhoto}
+                />
+              )}
+            </div>
+          )}
+
+          {mediaTab === 'background' && (
+            <div className="background-tab-pane">
+              <BackgroundFields
+                key={pageId}
+                card={card}
+                pageId={pageId}
+                onChange={onChange}
+              />
+            </div>
+          )}
+        </div>
       </div>
-      {photos.find((photo) => photo.id === selectedPhotoId) && (
-        <PhotoProperties
-          card={card}
-          photoId={selectedPhotoId!}
-          onChange={onChange}
-          onSelect={onSelectPhoto}
-        />
-      )}
 
       <ElementFields
         card={card}

@@ -91,12 +91,9 @@ export function BackgroundFields({
     }
   }
   return (
-    <fieldset className="background-fields">
-      <legend>
-        {pageId === 'cover' ? 'ကတ် နောက်ခံပုံ' : 'ဒီစာမျက်နှာ နောက်ခံပုံ'}
-      </legend>
+    <div className="background-fields-wrap">
       <div
-        className={`background-dropzone ${over ? 'is-over' : ''}`}
+        className={`background-dropzone compact ${over ? 'is-over' : ''}`}
         onDragOver={(e) => {
           e.preventDefault()
           if (!busy) setOver(true)
@@ -109,30 +106,49 @@ export function BackgroundFields({
         }}
       >
         {url ? (
-          <img
-            className="background-thumbnail"
-            src={url}
-            alt="လက်ရှိ နောက်ခံပုံ"
-          />
+          <div className="bg-preview-wrap">
+            <img
+              className="background-thumbnail"
+              src={url}
+              alt="လက်ရှိ နောက်ခံပုံ"
+            />
+            <label className="button ghost compact-file-btn">
+              နောက်ခံပုံ ပြောင်းမယ်
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={busy}
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? [])
+                  e.target.value = ''
+                  void upload(files)
+                }}
+              />
+            </label>
+          </div>
         ) : (
-          <ImagePlus size={26} aria-hidden="true" />
+          <div className="compact-dropzone-content">
+            <ImagePlus size={22} aria-hidden="true" />
+            <div className="compact-dropzone-text">
+              <label className="button ghost compact-file-btn">
+                နောက်ခံပုံ ရွေးမယ် / ဆွဲထည့်မယ်
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  disabled={busy}
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? [])
+                    e.target.value = ''
+                    void upload(files)
+                  }}
+                />
+              </label>
+              <span className="compact-file-badge">
+                JPG, PNG, WebP · 15 MB အထိ
+              </span>
+            </div>
+          </div>
         )}
-        <label className="photo-file-label">
-          {background ? 'နောက်ခံပုံ ပြောင်းမယ်' : 'နောက်ခံပုံ ရွေးမယ်'}
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            disabled={busy}
-            onChange={(e) => {
-              const files = Array.from(e.target.files ?? [])
-              e.target.value = ''
-              void upload(files)
-            }}
-          />
-        </label>
-        <p className="field-hint">
-          ပုံကို ဆွဲထည့်လည်း ရပါတယ်။ JPG / PNG / WebP · 15 MB အထိ
-        </p>
       </div>
       <p className="upload-feedback" role="status">
         {feedback ||
@@ -238,11 +254,6 @@ export function BackgroundFields({
           </div>
         </div>
       )}
-      <p className="field-hint">
-        နောက်ခံပုံက ကပ်ထားတဲ့ပုံတွေရဲ့ အောက်မှာ ရှိပါမယ်။ စာဖတ်လွယ်အောင်
-        အရောင်လွှာကို ချိန်ပါ။ ဒီ browser မှာ အလိုအလျောက် သိမ်းပြီး Cloud
-        သိမ်းမယ်နှိပ်ရင် ပုံပါ တင်ပေးပါတယ်။
-      </p>
-    </fieldset>
+    </div>
   )
 }
