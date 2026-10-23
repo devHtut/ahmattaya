@@ -5263,6 +5263,97 @@ footer {
   height: 100%;
   display: block;
 }
+
+/* Floating Text Box content */
+.element-textbox-content {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px 10px;
+  line-height: 1.4;
+  word-break: break-word;
+  white-space: pre-wrap;
+  user-select: none;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+.element-textbox-content.bg-transparent {
+  background: transparent;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+}
+.element-textbox-content.bg-sticky-yellow {
+  background: #fef08a !important;
+  color: #713f12 !important;
+  border: 1px solid #fde047;
+  box-shadow: 2px 3px 8px rgba(113, 63, 18, 0.15);
+}
+.element-textbox-content.bg-sticky-pink {
+  background: #fbcfe8 !important;
+  color: #831843 !important;
+  border: 1px solid #f472b6;
+  box-shadow: 2px 3px 8px rgba(131, 24, 67, 0.15);
+}
+.element-textbox-content.bg-sticky-blue {
+  background: #bae6fd !important;
+  color: #0c4a6e !important;
+  border: 1px solid #7dd3fc;
+  box-shadow: 2px 3px 8px rgba(12, 74, 110, 0.15);
+}
+.element-textbox-content.bg-parchment {
+  background: #fef3c7 !important;
+  color: #78350f !important;
+  border: 1px dashed #d97706;
+  box-shadow: 2px 3px 8px rgba(120, 53, 15, 0.15);
+}
+.element-textbox-content.bg-badge-white {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #1e293b !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.font-choices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+}
+.bg-choices-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bg-choice-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--ink);
+}
+.bg-choice-chip:hover {
+  border-color: var(--line-strong, var(--ink-soft));
+}
+.bg-choice-chip.active {
+  border-color: var(--accent, #7c3aed);
+  background: rgba(124, 58, 237, 0.08);
+  font-weight: 600;
+}
+.bg-preview-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
 .element-rotate-handle,
 .element-resize-handle {
   position: absolute;

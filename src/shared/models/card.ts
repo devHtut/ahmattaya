@@ -119,6 +119,7 @@ const v4CardFields = v2CardSchema.extend({
 })
 
 export const elementShapeSchema = z.enum([
+  'text',
   'heart',
   'star',
   'sparkle',
@@ -146,6 +147,10 @@ export const cardElementSchema = z.object({
   pageId: z.string().min(1).max(80),
   shape: elementShapeSchema,
   color: z.string().max(40).default('theme'),
+  text: z.string().max(300).default(''),
+  fontSize: z.number().min(8).max(36).default(14),
+  fontFamily: z.enum(['handwriting', 'serif', 'sans']).default('handwriting'),
+  bg: z.string().max(40).default('transparent'),
   frame: elementFrameSchema,
 })
 export type CardElement = z.infer<typeof cardElementSchema>

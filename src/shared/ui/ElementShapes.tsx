@@ -10,6 +10,7 @@ export interface ShapeDefinition {
 }
 
 export const ELEMENT_SHAPES: ShapeDefinition[] = [
+  { id: 'text', label: 'စာတို (Text)', icon: '📝', defaultWidth: 42, defaultRatio: 0.38 },
   { id: 'washi-tape', label: 'Washi Tape', icon: '🏷️', defaultWidth: 32, defaultRatio: 0.28 },
   { id: 'heart', label: 'အသည်းပုံ', icon: '💖', defaultWidth: 20, defaultRatio: 1 },
   { id: 'sparkle', label: 'Sparkle', icon: '✨', defaultWidth: 18, defaultRatio: 1 },
@@ -19,6 +20,21 @@ export const ELEMENT_SHAPES: ShapeDefinition[] = [
   { id: 'circle', label: 'စက်ဝိုင်း', icon: '⭕', defaultWidth: 20, defaultRatio: 1 },
   { id: 'rect', label: 'ထောင့်ဝိုင်း', icon: '🟩', defaultWidth: 26, defaultRatio: 0.6 },
   { id: 'stamp', label: 'တံဆိပ်ခေါင်း', icon: '💌', defaultWidth: 22, defaultRatio: 1.2 },
+]
+
+export const TEXT_BACKGROUNDS = [
+  { id: 'transparent', label: 'ကြည်လင် (Transparent)', color: 'transparent', border: 'transparent' },
+  { id: 'sticky-yellow', label: 'အဝါရောင် Post-it', color: '#fef08a', border: '#fde047', text: '#713f12' },
+  { id: 'sticky-pink', label: 'ပန်းရောင် Post-it', color: '#fbcfe8', border: '#f472b6', text: '#831843' },
+  { id: 'sticky-blue', label: 'မိုးပြာရောင် Post-it', color: '#bae6fd', border: '#7dd3fc', text: '#0c4a6e' },
+  { id: 'parchment', label: 'စက္ကူဟောင်း (Parchment)', color: '#fef3c7', border: '#d97706', text: '#78350f' },
+  { id: 'badge-white', label: 'အဖြူရောင် Badge', color: '#ffffff', border: 'rgba(0,0,0,0.12)', text: '#1e293b' },
+]
+
+export const TEXT_FONTS = [
+  { id: 'handwriting', label: 'လက်ရေးစတိုင် (Handwriting)', family: "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive" },
+  { id: 'serif', label: 'ကျက်သရေရှိ (Serif)', family: "'Fraunces', 'Cinzel', 'Noto Serif Myanmar', Georgia, serif" },
+  { id: 'sans', label: 'ရိုးရှင်းသပ်ရပ် (Clean Sans)', family: "'Padauk', 'Noto Sans Myanmar', sans-serif" },
 ]
 
 export const COLOR_PALETTE = [

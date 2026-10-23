@@ -156,9 +156,27 @@ export function ElementCanvas({
             onPointerCancel={end}
             onLostPointerCapture={end}
           >
-            <div className="element-inner" style={{ color: el.color === 'theme' ? 'inherit' : el.color }}>
-              {renderElementSvg(el.shape, el.color)}
-            </div>
+            {el.shape === 'text' ? (
+              <div
+                className={`element-textbox-content bg-${el.bg ?? 'transparent'}`}
+                style={{
+                  fontFamily:
+                    el.fontFamily === 'serif'
+                      ? "'Fraunces', 'Cinzel', 'Noto Serif Myanmar', serif"
+                      : el.fontFamily === 'sans'
+                        ? "'Padauk', 'Noto Sans Myanmar', sans-serif"
+                        : "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive",
+                  fontSize: `max(10px, ${((el.fontSize ?? 14) / 8).toFixed(1)}cqw)`,
+                  color: el.color === 'theme' ? 'inherit' : el.color,
+                }}
+              >
+                {el.text || 'စာတိုလေး ရေးပါ...'}
+              </div>
+            ) : (
+              <div className="element-inner" style={{ color: el.color === 'theme' ? 'inherit' : el.color }}>
+                {renderElementSvg(el.shape, el.color)}
+              </div>
+            )}
 
             {selected && editable && (
               <>
