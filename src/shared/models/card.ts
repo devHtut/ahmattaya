@@ -129,6 +129,7 @@ export const elementShapeSchema = z.enum([
   'ribbon',
   'flower',
   'stamp',
+  'sticker',
 ])
 export type ElementShape = z.infer<typeof elementShapeSchema>
 
@@ -151,6 +152,7 @@ export const cardElementSchema = z.object({
   fontSize: z.number().min(8).max(36).default(14),
   fontFamily: z.enum(['handwriting', 'serif', 'sans']).default('handwriting'),
   bg: z.string().max(40).default('transparent'),
+  stickerSrc: z.string().max(250).optional(),
   frame: elementFrameSchema,
 })
 export type CardElement = z.infer<typeof cardElementSchema>

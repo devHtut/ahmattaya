@@ -172,6 +172,15 @@ export function ElementCanvas({
               >
                 {el.text || 'စာတိုလေး ရေးပါ...'}
               </div>
+            ) : el.shape === 'sticker' && el.stickerSrc ? (
+              <div className="element-sticker-wrap">
+                <img
+                  src={el.stickerSrc}
+                  alt={el.text || 'Sticker'}
+                  className="element-sticker-img"
+                  draggable={false}
+                />
+              </div>
             ) : (
               <div className="element-inner" style={{ color: el.color === 'theme' ? 'inherit' : el.color }}>
                 {renderElementSvg(el.shape, el.color)}

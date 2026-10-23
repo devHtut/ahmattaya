@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   type CardConfig,
   type CardElement,
@@ -10,7 +11,11 @@ import {
   TEXT_BACKGROUNDS,
   TEXT_FONTS,
 } from '../../../shared/ui/ElementShapes'
-import { Copy, Trash2 } from 'lucide-react'
+import {
+  STICKER_CATEGORIES,
+  type StickerItem,
+} from '../../../shared/stickers/stickers-catalog'
+import { Copy, Trash2, Sparkles, Shapes } from 'lucide-react'
 
 export function ElementFields({
   card,
@@ -25,11 +30,54 @@ export function ElementFields({
   selectedElementId: string | null
   onSelectElement: (id: string | null) => void
 }) {
+  const [activeTab, setActiveTab] = useState<'stickers' | 'shapes'>('stickers')
+  const [selectedCatId, setSelectedCatId] = useState<string>(
+    STICKER_CATEGORIES[0]?.id ?? '',
+  )
+
   const allElements = card.elements ?? []
   const pageElements = allElements.filter((el) => el.pageId === pageId)
   const selectedElement = pageElements.find((el) => el.id === selectedElementId)
 
-  function addElement(shape: ElementShape) {
+  const currentCategory =
+    STICKER_CATEGORIES.find((c) => c.id === selectedCatId) ??
+    STICKER_CATEGORIES[0]
+
+  function addSticker(sticker: StickerItem) {
+    if (allElements.length >= MAX_ELEMENTS) {
+      alert(`ကတ်တစ်ခုလုံးတွင် elements အများဆုံး ${MAX_ELEMENTS} ခုသာ ထည့်နိုင်ပါသည်`)
+      return
+    }
+
+    const offset = (pageElements.length % 5) * 6
+    const newElement: CardElement = {
+      id: crypto.randomUUID(),
+      pageId,
+      shape: 'sticker',
+      stickerSrc: sticker.src,
+      color: '#ffffff',
+      text: sticker.name,
+      fontSize: 14,
+      fontFamily: 'handwriting',
+      bg: 'transparent',
+      frame: {
+        x: Math.min(85, Math.max(15, 50 + (pageElements.length % 2 === 0 ? offset : -offset))),
+        y: Math.min(85, Math.max(15, 50 + (pageElements.length % 3 === 0 ? -offset : offset))),
+        width: 22,
+        ratio: 1,
+        rotation: (pageElements.length % 4 - 2) * 3,
+        opacity: 1,
+      },
+    }
+
+    onChange({
+      ...card,
+      elements: [...allElements, newElement],
+    })
+    onSelectElement(newElement.id)
+  }
+
+  function addShape(shape: ElementShape) {
     if (allElements.length >= MAX_ELEMENTS) {
       alert(`ကတ်တစ်ခုလုံးတွင် elements အများဆုံး ${MAX_ELEMENTS} ခုသာ ထည့်နိုင်ပါသည်`)
       return
@@ -40,7 +88,6 @@ export function ElementFields({
     const defaultRatio = shapeDef?.defaultRatio ?? 1
     const isText = shape === 'text'
 
-    // Scatter slightly based on how many elements exist on this page
     const offset = (pageElements.length % 5) * 6
     const newElement: CardElement = {
       id: crypto.randomUUID(),
@@ -68,7 +115,11 @@ export function ElementFields({
     onSelectElement(newElement.id)
   }
 
-  function updateSelected(changes: Partial<CardElement> | { frame: Partial<CardElement['frame']> }) {
+  function updateSelected(
+    changes:
+      | Partial<CardElement>
+      | { frame: Partial<CardElement['frame']> },
+  ) {
     if (!selectedElement) return
     const nextElements = allElements.map((el) => {
       if (el.id !== selectedElement.id) return el
@@ -116,38 +167,119 @@ export function ElementFields({
     <div className="elements-editor-section">
       <div className="elements-section-header">
         <div>
-          <h3 className="elements-section-title">အလှဆင် သင်္ကေတများ (Elements)</h3>
+          <h3 className="elements-section-title">
+            အလှဆင် Stickers နှင့် သင်္ကေတများ
+          </h3>
           <p className="field-hint" style={{ margin: 0 }}>
-            စာမျက်နှာပေါ်တွင် ပုံလေးများ၊ စက်ဝိုင်း၊ tape အလှများကို လွတ်လပ်စွာ ထည့်သွင်းနိုင်ပါသည်
+            ကတ်ပေါ်တွင် စတစ်ကာများ၊ စာတို (Text Box) များနှင့် သင်္ကေတများကို
+            လွတ်လပ်စွာ နေရာချနိုင်ပါသည်
           </p>
         </div>
-        <span className="elements-count-badge">
-          {pageElements.length} ခု
-        </span>
+        <span className="elements-count-badge">{pageElements.length} ခု</span>
       </div>
 
-      <div className="elements-picker-grid" role="group" aria-label="Elements ရွေးချယ်ရန်">
-        {ELEMENT_SHAPES.map((shape) => (
-          <button
-            key={shape.id}
-            type="button"
-            className="element-picker-item"
-            title={`${shape.label} ထည့်မယ်`}
-            onClick={() => addElement(shape.id)}
+      {/* Main Switcher: Stickers vs Shapes */}
+      <div className="elements-category-tabs" role="tablist">
+        <button
+          type="button"
+          className={`elements-category-tab ${activeTab === 'stickers' ? 'active' : ''}`}
+          onClick={() => setActiveTab('stickers')}
+        >
+          <Sparkles size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />
+          Stickers များ (၂၁၀ ပုံ)
+        </button>
+        <button
+          type="button"
+          className={`elements-category-tab ${activeTab === 'shapes' ? 'active' : ''}`}
+          onClick={() => setActiveTab('shapes')}
+        >
+          <Shapes size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />
+          Text Box & Shapes
+        </button>
+      </div>
+
+      {/* Stickers Tab Content */}
+      {activeTab === 'stickers' && (
+        <div className="stickers-tab-container">
+          {/* Subcategory horizontal chips */}
+          <div
+            className="sticker-subcategories-chips"
+            role="tablist"
+            aria-label="Stickers အမျိုးအစားများ"
           >
-            <span className="element-picker-icon">{shape.icon}</span>
-            <span className="element-picker-label">{shape.label}</span>
-          </button>
-        ))}
-      </div>
+            {STICKER_CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`sticker-subcat-chip ${selectedCatId === cat.id ? 'active' : ''}`}
+                onClick={() => setSelectedCatId(cat.id)}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.name}</span>
+                <small style={{ opacity: 0.6 }}>({cat.stickers.length})</small>
+              </button>
+            ))}
+          </div>
 
+          {/* Sticker Images Grid */}
+          <div
+            className="stickers-picker-grid"
+            role="group"
+            aria-label={`${currentCategory.name} Stickers`}
+          >
+            {currentCategory.stickers.map((stk) => (
+              <button
+                key={stk.id}
+                type="button"
+                className="sticker-picker-btn"
+                title={`${stk.name} ထည့်မယ်`}
+                onClick={() => addSticker(stk)}
+              >
+                <img src={stk.src} alt={stk.name} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Shapes & Text Box Tab Content */}
+      {activeTab === 'shapes' && (
+        <div
+          className="elements-picker-grid"
+          role="group"
+          aria-label="Shapes ရွေးချယ်ရန်"
+        >
+          {ELEMENT_SHAPES.map((shape) => (
+            <button
+              key={shape.id}
+              type="button"
+              className="element-picker-item"
+              title={`${shape.label} ထည့်မယ်`}
+              onClick={() => addShape(shape.id)}
+            >
+              <span className="element-picker-icon">{shape.icon}</span>
+              <span className="element-picker-label">{shape.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Chips for items currently placed on this page */}
       {pageElements.length > 0 && (
-        <div className="page-elements-list" role="tablist" aria-label="ထည့်ထားသော Elements">
-          <span className="elements-list-caption">ထည့်ထားသည့် သင်္ကေတများ:</span>
+        <div
+          className="page-elements-list"
+          role="tablist"
+          aria-label="ထည့်ထားသော Elements"
+        >
+          <span className="elements-list-caption">
+            ထည့်ထားသည့် အလှဆင်ပစ္စည်းများ ({pageElements.length}):
+          </span>
           <div className="elements-chips-wrap">
             {pageElements.map((el, index) => {
               const def = ELEMENT_SHAPES.find((s) => s.id === el.shape)
               const isSelected = selectedElementId === el.id
+              const isSticker = el.shape === 'sticker'
+
               return (
                 <button
                   key={el.id}
@@ -155,8 +287,25 @@ export function ElementFields({
                   className={`element-chip ${isSelected ? 'active' : ''}`}
                   onClick={() => onSelectElement(isSelected ? null : el.id)}
                 >
-                  <span>{def?.icon ?? '✨'}</span>
-                  <span>{def?.label ?? 'Element'} {index + 1}</span>
+                  {isSticker && el.stickerSrc ? (
+                    <img
+                      src={el.stickerSrc}
+                      alt="Sticker"
+                      style={{
+                        width: 16,
+                        height: 16,
+                        objectFit: 'contain',
+                        marginRight: 4,
+                      }}
+                    />
+                  ) : (
+                    <span>{def?.icon ?? '✨'}</span>
+                  )}
+                  <span>
+                    {isSticker
+                      ? `စတစ်ကာ ${index + 1}`
+                      : `${def?.label ?? 'Element'} ${index + 1}`}
+                  </span>
                 </button>
               )
             })}
@@ -164,15 +313,31 @@ export function ElementFields({
         </div>
       )}
 
+      {/* Inspector for selected element/sticker */}
       {selectedElement && (
         <div className="element-inspector-card">
           <div className="element-inspector-header">
             <div className="inspector-title-group">
-              <span className="inspector-icon">
-                {ELEMENT_SHAPES.find((s) => s.id === selectedElement.shape)?.icon}
-              </span>
+              {selectedElement.shape === 'sticker' && selectedElement.stickerSrc ? (
+                <img
+                  src={selectedElement.stickerSrc}
+                  alt="Selected"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    objectFit: 'contain',
+                    marginRight: 6,
+                  }}
+                />
+              ) : (
+                <span className="inspector-icon">
+                  {ELEMENT_SHAPES.find((s) => s.id === selectedElement.shape)?.icon}
+                </span>
+              )}
               <strong>
-                {ELEMENT_SHAPES.find((s) => s.id === selectedElement.shape)?.label} အပြင်အဆင်
+                {selectedElement.shape === 'sticker'
+                  ? 'စတစ်ကာ အပြင်အဆင်'
+                  : `${ELEMENT_SHAPES.find((s) => s.id === selectedElement.shape)?.label} အပြင်အဆင်`}
               </strong>
             </div>
             <div className="inspector-actions">
@@ -218,7 +383,11 @@ export function ElementFields({
                         type="button"
                         className={`button ghost ${selectedElement.fontFamily === f.id ? 'active' : ''}`}
                         style={{ padding: '4px 8px', fontSize: '11px' }}
-                        onClick={() => updateSelected({ fontFamily: f.id as CardElement['fontFamily'] })}
+                        onClick={() =>
+                          updateSelected({
+                            fontFamily: f.id as CardElement['fontFamily'],
+                          })
+                        }
                       >
                         {f.label}
                       </button>
@@ -227,7 +396,9 @@ export function ElementFields({
                 </div>
 
                 <div className="control-row">
-                  <span className="control-label">နောက်ခံပုံစံ (Background)</span>
+                  <span className="control-label">
+                    နောက်ခံပုံစံ (Background)
+                  </span>
                   <div className="bg-choices-wrap">
                     {TEXT_BACKGROUNDS.map((bg) => (
                       <button
@@ -238,7 +409,10 @@ export function ElementFields({
                       >
                         <span
                           className="bg-preview-dot"
-                          style={{ backgroundColor: bg.color, borderColor: bg.border }}
+                          style={{
+                            backgroundColor: bg.color,
+                            borderColor: bg.border,
+                          }}
                         />
                         <span>{bg.label}</span>
                       </button>
@@ -255,32 +429,43 @@ export function ElementFields({
                     min={10}
                     max={32}
                     value={selectedElement.fontSize ?? 16}
-                    onChange={(e) => updateSelected({ fontSize: Number(e.target.value) })}
+                    onChange={(e) =>
+                      updateSelected({ fontSize: Number(e.target.value) })
+                    }
                   />
                 </div>
               </>
             )}
 
+            {/* Color swatches for geometric shapes / text */}
+            {selectedElement.shape !== 'sticker' && (
+              <div className="control-row">
+                <span className="control-label">
+                  {selectedElement.shape === 'text' ? 'စာလုံးအရောင်' : 'အရောင်'}
+                </span>
+                <div className="color-swatches-row">
+                  {COLOR_PALETTE.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`color-swatch-btn ${selectedElement.color === c.id ? 'active' : ''}`}
+                      style={{
+                        backgroundColor:
+                          c.id === 'theme' ? 'var(--card-accent, #7c3aed)' : c.hex,
+                      }}
+                      title={c.label}
+                      onClick={() => updateSelected({ color: c.id })}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Size Slider */}
             <div className="control-row">
               <span className="control-label">
-                {selectedElement.shape === 'text' ? 'စာလုံးအရောင်' : 'အရောင်'}
+                အရွယ်အစား ({Math.round(selectedElement.frame.width)}%)
               </span>
-              <div className="color-swatches-row">
-                {COLOR_PALETTE.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className={`color-swatch-btn ${selectedElement.color === c.id ? 'active' : ''}`}
-                    style={{ backgroundColor: c.id === 'theme' ? 'var(--card-accent, #7c3aed)' : c.hex }}
-                    title={c.label}
-                    onClick={() => updateSelected({ color: c.id })}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="control-row">
-              <span className="control-label">အရွယ်အစား ({Math.round(selectedElement.frame.width)}%)</span>
               <input
                 type="range"
                 min={8}
@@ -294,8 +479,11 @@ export function ElementFields({
               />
             </div>
 
+            {/* Rotation Controls */}
             <div className="control-row">
-              <span className="control-label">စောင်းခြင်း ({Math.round(selectedElement.frame.rotation)}°)</span>
+              <span className="control-label">
+                စောင်းခြင်း ({Math.round(selectedElement.frame.rotation)}°)
+              </span>
               <div className="rotation-quick-buttons">
                 {[-15, 0, 15, 45].map((angle) => (
                   <button
@@ -303,16 +491,23 @@ export function ElementFields({
                     type="button"
                     className={`button ghost ${Math.round(selectedElement.frame.rotation) === angle ? 'active' : ''}`}
                     style={{ padding: '3px 8px', fontSize: '11px' }}
-                    onClick={() => updateSelected({ frame: { rotation: angle } })}
+                    onClick={() =>
+                      updateSelected({ frame: { rotation: angle } })
+                    }
                   >
-                    {angle === 0 ? 'တည့်တည့်' : `${angle > 0 ? '+' : ''}${angle}°`}
+                    {angle === 0
+                      ? 'တည့်တည့်'
+                      : `${angle > 0 ? '+' : ''}${angle}°`}
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* Opacity Slider */}
             <div className="control-row">
-              <span className="control-label">ကြည်လင်မှု ({Math.round(selectedElement.frame.opacity * 100)}%)</span>
+              <span className="control-label">
+                ကြည်လင်မှု ({Math.round(selectedElement.frame.opacity * 100)}%)
+              </span>
               <input
                 type="range"
                 min={0.2}

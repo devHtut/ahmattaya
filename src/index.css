@@ -5710,4 +5710,125 @@ footer {
   gap: 6px;
 }
 
+/* Sticker Library and Picker Styles */
+.elements-category-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: var(--paper-soft, rgba(0, 0, 0, 0.04));
+  padding: 4px;
+  border-radius: var(--radius-m, 10px);
+}
+.elements-category-tab {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  border-radius: var(--radius-s, 8px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.elements-category-tab:hover {
+  color: var(--ink);
+}
+.elements-category-tab.active {
+  background: var(--paper, #ffffff);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+.stickers-tab-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.sticker-subcategories-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+.sticker-subcat-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--paper, #fff);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sticker-subcat-chip:hover {
+  border-color: var(--primary, #d946ef);
+}
+.sticker-subcat-chip.active {
+  background: var(--primary-light, #fdf2f8);
+  border-color: var(--primary, #d946ef);
+  color: var(--primary-dark, #86198f);
+  font-weight: 600;
+}
+.stickers-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-height: 290px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--paper, #ffffff);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m, 10px);
+}
+.sticker-picker-btn {
+  aspect-ratio: 1;
+  padding: 6px;
+  border-radius: var(--radius-s, 8px);
+  background: var(--paper-soft, rgba(0, 0, 0, 0.02));
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.sticker-picker-btn:hover {
+  transform: scale(1.1);
+  border-color: var(--primary, #d946ef);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+.sticker-picker-btn img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12));
+}
+.element-sticker-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.element-sticker-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
 
