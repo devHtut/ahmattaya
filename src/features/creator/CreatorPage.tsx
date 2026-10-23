@@ -130,6 +130,7 @@ export function CreatorPage({
   const [step, setStep] = useState<MakerStep>('card')
   const [view, setView] = useState<CanvasView>('pages')
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
 
@@ -156,6 +157,7 @@ export function CreatorPage({
     if (currentPageIndex > 0) {
       setSelectedPageId(allPageIds[currentPageIndex - 1])
       setSelectedPhotoId(null)
+      setSelectedElementId(null)
     }
   }
 
@@ -163,6 +165,7 @@ export function CreatorPage({
     if (currentPageIndex < totalPagesCount - 1) {
       setSelectedPageId(allPageIds[currentPageIndex + 1])
       setSelectedPhotoId(null)
+      setSelectedElementId(null)
     }
   }
 
@@ -172,6 +175,7 @@ export function CreatorPage({
       onChange({ ...card, pages: [...card.pages, next] })
       setSelectedPageId(next.id)
       setSelectedPhotoId(null)
+      setSelectedElementId(null)
       setView('pages')
     }
   }
@@ -362,12 +366,28 @@ export function CreatorPage({
                       card={card}
                       pageId={previewPageId}
                       selectedId={selectedPhotoId}
-                      onSelect={setSelectedPhotoId}
+                      onSelect={(id) => {
+                        setSelectedPhotoId(id)
+                        if (id) setSelectedElementId(null)
+                      }}
                       onCommit={(id, frame) =>
                         onChange({
                           ...card,
                           photos: card.photos.map((photo) =>
                             photo.id === id ? { ...photo, frame } : photo,
+                          ),
+                        })
+                      }
+                      selectedElementId={selectedElementId}
+                      onSelectElement={(id) => {
+                        setSelectedElementId(id)
+                        if (id) setSelectedPhotoId(null)
+                      }}
+                      onCommitElement={(id, frame) =>
+                        onChange({
+                          ...card,
+                          elements: (card.elements ?? []).map((el) =>
+                            el.id === id ? { ...el, frame } : el,
                           ),
                         })
                       }
@@ -379,7 +399,12 @@ export function CreatorPage({
                     pageId={view === 'pages' ? previewPageId : 'cover'}
                     selectedPhotoId={view === 'pages' ? selectedPhotoId : null}
                     onSelectPhoto={
-                      view === 'pages' ? setSelectedPhotoId : undefined
+                      view === 'pages'
+                        ? (id) => {
+                            setSelectedPhotoId(id)
+                            if (id) setSelectedElementId(null)
+                          }
+                        : undefined
                     }
                     onCommitPhoto={
                       view === 'pages'
@@ -388,6 +413,26 @@ export function CreatorPage({
                               ...card,
                               photos: card.photos.map((photo) =>
                                 photo.id === id ? { ...photo, frame } : photo,
+                              ),
+                            })
+                        : undefined
+                    }
+                    selectedElementId={view === 'pages' ? selectedElementId : null}
+                    onSelectElement={
+                      view === 'pages'
+                        ? (id) => {
+                            setSelectedElementId(id)
+                            if (id) setSelectedPhotoId(null)
+                          }
+                        : undefined
+                    }
+                    onCommitElement={
+                      view === 'pages'
+                        ? (id, frame) =>
+                            onChange({
+                              ...card,
+                              elements: (card.elements ?? []).map((el) =>
+                                el.id === id ? { ...el, frame } : el,
                               ),
                             })
                         : undefined
@@ -410,6 +455,7 @@ export function CreatorPage({
                 onClick={() => {
                   setSelectedPageId('cover')
                   setSelectedPhotoId(null)
+                  setSelectedElementId(null)
                 }}
                 title="ကတ်အဖုံး"
               >
@@ -438,6 +484,7 @@ export function CreatorPage({
                     onClick={() => {
                       setSelectedPageId(p.id)
                       setSelectedPhotoId(null)
+                      setSelectedElementId(null)
                     }}
                     title={p.title || `စာမျက်နှာ ${idx + 1}`}
                   >
@@ -552,10 +599,19 @@ export function CreatorPage({
                 onSelectPage={(id) => {
                   setSelectedPageId(id)
                   setSelectedPhotoId(null)
+                  setSelectedElementId(null)
                   setView('pages')
                 }}
                 selectedPhotoId={selectedPhotoId}
-                onSelectPhoto={setSelectedPhotoId}
+                onSelectPhoto={(id) => {
+                  setSelectedPhotoId(id)
+                  if (id) setSelectedElementId(null)
+                }}
+                selectedElementId={selectedElementId}
+                onSelectElement={(id) => {
+                  setSelectedElementId(id)
+                  if (id) setSelectedPhotoId(null)
+                }}
               />
             )}
 

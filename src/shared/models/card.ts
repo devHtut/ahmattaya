@@ -118,8 +118,44 @@ const v4CardFields = v2CardSchema.extend({
   photos: z.array(photoSchema).max(MAX_PHOTOS),
 })
 
+export const elementShapeSchema = z.enum([
+  'heart',
+  'star',
+  'sparkle',
+  'circle',
+  'rect',
+  'washi-tape',
+  'ribbon',
+  'flower',
+  'stamp',
+])
+export type ElementShape = z.infer<typeof elementShapeSchema>
+
+export const elementFrameSchema = z.object({
+  x: z.number().finite().min(0).max(100),
+  y: z.number().finite().min(0).max(100),
+  width: z.number().finite().min(5).max(80),
+  ratio: z.number().finite().min(0.1).max(10).default(1),
+  rotation: z.number().finite().min(-180).max(180).default(0),
+  opacity: z.number().finite().min(0.1).max(1).default(1),
+})
+export type ElementFrame = z.infer<typeof elementFrameSchema>
+
+export const cardElementSchema = z.object({
+  id: z.string().min(1).max(80),
+  pageId: z.string().min(1).max(80),
+  shape: elementShapeSchema,
+  color: z.string().max(40).default('theme'),
+  frame: elementFrameSchema,
+})
+export type CardElement = z.infer<typeof cardElementSchema>
+
+export const MAX_ELEMENTS = 30
+
 function validateCardReferences(
-  card: Pick<z.infer<typeof v4CardFields>, 'pages' | 'photos'>,
+  card: Pick<z.infer<typeof v4CardFields>, 'pages' | 'photos'> & {
+    elements?: CardElement[]
+  },
   ctx: z.RefinementCtx,
 ) {
   const pageIds = new Set(card.pages.map((page) => page.id))
@@ -135,6 +171,17 @@ function validateCardReferences(
   for (const photo of card.photos) {
     if (photo.pageId !== 'cover' && !pageIds.has(photo.pageId))
       ctx.addIssue({ code: 'custom', message: 'Photo page is missing' })
+  }
+  if (card.elements) {
+    const elIds = new Set(card.elements.map((el) => el.id))
+    if (elIds.size !== card.elements.length) {
+      ctx.addIssue({ code: 'custom', message: 'Duplicate element identity' })
+    }
+    for (const el of card.elements) {
+      if (el.pageId !== 'cover' && !pageIds.has(el.pageId)) {
+        ctx.addIssue({ code: 'custom', message: 'Element page is missing' })
+      }
+    }
   }
 }
 export const v4CardSchema = v4CardFields.superRefine(validateCardReferences)
@@ -168,6 +215,7 @@ export const cardSchema = v6CardFields
     background: backgroundSchema.nullable().default(null),
     music: musicSchema,
     event: eventSchema.default({}),
+    elements: z.array(cardElementSchema).max(MAX_ELEMENTS).default([]),
   })
   .superRefine(validateCardReferences)
 export type CardConfig = z.infer<typeof cardSchema>

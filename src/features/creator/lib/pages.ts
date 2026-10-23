@@ -17,6 +17,7 @@ export function removePage(card: CardConfig, pageId: string): CardConfig {
     ...card,
     pages: card.pages.filter((page) => page.id !== pageId),
     photos: card.photos.filter((photo) => photo.pageId !== pageId),
+    elements: (card.elements ?? []).filter((el) => el.pageId !== pageId),
   }
 }
 export function createPage(id: string): CardPage {

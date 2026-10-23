@@ -62,6 +62,7 @@ export function createCard(occasion: Occasion): CardConfig {
           : {},
     pages: [],
     photos: [],
+    elements: [],
     theme: 'lavender',
     appearance: createAppearance('lavender'),
   }

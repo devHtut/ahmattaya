@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BackgroundFields } from './BackgroundFields'
 import { StyleFields } from './StyleFields'
 import { ImagePlus, Trash2 } from 'lucide-react'
+import { ElementFields } from './ElementFields'
 import {
   MAX_PHOTOS,
   type CardConfig,
@@ -19,6 +20,8 @@ export function PagesFields({
   onSelectPage,
   selectedPhotoId,
   onSelectPhoto,
+  selectedElementId = null,
+  onSelectElement = () => {},
 }: {
   card: CardConfig
   onChange: (card: CardConfig) => void
@@ -26,6 +29,8 @@ export function PagesFields({
   onSelectPage: (id: string) => void
   selectedPhotoId: string | null
   onSelectPhoto: (id: string | null) => void
+  selectedElementId?: string | null
+  onSelectElement?: (id: string | null) => void
 }) {
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState('')
@@ -289,6 +294,14 @@ export function PagesFields({
           onSelect={onSelectPhoto}
         />
       )}
+
+      <ElementFields
+        card={card}
+        pageId={pageId}
+        onChange={onChange}
+        selectedElementId={selectedElementId}
+        onSelectElement={onSelectElement}
+      />
     </div>
   )
 }

@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react'
 import { useImageAsset } from '../media/useImageAsset'
-import type { CardAppearance, CardConfig, PhotoFrame } from '../models/card'
+import type { CardAppearance, CardConfig, ElementFrame, PhotoFrame } from '../models/card'
 import { occasions } from '../templates/templates'
 import { PhotoCanvas } from './PhotoCanvas'
+import { ElementCanvas } from './ElementCanvas'
 
 function textStyle(style: CardAppearance['heading']): CSSProperties {
   return {
@@ -20,12 +21,18 @@ export function CardPreview({
   selectedPhotoId,
   onSelectPhoto,
   onCommitPhoto,
+  selectedElementId,
+  onSelectElement,
+  onCommitElement,
 }: {
   card: CardConfig
   pageId?: string
   selectedPhotoId?: string | null
   onSelectPhoto?: (id: string | null) => void
   onCommitPhoto?: (id: string, frame: PhotoFrame) => void
+  selectedElementId?: string | null
+  onSelectElement?: (id: string | null) => void
+  onCommitElement?: (id: string, frame: ElementFrame) => void
 }) {
   const page = card.pages.find((item) => item.id === pageId)
   const background = page ? page.background : card.background
@@ -34,6 +41,9 @@ export function CardPreview({
   )
   const photos = card.photos.filter(
     (photo) => photo.pageId === (page?.id ?? 'cover'),
+  )
+  const elements = (card.elements ?? []).filter(
+    (el) => el.pageId === (page?.id ?? 'cover'),
   )
   const { colors, heading, body } = card.appearance
   const isCover = !page
@@ -121,11 +131,25 @@ export function CardPreview({
             အမှတ်တရ · AhMatTaYa
           </span>
         </div>
+        <div className="elements-canvas-wrapper">
+          <ElementCanvas
+            elements={elements}
+            selectedId={selectedElementId}
+            onSelect={(id) => {
+              if (id) onSelectPhoto?.(null)
+              onSelectElement?.(id)
+            }}
+            onCommit={onCommitElement}
+          />
+        </div>
         <div className="photo-canvas-wrapper reveal-step-photo">
           <PhotoCanvas
             photos={photos}
             selectedId={selectedPhotoId}
-            onSelect={onSelectPhoto}
+            onSelect={(id) => {
+              if (id) onSelectElement?.(null)
+              onSelectPhoto?.(id)
+            }}
             onCommit={onCommitPhoto}
           />
         </div>

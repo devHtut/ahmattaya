@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import type { CardConfig, PhotoFrame } from '../../../shared/models/card'
+import type { CardConfig, ElementFrame, PhotoFrame } from '../../../shared/models/card'
 import { CardPreview } from '../../../shared/ui/CardPreview'
 
 export function CanvasWorkspace({
@@ -8,12 +8,18 @@ export function CanvasWorkspace({
   selectedId,
   onSelect,
   onCommit,
+  selectedElementId,
+  onSelectElement,
+  onCommitElement,
 }: {
   card: CardConfig
   pageId: string
   selectedId: string | null
   onSelect: (id: string | null) => void
   onCommit: (id: string, frame: PhotoFrame) => void
+  selectedElementId?: string | null
+  onSelectElement?: (id: string | null) => void
+  onCommitElement?: (id: string, frame: ElementFrame) => void
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   return (
@@ -50,6 +56,9 @@ export function CanvasWorkspace({
             selectedPhotoId={selectedId}
             onSelectPhoto={onSelect}
             onCommitPhoto={onCommit}
+            selectedElementId={selectedElementId}
+            onSelectElement={onSelectElement}
+            onCommitElement={onCommitElement}
           />
         </div>
         <p className="field-hint">
