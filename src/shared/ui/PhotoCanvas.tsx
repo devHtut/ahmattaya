@@ -110,11 +110,21 @@ export function PhotoCanvas({
   const finish = (event: PointerEvent<HTMLElement>) => {
     const current = gesture.current
     if (!current || current.pointerId !== event.pointerId) return
-    onCommit?.(current.id, frameAt(event, current))
+    const finalFrame = frameAt(event, current)
     gesture.current = null
     setLive(null)
+    onCommit?.(current.id, finalFrame)
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId)
+  }
+  const handleLostCapture = (event: PointerEvent<HTMLElement>) => {
+    const current = gesture.current
+    if (current && current.pointerId === event.pointerId) {
+      const finalFrame = frameAt(event, current)
+      gesture.current = null
+      setLive(null)
+      onCommit?.(current.id, finalFrame)
+    }
   }
   const cancel = () => {
     gesture.current = null
@@ -154,8 +164,8 @@ export function PhotoCanvas({
             onPointerDown={(e) => start(e, photo, 'move')}
             onPointerMove={move}
             onPointerUp={finish}
-            onPointerCancel={cancel}
-            onLostPointerCapture={cancel}
+            onPointerCancel={handleLostCapture}
+            onLostPointerCapture={handleLostCapture}
             onKeyDown={(e) => {
               if (!editable) return
               if (e.key === 'Escape') {
@@ -198,6 +208,10 @@ export function PhotoCanvas({
                   className="canvas-handle rotate-handle"
                   aria-label={`ပုံ ${index + 1} လှည့်မယ်`}
                   onPointerDown={(e) => start(e, photo, 'rotate')}
+                  onPointerMove={move}
+                  onPointerUp={finish}
+                  onPointerCancel={handleLostCapture}
+                  onLostPointerCapture={handleLostCapture}
                   onKeyDown={(e) => {
                     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                       e.preventDefault()
@@ -219,6 +233,10 @@ export function PhotoCanvas({
                   className="canvas-handle resize-handle"
                   aria-label={`ပုံ ${index + 1} အရွယ်ပြောင်းမယ်`}
                   onPointerDown={(e) => start(e, photo, 'resize')}
+                  onPointerMove={move}
+                  onPointerUp={finish}
+                  onPointerCancel={handleLostCapture}
+                  onLostPointerCapture={handleLostCapture}
                   onKeyDown={(e) => {
                     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                       e.preventDefault()

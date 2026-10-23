@@ -135,6 +135,31 @@ export function useCreatorDraft() {
       })
     },
     onChange,
+    saveNow: () => {
+      const parsed = cardSchema.safeParse(active.card)
+      if (parsed.success) {
+        update({
+          ...active,
+          card: parsed.data,
+          updatedAt: new Date().toISOString(),
+        })
+        return true
+      }
+      return false
+    },
+    importBackup: (name: string, importedCard: CardConfig) => {
+      const project = makeProject(importedCard, name)
+      persist(
+        {
+          ...state.library,
+          activeId: project.id,
+          projects: [...state.library.projects, project],
+        },
+        [],
+        [],
+      )
+      return project.id
+    },
     retrySave: () =>
       setState({
         ...state,
