@@ -104,42 +104,6 @@ export function CakeFields({
                     : 'ရွေးချယ်ထားသော စာမျက်နှာ အပြီးတွင် ကိတ်မုန့် ပေါ်ပါမည်။'}
               </small>
             </label>
-            <div
-              className="shelf-filter"
-              role="group"
-              aria-label="ကိတ်မုန့် နေရာ အမြန်ရွေးရန်"
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '6px',
-                margin: '-4px 0 12px',
-              }}
-            >
-              <button
-                type="button"
-                className={`filter-pill ${!card.cake.placement || card.cake.placement === 'end' ? 'active' : ''}`}
-                onClick={() => update({ placement: 'end' })}
-              >
-                နောက်ဆုံးတွင် (Default)
-              </button>
-              <button
-                type="button"
-                className={`filter-pill ${card.cake.placement === 'cover' ? 'active' : ''}`}
-                onClick={() => update({ placement: 'cover' })}
-              >
-                အဖုံးအပြီး
-              </button>
-              {card.pages.map((p, idx) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`filter-pill ${card.cake.placement === p.id ? 'active' : ''}`}
-                  onClick={() => update({ placement: p.id })}
-                >
-                  စာမျက်နှာ {idx + 1} အပြီး
-                </button>
-              ))}
-            </div>
 
             <label>
               Cake သား
