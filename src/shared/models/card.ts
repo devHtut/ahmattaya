@@ -150,7 +150,7 @@ export const cardElementSchema = z.object({
   color: z.string().max(40).default('theme'),
   text: z.string().max(300).default(''),
   fontSize: z.number().min(8).max(36).default(14),
-  fontFamily: z.enum(['handwriting', 'serif', 'sans']).default('handwriting'),
+  fontFamily: z.string().max(80).default('handwriting'),
   bg: z.string().max(40).default('transparent'),
   stickerSrc: z.string().max(250).optional(),
   frame: elementFrameSchema,

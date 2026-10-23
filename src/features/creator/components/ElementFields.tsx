@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react'
 import {
   type CardConfig,
   type CardElement,
-  type ElementShape,
   MAX_ELEMENTS,
 } from '../../../shared/models/card'
 import {
   COLOR_PALETTE,
   ELEMENT_SHAPES,
   TEXT_BACKGROUNDS,
-  TEXT_FONTS,
 } from '../../../shared/ui/ElementShapes'
+import { getAllAvailableFonts } from '../../../shared/fonts/fonts-catalog'
 import {
   STICKER_CATEGORIES,
   type StickerItem,
@@ -39,6 +38,7 @@ export function ElementFields({
   const allElements = card.elements ?? []
   const pageElements = allElements.filter((el) => el.pageId === pageId)
   const selectedElement = pageElements.find((el) => el.id === selectedElementId)
+  const availableFonts = getAllAvailableFonts()
 
   const currentCategory =
     STICKER_CATEGORIES.find((c) => c.id === selectedCatId) ??
@@ -55,7 +55,7 @@ export function ElementFields({
 
   function addSticker(sticker: StickerItem) {
     if (allElements.length >= MAX_ELEMENTS) {
-      alert(`ကတ်တစ်ခုလုံးတွင် elements အများဆုံး ${MAX_ELEMENTS} ခုသာ ထည့်နိုင်ပါသည်`)
+      alert(`ကတ်တစ်ခုလုံးတွင် stickers/စာတို အများဆုံး ${MAX_ELEMENTS} ခုသာ ထည့်နိုင်ပါသည်`)
       return
     }
 
@@ -87,34 +87,29 @@ export function ElementFields({
     onSelectElement(newElement.id)
   }
 
-  function addShape(shape: ElementShape) {
+  function addTextBox() {
     if (allElements.length >= MAX_ELEMENTS) {
-      alert(`ကတ်တစ်ခုလုံးတွင် elements အများဆုံး ${MAX_ELEMENTS} ခုသာ ထည့်နိုင်ပါသည်`)
+      alert(`ကတ်တစ်ခုလုံးတွင် stickers/စာတို အများဆုံး ${MAX_ELEMENTS} ခုသာ ထည့်နိုင်ပါသည်`)
       return
     }
-
-    const shapeDef = ELEMENT_SHAPES.find((s) => s.id === shape)
-    const defaultWidth = shapeDef?.defaultWidth ?? 20
-    const defaultRatio = shapeDef?.defaultRatio ?? 1
-    const isText = shape === 'text'
 
     const offset = (pageElements.length % 5) * 6
     const newElement: CardElement = {
       id: crypto.randomUUID(),
       pageId,
-      shape,
-      color: isText ? 'theme' : shape === 'washi-tape' ? '#fb7185' : 'theme',
-      text: isText ? 'ချစ်ခြင်းများစွာဖြင့်' : '',
+      shape: 'text',
+      color: '#334155',
+      text: 'ချစ်ခြင်းများစွာဖြင့်',
       fontSize: 16,
       fontFamily: 'handwriting',
-      bg: isText ? 'sticky-yellow' : 'transparent',
+      bg: 'sticky-yellow',
       frame: {
         x: Math.min(85, Math.max(15, 50 + (pageElements.length % 2 === 0 ? offset : -offset))),
         y: Math.min(85, Math.max(15, 50 + (pageElements.length % 3 === 0 ? -offset : offset))),
-        width: defaultWidth,
-        ratio: defaultRatio,
-        rotation: isText ? -3 : shape === 'washi-tape' ? -12 : 0,
-        opacity: shape === 'washi-tape' ? 0.85 : 1,
+        width: 38,
+        ratio: 0.38,
+        rotation: -3,
+        opacity: 1,
       },
     }
 
@@ -197,28 +192,12 @@ export function ElementFields({
         <button
           type="button"
           className="button ghost add-textbox-launch-btn"
-          onClick={() => addShape('text')}
-          title="စာတို (Sticky Text Box) ထည့်မယ်"
+          onClick={addTextBox}
+          title="စာတို (Text Box) ထည့်မယ်"
         >
           <Type size={14} />
           <span>စာတို ထည့်မယ်</span>
         </button>
-      </div>
-
-      {/* Quick shapes row (Washi, Pin, Paperclip, Heart, Star) */}
-      <div className="quick-shapes-row" aria-label="အမြန် ထည့်နိုင်သော ပစ္စည်းများ">
-        {ELEMENT_SHAPES.filter((s) => s.id !== 'text').map((shape) => (
-          <button
-            key={shape.id}
-            type="button"
-            className="quick-shape-btn"
-            title={`${shape.label} ထည့်မယ်`}
-            onClick={() => addShape(shape.id)}
-          >
-            <span>{shape.icon}</span>
-            <span className="quick-shape-text">{shape.label}</span>
-          </button>
-        ))}
       </div>
 
       {/* Chips for items currently placed on this page */}
@@ -226,16 +205,17 @@ export function ElementFields({
         <div
           className="page-elements-list"
           role="tablist"
-          aria-label="ထည့်ထားသော Elements"
+          aria-label="ထည့်ထားသော အရာများ"
         >
           <span className="elements-list-caption">
-            ထည့်ထားသည့် အလှဆင်ပစ္စည်းများ ({pageElements.length}):
+            ထည့်ထားသည့် ပစ္စည်းများ ({pageElements.length}):
           </span>
           <div className="elements-chips-wrap">
             {pageElements.map((el, index) => {
               const def = ELEMENT_SHAPES.find((s) => s.id === el.shape)
               const isSelected = selectedElementId === el.id
               const isSticker = el.shape === 'sticker'
+              const isText = el.shape === 'text'
 
               return (
                 <button
@@ -255,13 +235,17 @@ export function ElementFields({
                         marginRight: 4,
                       }}
                     />
+                  ) : isText ? (
+                    <span>📝</span>
                   ) : (
                     <span>{def?.icon ?? '✨'}</span>
                   )}
                   <span>
                     {isSticker
                       ? `စတစ်ကာ ${index + 1}`
-                      : `${def?.label ?? 'Element'} ${index + 1}`}
+                      : isText
+                        ? `စာတို ${index + 1}`
+                        : `${def?.label ?? 'ပစ္စည်း'} ${index + 1}`}
                   </span>
                 </button>
               )
@@ -286,6 +270,8 @@ export function ElementFields({
                     marginRight: 6,
                   }}
                 />
+              ) : selectedElement.shape === 'text' ? (
+                <span className="inspector-icon">📝</span>
               ) : (
                 <span className="inspector-icon">
                   {ELEMENT_SHAPES.find((s) => s.id === selectedElement.shape)?.icon}
@@ -294,7 +280,9 @@ export function ElementFields({
               <strong>
                 {selectedElement.shape === 'sticker'
                   ? 'စတစ်ကာ အပြင်အဆင်'
-                  : `${ELEMENT_SHAPES.find((s) => s.id === selectedElement.shape)?.label} အပြင်အဆင်`}
+                  : selectedElement.shape === 'text'
+                    ? 'စာတို (Text Box) အပြင်အဆင်'
+                    : 'အလှဆင်ပစ္စည်း အပြင်အဆင်'}
               </strong>
             </div>
             <div className="inspector-actions">
@@ -332,47 +320,70 @@ export function ElementFields({
                 </div>
 
                 <div className="control-row">
-                  <span className="control-label">ဖောင့်စတိုင်</span>
-                  <div className="font-choices-grid">
-                    {TEXT_FONTS.map((f) => (
-                      <button
-                        key={f.id}
-                        type="button"
-                        className={`button ghost ${selectedElement.fontFamily === f.id ? 'active' : ''}`}
-                        style={{ padding: '4px 8px', fontSize: '11px' }}
-                        onClick={() =>
-                          updateSelected({
-                            fontFamily: f.id as CardElement['fontFamily'],
-                          })
-                        }
-                      >
+                  <label className="control-label" htmlFor="textbox-font-select">
+                    ဖောင့် (Font)
+                  </label>
+                  <select
+                    id="textbox-font-select"
+                    className="element-select-dropdown"
+                    value={selectedElement.fontFamily ?? 'handwriting'}
+                    onChange={(e) =>
+                      updateSelected({
+                        fontFamily: e.target.value,
+                      })
+                    }
+                  >
+                    {availableFonts.map((f) => (
+                      <option key={f.id} value={f.id}>
                         {f.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="control-row">
+                  <span className="control-label">
+                    နောက်ခံအရောင် (Background)
+                  </span>
+                  <div className="color-swatches-row">
+                    {TEXT_BACKGROUNDS.map((bg) => (
+                      <button
+                        key={bg.id}
+                        type="button"
+                        className={`color-swatch-btn ${selectedElement.bg === bg.id ? 'active' : ''} ${bg.id === 'transparent' ? 'swatch-transparent' : ''}`}
+                        style={{
+                          backgroundColor: bg.color,
+                          borderColor: bg.border,
+                        }}
+                        title={bg.label}
+                        onClick={() => updateSelected({ bg: bg.id })}
+                      >
+                        {bg.id === 'transparent' && (
+                          <span
+                            className="swatch-transparent-slash"
+                            aria-hidden="true"
+                          />
+                        )}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="control-row">
-                  <span className="control-label">
-                    နောက်ခံပုံစံ (Background)
-                  </span>
-                  <div className="bg-choices-wrap">
-                    {TEXT_BACKGROUNDS.map((bg) => (
+                  <span className="control-label">စာလုံးအရောင်</span>
+                  <div className="color-swatches-row">
+                    {COLOR_PALETTE.map((c) => (
                       <button
-                        key={bg.id}
+                        key={c.id}
                         type="button"
-                        className={`bg-choice-chip ${selectedElement.bg === bg.id ? 'active' : ''}`}
-                        onClick={() => updateSelected({ bg: bg.id })}
-                      >
-                        <span
-                          className="bg-preview-dot"
-                          style={{
-                            backgroundColor: bg.color,
-                            borderColor: bg.border,
-                          }}
-                        />
-                        <span>{bg.label}</span>
-                      </button>
+                        className={`color-swatch-btn ${selectedElement.color === c.id ? 'active' : ''}`}
+                        style={{
+                          backgroundColor:
+                            c.id === 'theme' ? 'var(--card-accent, #7c3aed)' : c.hex,
+                        }}
+                        title={c.label}
+                        onClick={() => updateSelected({ color: c.id })}
+                      />
                     ))}
                   </div>
                 </div>
@@ -392,30 +403,6 @@ export function ElementFields({
                   />
                 </div>
               </>
-            )}
-
-            {/* Color swatches for geometric shapes / text */}
-            {selectedElement.shape !== 'sticker' && (
-              <div className="control-row">
-                <span className="control-label">
-                  {selectedElement.shape === 'text' ? 'စာလုံးအရောင်' : 'အရောင်'}
-                </span>
-                <div className="color-swatches-row">
-                  {COLOR_PALETTE.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      className={`color-swatch-btn ${selectedElement.color === c.id ? 'active' : ''}`}
-                      style={{
-                        backgroundColor:
-                          c.id === 'theme' ? 'var(--card-accent, #7c3aed)' : c.hex,
-                      }}
-                      title={c.label}
-                      onClick={() => updateSelected({ color: c.id })}
-                    />
-                  ))}
-                </div>
-              </div>
             )}
 
             {/* Size Slider */}

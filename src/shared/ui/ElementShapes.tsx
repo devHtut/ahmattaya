@@ -22,19 +22,34 @@ export const ELEMENT_SHAPES: ShapeDefinition[] = [
   { id: 'stamp', label: 'တံဆိပ်ခေါင်း', icon: '💌', defaultWidth: 22, defaultRatio: 1.2 },
 ]
 
+export interface FontOption {
+  id: string
+  label: string
+  family: string
+  isCustom?: boolean
+}
+
 export const TEXT_BACKGROUNDS = [
-  { id: 'transparent', label: 'ကြည်လင် (Transparent)', color: 'transparent', border: 'transparent' },
-  { id: 'sticky-yellow', label: 'အဝါရောင် Post-it', color: '#fef08a', border: '#fde047', text: '#713f12' },
-  { id: 'sticky-pink', label: 'ပန်းရောင် Post-it', color: '#fbcfe8', border: '#f472b6', text: '#831843' },
-  { id: 'sticky-blue', label: 'မိုးပြာရောင် Post-it', color: '#bae6fd', border: '#7dd3fc', text: '#0c4a6e' },
-  { id: 'parchment', label: 'စက္ကူဟောင်း (Parchment)', color: '#fef3c7', border: '#d97706', text: '#78350f' },
-  { id: 'badge-white', label: 'အဖြူရောင် Badge', color: '#ffffff', border: 'rgba(0,0,0,0.12)', text: '#1e293b' },
+  { id: 'transparent', label: 'ကြည်လင် (Transparent)', color: 'transparent', border: '#94a3b8' },
+  { id: 'sticky-yellow', label: 'အဝါရောင် Post-it', color: '#fef08a', border: '#fde047' },
+  { id: 'sticky-pink', label: 'ပန်းရောင် Post-it', color: '#fbcfe8', border: '#f472b6' },
+  { id: 'sticky-blue', label: 'မိုးပြာရောင် Post-it', color: '#bae6fd', border: '#7dd3fc' },
+  { id: 'parchment', label: 'စက္ကူဟောင်း (Parchment)', color: '#fef3c7', border: '#d97706' },
+  { id: 'badge-white', label: 'အဖြူရောင် Badge', color: '#ffffff', border: '#cbd5e1' },
+  { id: 'mint', label: 'အစိမ်းနုရောင်', color: '#d1fae5', border: '#a7f3d0' },
+  { id: 'lavender', label: 'ခရမ်းနုရောင်', color: '#ede9fe', border: '#ddd6fe' },
+  { id: 'peach', label: 'မက်မွန်ရောင်', color: '#ffedd5', border: '#fed7aa' },
+  { id: 'dark', label: 'အမည်းရောင် (Dark)', color: '#1e293b', border: '#334155' },
 ]
 
-export const TEXT_FONTS = [
+export const TEXT_FONTS: FontOption[] = [
   { id: 'handwriting', label: 'လက်ရေးစတိုင် (Handwriting)', family: "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive" },
-  { id: 'serif', label: 'ကျက်သရေရှိ (Serif)', family: "'Fraunces', 'Cinzel', 'Noto Serif Myanmar', Georgia, serif" },
-  { id: 'sans', label: 'ရိုးရှင်းသပ်ရပ် (Clean Sans)', family: "'Padauk', 'Noto Sans Myanmar', sans-serif" },
+  { id: 'serif', label: 'ကျက်သရေရှိ Serif (Playfair / Fraunces)', family: "'Playfair Display', 'Fraunces', 'Cinzel', 'Noto Serif Myanmar', serif" },
+  { id: 'sans', label: 'ရိုးရှင်းသပ်ရပ် Sans (Padauk)', family: "'Padauk', 'Noto Sans Myanmar', sans-serif" },
+  { id: 'Padauk', label: 'Padauk (ပိတောက်မြန်မာဖောင့်)', family: "'Padauk', sans-serif" },
+  { id: 'Noto Sans Myanmar', label: 'Noto Sans Myanmar', family: "'Noto Sans Myanmar', sans-serif" },
+  { id: 'Playfair Display', label: 'Playfair Display', family: "'Playfair Display', serif" },
+  { id: 'Fraunces', label: 'Fraunces Display', family: "'Fraunces', serif" },
 ]
 
 export const COLOR_PALETTE = [

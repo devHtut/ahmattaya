@@ -165,7 +165,9 @@ export function ElementCanvas({
                       ? "'Fraunces', 'Cinzel', 'Noto Serif Myanmar', serif"
                       : el.fontFamily === 'sans'
                         ? "'Padauk', 'Noto Sans Myanmar', sans-serif"
-                        : "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive",
+                        : el.fontFamily === 'handwriting'
+                          ? "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive"
+                          : `'${el.fontFamily}', 'Noto Sans Myanmar', sans-serif`,
                   fontSize: `max(10px, ${((el.fontSize ?? 14) / 8).toFixed(1)}cqw)`,
                   color: el.color === 'theme' ? 'inherit' : el.color,
                 }}
