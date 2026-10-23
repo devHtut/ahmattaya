@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CloudConnection } from '../publishing/CloudConnection'
+import { PublishCard } from '../publishing/PublishCard'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Check,
@@ -44,9 +45,11 @@ export function EditorToolbar({
   }
 
   const shareDialog = useRef<HTMLDialogElement>(null)
+  const cloudDialog = useRef<HTMLDialogElement>(null)
   const exportDialog = useRef<HTMLDialogElement>(null)
   const fileMenuRef = useRef<HTMLDetailsElement>(null)
   const [cloudOpened, setCloudOpened] = useState(false)
+  const [shareOpened, setShareOpened] = useState(false)
 
   const handleExplicitSave = useCallback(() => {
     w.saveNow()
@@ -261,10 +264,10 @@ export function EditorToolbar({
       <button
         className="icon-button"
         aria-label="Cloud ကတ်များ"
-        title="Cloud သိမ်းဆည်းမှု"
+        title="တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cross-Device Cloud Sync)"
         onClick={() => {
           setCloudOpened(true)
-          shareDialog.current?.showModal()
+          cloudDialog.current?.showModal()
         }}
       >
         <Cloud size={17} />
@@ -326,7 +329,7 @@ export function EditorToolbar({
           className="button primary"
           style={{ padding: '9px 16px', fontSize: 12 }}
           onClick={() => {
-            setCloudOpened(true)
+            setShareOpened(true)
             shareDialog.current?.showModal()
           }}
         >
@@ -428,13 +431,13 @@ export function EditorToolbar({
       <dialog
         ref={shareDialog}
         onClose={() => {
-          if (!shareDialog.current?.open) setCloudOpened(false)
+          if (!shareDialog.current?.open) setShareOpened(false)
         }}
         className="share-dialog"
         aria-labelledby="share-heading"
       >
         <div className="share-dialog-header">
-          <h2 id="share-heading">Cloud နဲ့ မျှဝေမှု</h2>
+          <h2 id="share-heading">ကတ်ကို မျှဝေရန် (Share Card)</h2>
           <button
             className="icon-button"
             aria-label="ပိတ်မယ်"
@@ -444,13 +447,90 @@ export function EditorToolbar({
           </button>
         </div>
         <p className="share-dialog-desc">
-          ဒီ browser မှာ အလိုအလျောက် သိမ်းပေးပါတယ်။ Cloud မိတ္တူအတွက် အောက်က
-          သိမ်းမယ်ကို နှိပ်ပါ။ ချစ်ရသူဆီ ပို့ဖို့ Publish နှိပ်ပြီး link
-          ယူနိုင်ပါတယ်။
+          ဒီကတ်ကို ချစ်ရသူဆီ ပေးပို့ရန် Receiver Link နှင့် QR Code ကို အကောင့်ဖွင့်စရာမလိုဘဲ တိုက်ရိုက်ထုတ်ယူနိုင်ပါသည်။
         </p>
+        {(w.saveStatus === 'error' || w.saveStatus === 'blocked') && (
+          <p role="alert" className="music-error">
+            လက်ရှိပြင်ထားတာတွေ မသိမ်းရသေးပါ။ Editor မှာ သိမ်းဆည်းမှုအခြေအနေကို
+            ပြန်စစ်ပေးပါ။
+          </p>
+        )}
+        {shareOpened && (
+          <PublishCard
+            workspace={w}
+            publishBlocked={w.saveStatus === 'blocked' || w.saveStatus === 'error'}
+          />
+        )}
+        <div
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.85rem 1rem',
+            borderRadius: '10px',
+            background: 'var(--paper-soft, rgba(0, 0, 0, 0.03))',
+            border: '1px solid var(--line, rgba(0, 0, 0, 0.08))',
+            fontSize: '12px',
+            color: 'var(--ink-soft, #64748b)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <span>
+            💡 တခြား Device / ဖုန်းများမှာပါ ကတ်ကို ဆက်လက်ပြင်ဆင်လိုပါက
+          </span>
+          <button
+            type="button"
+            className="button ghost"
+            style={{
+              fontSize: '11px',
+              padding: '5px 10px',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}
+            onClick={() => {
+              shareDialog.current?.close()
+              setCloudOpened(true)
+              cloudDialog.current?.showModal()
+            }}
+          >
+            <Cloud size={14} />
+            Cloud Sync သွားရန်
+          </button>
+        </div>
+        <div className="share-dialog-actions" style={{ marginTop: '1.25rem' }}>
+          <Link
+            className="button ghost"
+            to="/preview"
+            onClick={() => shareDialog.current?.close()}
+          >
+            <Eye size={16} /> ကိုယ့်ကတ် နမူနာကြည့်မယ်
+          </Link>
+        </div>
+      </dialog>
+
+      <dialog
+        ref={cloudDialog}
+        onClose={() => {
+          if (!cloudDialog.current?.open) setCloudOpened(false)
+        }}
+        className="share-dialog"
+        aria-labelledby="cloud-heading"
+      >
+        <div className="share-dialog-header">
+          <h2 id="cloud-heading">တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cloud Sync)</h2>
+          <button
+            className="icon-button"
+            aria-label="ပိတ်မယ်"
+            onClick={() => cloudDialog.current?.close()}
+          >
+            <X size={16} />
+          </button>
+        </div>
         <p className="share-dialog-desc">
-          Publish လုပ်ရင် ဒီကတ်အတွက် သီးခြား receiver link ရပါမယ်။ အတူပြင်ဆင်သူ
-          ဖိတ်ခေါ်တဲ့ link နဲ့ သီးခြားဖြစ်ပါတယ်။
+          အီးမေးလ်ဖြင့် အကောင့်ဝင်ထားပါက လက်ရှိဖန်တီးထားသော ကတ်များကို အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာများမှလည်း အချိန်မရွေး ပြန်လည်ဖွင့်ဖောက်ပြင်ဆင်နိုင်မည် ဖြစ်ပါသည်။
         </p>
         {(w.saveStatus === 'error' || w.saveStatus === 'blocked') && (
           <p role="alert" className="music-error">
@@ -461,18 +541,9 @@ export function EditorToolbar({
         {cloudOpened && (
           <CloudConnection
             workspace={w}
-            onRestored={() => shareDialog.current?.close()}
+            onRestored={() => cloudDialog.current?.close()}
           />
         )}
-        <div className="share-dialog-actions">
-          <Link
-            className="button primary"
-            to="/preview"
-            onClick={() => shareDialog.current?.close()}
-          >
-            <Eye size={16} /> ကိုယ့်ကတ် နမူနာကြည့်မယ်
-          </Link>
-        </div>
       </dialog>
     </header>
   )

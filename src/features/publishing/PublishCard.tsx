@@ -14,16 +14,16 @@ import type { TransferProgress } from '../../shared/cloud/media'
 const QrInvitation = lazy(() => import('./qr/QrInvitation'))
 export function PublishCard({
   workspace: w,
-  ownerId,
-  disabled,
-  publishBlocked,
+  ownerId: propOwnerId,
+  disabled = false,
+  publishBlocked = false,
   onBusy,
 }: {
   workspace: ProjectWorkspace
-  ownerId: string
-  disabled: boolean
-  publishBlocked: boolean
-  onBusy: (busy: boolean) => void
+  ownerId?: string
+  disabled?: boolean
+  publishBlocked?: boolean
+  onBusy?: (busy: boolean) => void
 }) {
   const [publication, setPublication] = useState<Publication | null>(null)
   const [qrOpened, setQrOpened] = useState(false)
@@ -34,32 +34,46 @@ export function PublishCard({
   const [progress, setProgress] = useState<TransferProgress | null>(null)
   const alive = useRef(false),
     running = useRef(false)
-  const projectId =
-    w.project.cloud?.ownerId === ownerId
-      ? w.project.cloud.projectId
-      : w.project.id
+
   useEffect(() => {
     let cancelled = false
     alive.current = true
-    getCloudClient()
-      .then((client) => getPublication(client, projectId))
-      .then((p) => {
+
+    async function checkPub() {
+      try {
+        const client = await getCloudClient()
+        const { data } = await client.auth.getSession()
+        const currentOwner = propOwnerId || data.session?.user.id
+        if (!currentOwner) {
+          if (!cancelled) setLoading(false)
+          return
+        }
+        const projectId =
+          w.project.cloud?.ownerId === currentOwner
+            ? w.project.cloud.projectId
+            : w.project.id
+
+        const p = await getPublication(client, projectId)
         if (!cancelled) {
           setPublication(p)
           setLoading(false)
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!cancelled) {
           setError(publishingMessage(err))
           setLoading(false)
         }
-      })
+      }
+    }
+
+    void checkPub()
+
     return () => {
       cancelled = true
       alive.current = false
     }
-  }, [ownerId, projectId])
+  }, [propOwnerId, w.project.cloud, w.project.id])
+
   async function act(remove = false) {
     if (
       running.current ||
@@ -70,17 +84,28 @@ export function PublishCard({
       return
     running.current = true
     setBusy(true)
-    onBusy(true)
+    onBusy?.(true)
     setError('')
     setFeedback('')
     setProgress(null)
     const project = structuredClone(w.project)
     try {
       const client = await getCloudClient()
+      const { data } = await client.auth.getSession()
+      let effectiveOwner = propOwnerId || data.session?.user.id
+
+      if (!effectiveOwner) {
+        // Automatic silent anonymous sign-in: enables instant publishing without requiring an email!
+        const anon = await client.auth.signInAnonymously()
+        if (anon.error) throw anon.error
+        if (!anon.data.user) throw new Error('No user returned')
+        effectiveOwner = anon.data.user.id
+      }
+
       const result =
         remove && publication
           ? await unpublish(client, publication.id)
-          : await publishProject(client, ownerId, project, {
+          : await publishProject(client, effectiveOwner, project, {
               onSaved: (receipt) => w.recordCloudSave(project.id, receipt),
               onProgress: (p) => {
                 if (alive.current) setProgress(p)
@@ -98,7 +123,7 @@ export function PublishCard({
       if (alive.current) setError(publishingMessage(err))
     } finally {
       running.current = false
-      onBusy(false)
+      onBusy?.(false)
       if (alive.current) {
         setBusy(false)
         setProgress(null)
@@ -118,12 +143,12 @@ export function PublishCard({
   return (
     <section className="publish-card" aria-labelledby="publish-heading">
       <h3 id="publish-heading">
-        <Link2 size={18} /> ချစ်ရသူဆီ ပို့မယ်
+        <Link2 size={18} /> ချစ်ရသူဆီ ပို့မယ် (Receiver Link)
       </h3>
       <p className="field-hint">
-        Publish နှိပ်ရင် ဒီအချိန်က ကတ်မိတ္တူကို ပို့ပေးပါမယ်။ Link ရသူတိုင်း
-        ကြည့်နိုင်ပြီး ပြင်လို့မရပါ။ Draft ထပ်ပြင်ပြီးရင် Publish ပြန်နှိပ်မှ
-        receiver မြင်ရတဲ့ကတ် ပြောင်းပါမယ်။
+        Publish နှိပ်ရင် လက်ရှိပြင်ဆင်ထားသော ကတ်အွန်လိုင်းမိတ္တူကို ထုတ်ပေးပါမည်။
+        Link ရရှိသူတိုင်း မည်သည့် Device / Browser မှမဆို ဖွင့်ဖတ်ကြည့်ရှုနိုင်ပြီး
+        ပြင်ဆင်ခွင့် မရှိပါ။
       </p>
       {loading && <p role="status">Share link ကို စစ်နေပါတယ်…</p>}
       <button
@@ -138,10 +163,10 @@ export function PublishCard({
         onClick={() => void act()}
       >
         {busy
-          ? 'ပြင်ဆင်နေပါတယ်…'
+          ? 'အွန်လိုင်းပေါ် တင်နေပါသည်…'
           : publication?.active
-            ? 'ပြင်ထားတဲ့ကတ်ကို Publish ပြန်လုပ်မယ်'
-            : 'Publish လုပ်ပြီး link ယူမယ်'}
+            ? 'ပြင်ဆင်ထားချက်များကို Update လုပ်မည်'
+            : 'Publish လုပ်ပြီး Link ယူမည် 🚀'}
       </button>
       {progress && progress.total > 0 && (
         <p role="status">
