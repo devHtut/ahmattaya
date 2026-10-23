@@ -178,8 +178,8 @@ export function ProjectsPage({
                         </Link>
                         <button
                           className="icon-button"
-                          aria-label="မော်ကွန်းထုတ်မယ်"
-                          title="မော်ကွန်းထုတ်မယ်"
+                          aria-label="မိတ္တူပွားမယ် (Duplicate)"
+                          title="မိတ္တူပွားမယ် (Duplicate)"
                           onClick={() => {
                             w.duplicate(project.id)
                             navigate('/create')

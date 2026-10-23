@@ -47,7 +47,6 @@ export function EditorToolbar({
   const shareDialog = useRef<HTMLDialogElement>(null)
   const cloudDialog = useRef<HTMLDialogElement>(null)
   const exportDialog = useRef<HTMLDialogElement>(null)
-  const fileMenuRef = useRef<HTMLDetailsElement>(null)
   const [cloudOpened, setCloudOpened] = useState(false)
   const [shareOpened, setShareOpened] = useState(false)
 
@@ -92,29 +91,6 @@ export function EditorToolbar({
     printCard()
   }
 
-  useEffect(() => {
-    function handleClickOutside(event: globalThis.PointerEvent) {
-      if (
-        fileMenuRef.current?.open &&
-        !fileMenuRef.current.contains(event.target as Node)
-      ) {
-        fileMenuRef.current.removeAttribute('open')
-      }
-    }
-
-    function handleEsc(event: KeyboardEvent) {
-      if (event.key === 'Escape' && fileMenuRef.current?.open) {
-        fileMenuRef.current.removeAttribute('open')
-      }
-    }
-
-    document.addEventListener('pointerdown', handleClickOutside)
-    document.addEventListener('keydown', handleEsc)
-    return () => {
-      document.removeEventListener('pointerdown', handleClickOutside)
-      document.removeEventListener('keydown', handleEsc)
-    }
-  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -152,14 +128,6 @@ export function EditorToolbar({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [w, handleExplicitSave])
 
-  const closeMenu = (e?: React.SyntheticEvent) => {
-    if (fileMenuRef.current) {
-      fileMenuRef.current.removeAttribute('open')
-    } else if (e) {
-      ;(e.target as HTMLElement).closest('details')?.removeAttribute('open')
-    }
-  }
-
   return (
     <header className="atelier-bar">
       <Link to="/" className="atelier-brand" aria-label="AhMatTaYa">
@@ -171,42 +139,6 @@ export function EditorToolbar({
           <small>Atelier</small>
         </span>
       </Link>
-
-      <details ref={fileMenuRef} className="file-menu">
-        <summary>ဖိုင်</summary>
-        <div className="file-menu-items">
-          <button
-            onClick={(e) => {
-              w.create('birthday')
-              closeMenu(e)
-            }}
-          >
-            + ကတ်အသစ်
-          </button>
-          <Link to="/templates" onClick={() => closeMenu()}>
-            နမူနာများ
-          </Link>
-          <button
-            onClick={(e) => {
-              w.duplicate()
-              closeMenu(e)
-            }}
-          >
-            မော်ကွန်းထုတ်မယ်
-          </button>
-          <button
-            onClick={(e) => {
-              exportDialog.current?.showModal()
-              closeMenu(e)
-            }}
-          >
-            📥 ဖိုင်ထုတ်ယူရန် / Backup
-          </button>
-          <Link to="/projects" onClick={() => closeMenu()}>
-            ကတ်များ အားလုံး
-          </Link>
-        </div>
-      </details>
 
       <div
         className="name-wrap"
