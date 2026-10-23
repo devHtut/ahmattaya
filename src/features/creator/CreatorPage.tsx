@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -140,6 +140,13 @@ export function CreatorPage({
   const previewPageId = card.pages.some((page) => page.id === selectedPageId)
     ? selectedPageId
     : 'cover'
+
+  const cakePlacement = card.cake.placement || 'end'
+  const hasValidPagePlacement =
+    cakePlacement !== 'end' &&
+    (cakePlacement === 'cover' ||
+      card.pages.some((p) => p.id === cakePlacement))
+  const effectiveCakePlacement = hasValidPagePlacement ? cakePlacement : 'end'
 
   const allPageIds = ['cover', ...card.pages.map((p) => p.id)]
   const currentPageIndex = Math.max(0, allPageIds.indexOf(previewPageId))
@@ -408,20 +415,64 @@ export function CreatorPage({
               >
                 📇 အဖုံး
               </button>
-              {card.pages.map((p, idx) => (
+
+              {card.cake.enabled && effectiveCakePlacement === 'cover' && (
                 <button
-                  key={p.id}
                   type="button"
-                  className={`stage-page-dot ${selectedPageId === p.id ? 'active' : ''}`}
+                  className="stage-page-dot cake-indicator"
                   onClick={() => {
-                    setSelectedPageId(p.id)
-                    setSelectedPhotoId(null)
+                    setView('cake')
+                    setStep('cake')
                   }}
-                  title={p.title || `စာမျက်နှာ ${idx + 1}`}
+                  title="ကိတ်မုန့် (မျက်နှာဖုံး အပြီးတွင် ပေါ်မည်)"
                 >
-                  📄 {idx + 1}
+                  🎂 ကိတ်
                 </button>
+              )}
+
+              {card.pages.map((p, idx) => (
+                <Fragment key={p.id}>
+                  <button
+                    type="button"
+                    className={`stage-page-dot ${selectedPageId === p.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedPageId(p.id)
+                      setSelectedPhotoId(null)
+                    }}
+                    title={p.title || `စာမျက်နှာ ${idx + 1}`}
+                  >
+                    📄 {idx + 1}
+                  </button>
+                  {card.cake.enabled && effectiveCakePlacement === p.id && (
+                    <button
+                      type="button"
+                      className="stage-page-dot cake-indicator"
+                      onClick={() => {
+                        setView('cake')
+                        setStep('cake')
+                      }}
+                      title={`ကိတ်မုန့် (စာမျက်နှာ ${idx + 1} အပြီးတွင် ပေါ်မည်)`}
+                    >
+                      🎂 ကိတ်
+                    </button>
+                  )}
+                </Fragment>
               ))}
+
+              {card.cake.enabled && effectiveCakePlacement === 'end' && (
+                <button
+                  type="button"
+                  className="stage-page-dot cake-indicator"
+                  onClick={() => {
+                    setView('cake')
+                    setStep('cake')
+                  }}
+                  title="ကိတ်မုန့် (ကတ်ရဲ့ နောက်ဆုံးတွင် ပေါ်မည်)"
+                >
+                  🎂 ကိတ်
+                </button>
+              )}
+
               {card.pages.length < MAX_PAGES && (
                 <button
                   type="button"

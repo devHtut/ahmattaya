@@ -42,6 +42,7 @@ export const legacyCakeSchema = z.object({
   creamColor: color,
   accentColor: color,
   decoration: z.enum(['plain', 'pearls', 'berries']),
+  placement: z.string().max(80).optional(),
 })
 export const cakeSchema = legacyCakeSchema
   .extend({

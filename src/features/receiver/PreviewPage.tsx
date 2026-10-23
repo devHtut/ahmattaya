@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, RotateCcw } from 'lucide-react'
 import type { CardConfig } from '../../shared/models/card'
@@ -67,11 +67,28 @@ export function PreviewPage({
   const isWedding = card.occasion === 'wedding-invitation'
   const isAnniversary = card.occasion === 'anniversary'
 
+  const cakePlacement = card.cake.placement || 'end'
+  const hasValidPagePlacement =
+    cakePlacement !== 'end' &&
+    (cakePlacement === 'cover' ||
+      card.pages.some((p) => p.id === cakePlacement))
+  const effectiveCakePlacement = hasValidPagePlacement ? cakePlacement : 'end'
+
   const scenes: string[] = ['story-cover']
-  card.pages.forEach((p) => scenes.push(`story-page-${p.id}`))
+  if (card.cake.enabled && effectiveCakePlacement === 'cover') {
+    scenes.push('story-cake')
+  }
+  card.pages.forEach((p) => {
+    scenes.push(`story-page-${p.id}`)
+    if (card.cake.enabled && effectiveCakePlacement === p.id) {
+      scenes.push('story-cake')
+    }
+  })
   if (isWedding) scenes.push('story-wedding')
   if (isAnniversary) scenes.push('story-anniversary')
-  if (card.cake.enabled) scenes.push('story-cake')
+  if (card.cake.enabled && effectiveCakePlacement === 'end') {
+    scenes.push('story-cake')
+  }
   scenes.push('story-end')
 
   function getNextScene(currentId: string) {
@@ -167,6 +184,83 @@ export function PreviewPage({
     setMusicBlocked(false)
     pageRoot.current?.scrollTo({ top: 0, behavior: 'instant' })
   }
+  const renderCakeSection = () => {
+    if (!card.cake.enabled) return null
+    const isAtEnd = effectiveCakePlacement === 'end'
+    return (
+      <section
+        id="story-cake"
+        className="story-scene scene-cake"
+        aria-label="သင့်အတွက် Cake"
+      >
+        <Reveal>
+          <p className="scene-kicker">
+            {isAtEnd ? 'နောက်ဆုံး အံ့ဩစရာ' : 'သင့်အတွက် အမှတ်တရ'}
+          </p>
+          <h2 className="cake-scene-title">
+            {card.receiverName || 'သင့်'} အတွက် Cake လေး 🎂
+          </h2>
+          <div className="story-cake">
+            <CakePreview
+              recipe={card.cake}
+              extinguishedCandleIds={extinguishedCandles}
+              onToggleCandle={handleToggleCandle}
+            />
+          </div>
+          {candleCount > 0 && (
+            <div className="cake-actions">
+              {!allCandlesBlown ? (
+                <button
+                  type="button"
+                  className="cake-blow-btn"
+                  onClick={handleBlowAll}
+                >
+                  🕯️💨 ဆုတောင်းပြီး မီးမှုတ်မယ်
+                </button>
+              ) : (
+                <div className="cake-wish-banner" role="status">
+                  <h3>🎉 ဆုတောင်းပြည့်ပါစေ! ✨</h3>
+                  <p>မွေးနေ့/အမှတ်တရဆုမွန်ကောင်းများ အမြဲပြည့်စုံပါစေ။</p>
+                  <button
+                    type="button"
+                    className="button secondary"
+                    onClick={handleRelight}
+                  >
+                    🕯️ ဖယောင်းတိုင် ပြန်ထွန်းမယ်
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <p className="cake-wish">
+            {candleCount > 0
+              ? allCandlesBlown
+                ? 'ဆုတောင်းလေး တောင်းပြီးပါပြီ ✨ ကိတ်လေးကို လှည့်ကြည့်နိုင်ပါတယ်'
+                : 'ဖယောင်းတိုင်လေးများကို နှိပ်၍လည်း မီးငြိမ်းနိုင်ပါတယ် ✨'
+              : 'ကိတ်လေးကို လှည့်ကြည့်ရင်း ဆုတောင်းလေး တောင်းလိုက်ပါ ✨'}
+          </p>
+          <div className="cake-ar-action">
+            <button
+              type="button"
+              className="button secondary webar-trigger-button"
+              onClick={() => setArModalOpen(true)}
+            >
+              📱 လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် Cake ကြည့်မယ် (WebAR)
+            </button>
+          </div>
+        </Reveal>
+        <ScrollHint target={getNextScene('story-cake')} />
+        {arModalOpen && (
+          <WebARModal
+            recipe={card.cake}
+            cakeTitle={card.receiverName || 'Cake'}
+            onClose={() => setArModalOpen(false)}
+          />
+        )}
+      </section>
+    )
+  }
+
   const accent = card.appearance.colors.accent
   return (
     <main
@@ -247,23 +341,27 @@ export function PreviewPage({
             <ScrollHint target={getNextScene('story-cover')} />
           </section>
 
+          {effectiveCakePlacement === 'cover' && renderCakeSection()}
+
           {card.pages.map((page, index) => (
-            <section
-              id={`story-page-${page.id}`}
-              className="story-scene scene-page"
-              key={page.id}
-              aria-label={`စာမျက်နှာ ${index + 2}`}
-            >
-              <Reveal>
-                <p className="scene-kicker reveal-step-1">
-                  အမှတ်တရ {index + 1} / {card.pages.length}
-                </p>
-                <div className="story-card">
-                  <CardPreview card={card} pageId={page.id} />
-                </div>
-              </Reveal>
-              <ScrollHint target={getNextScene(`story-page-${page.id}`)} />
-            </section>
+            <Fragment key={page.id}>
+              <section
+                id={`story-page-${page.id}`}
+                className="story-scene scene-page"
+                aria-label={`စာမျက်နှာ ${index + 2}`}
+              >
+                <Reveal>
+                  <p className="scene-kicker reveal-step-1">
+                    အမှတ်တရ {index + 1} / {card.pages.length}
+                  </p>
+                  <div className="story-card">
+                    <CardPreview card={card} pageId={page.id} />
+                  </div>
+                </Reveal>
+                <ScrollHint target={getNextScene(`story-page-${page.id}`)} />
+              </section>
+              {effectiveCakePlacement === page.id && renderCakeSection()}
+            </Fragment>
           ))}
 
           {isWedding && (
@@ -302,75 +400,7 @@ export function PreviewPage({
             </section>
           )}
 
-          {card.cake.enabled && (
-            <section
-              id="story-cake"
-              className="story-scene scene-cake"
-              aria-label="သင့်အတွက် Cake"
-            >
-              <Reveal>
-                <p className="scene-kicker">နောက်ဆုံး အံ့ဩစရာ</p>
-                <h2 className="cake-scene-title">
-                  {card.receiverName || 'သင့်'} အတွက် Cake လေး 🎂
-                </h2>
-                <div className="story-cake">
-                  <CakePreview
-                    recipe={card.cake}
-                    extinguishedCandleIds={extinguishedCandles}
-                    onToggleCandle={handleToggleCandle}
-                  />
-                </div>
-                {candleCount > 0 && (
-                  <div className="cake-actions">
-                    {!allCandlesBlown ? (
-                      <button
-                        type="button"
-                        className="cake-blow-btn"
-                        onClick={handleBlowAll}
-                      >
-                        🕯️💨 ဆုတောင်းပြီး မီးမှုတ်မယ်
-                      </button>
-                    ) : (
-                      <div className="cake-wish-banner" role="status">
-                        <h3>🎉 ဆုတောင်းပြည့်ပါစေ! ✨</h3>
-                        <p>မွေးနေ့/အမှတ်တရဆုမွန်ကောင်းများ အမြဲပြည့်စုံပါစေ။</p>
-                        <button
-                          type="button"
-                          className="button secondary"
-                          onClick={handleRelight}
-                        >
-                          🕯️ ဖယောင်းတိုင် ပြန်ထွန်းမယ်
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-                <p className="cake-wish">
-                  {candleCount > 0
-                    ? allCandlesBlown
-                      ? 'ဆုတောင်းလေး တောင်းပြီးပါပြီ ✨ ကိတ်လေးကို လှည့်ကြည့်နိုင်ပါတယ်'
-                      : 'ဖယောင်းတိုင်လေးများကို နှိပ်၍လည်း မီးငြိမ်းနိုင်ပါတယ် ✨'
-                    : 'ကိတ်လေးကို လှည့်ကြည့်ရင်း ဆုတောင်းလေး တောင်းလိုက်ပါ ✨'}
-                </p>
-                <div className="cake-ar-action">
-                  <button
-                    type="button"
-                    className="button secondary webar-trigger-button"
-                    onClick={() => setArModalOpen(true)}
-                  >
-                    📱 လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် Cake ကြည့်မယ် (WebAR)
-                  </button>
-                </div>
-              </Reveal>
-              {arModalOpen && (
-                <WebARModal
-                  recipe={card.cake}
-                  cakeTitle={card.receiverName || 'Cake'}
-                  onClose={() => setArModalOpen(false)}
-                />
-              )}
-            </section>
-          )}
+          {effectiveCakePlacement === 'end' && renderCakeSection()}
 
           <section id="story-end" className="story-scene scene-end">
             <Reveal>

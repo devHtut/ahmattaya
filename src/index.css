@@ -760,6 +760,16 @@ legend {
   border-color: var(--ink);
   box-shadow: 0 2px 8px rgba(51, 42, 29, 0.2);
 }
+.stage-page-dot.cake-indicator {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--card));
+}
+.stage-page-dot.cake-indicator:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--card));
+  border-color: var(--accent);
+}
 .stage-page-add {
   width: 28px;
   height: 28px;

@@ -110,3 +110,26 @@ test('v6 migration preserves content and introduces a disabled cake; recipes rou
   assert.equal(saveDraft(storage, loaded.card), true)
   assert.deepEqual(loadDraft(storage).card.cake, loaded.card.cake)
 })
+test('cake placement supports end, cover and page ids and rejects oversized strings', () => {
+  const cake = createCake()
+  assert.equal(
+    cakeSchema.safeParse({ ...cake, placement: 'end' }).success,
+    true,
+  )
+  assert.equal(
+    cakeSchema.safeParse({ ...cake, placement: 'cover' }).success,
+    true,
+  )
+  assert.equal(
+    cakeSchema.safeParse({ ...cake, placement: 'page-123' }).success,
+    true,
+  )
+  assert.equal(
+    cakeSchema.safeParse({ ...cake, placement: undefined }).success,
+    true,
+  )
+  assert.equal(
+    cakeSchema.safeParse({ ...cake, placement: 'x'.repeat(81) }).success,
+    false,
+  )
+})

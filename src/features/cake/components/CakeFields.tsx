@@ -44,7 +44,13 @@ export function CakeFields({
                 <button
                   key={preset.id}
                   onClick={() =>
-                    onChange({ ...card, cake: cakeFromPreset(preset.id) })
+                    onChange({
+                      ...card,
+                      cake: {
+                        ...cakeFromPreset(preset.id),
+                        placement: card.cake.placement,
+                      },
+                    })
                   }
                 >
                   <CakeIllustration recipe={preset.recipe} />
@@ -56,7 +62,13 @@ export function CakeFields({
             <button
               className="button secondary cake-scratch"
               onClick={() =>
-                onChange({ ...card, cake: cakeFromPreset('blank') })
+                onChange({
+                  ...card,
+                  cake: {
+                    ...cakeFromPreset('blank'),
+                    placement: card.cake.placement,
+                  },
+                })
               }
             >
               အကြမ်းထည်ကနေ စမယ်
@@ -67,6 +79,68 @@ export function CakeFields({
             </p>
           </fieldset>
           <div className="fields">
+            <label>
+              ကိတ်မုန့် ပေါ်စေချင်သည့် နေရာ
+              <select
+                value={card.cake.placement || 'end'}
+                onChange={(e) => update({ placement: e.target.value })}
+              >
+                <option value="end">
+                  ကတ်ရဲ့ နောက်ဆုံးတွင် (မူရင်းပုံစံ · Climax)
+                </option>
+                <option value="cover">မျက်နှာဖုံး အပြီးတွင်</option>
+                {card.pages.map((p, idx) => (
+                  <option key={p.id} value={p.id}>
+                    စာမျက်နှာ {idx + 1} {p.title ? `(${p.title})` : ''}{' '}
+                    အပြီးတွင်
+                  </option>
+                ))}
+              </select>
+              <small className="field-hint">
+                {!card.cake.placement || card.cake.placement === 'end'
+                  ? 'စာမျက်နှာများ အားလုံး ဖတ်ပြီးမှ အဆုံးသတ်တွင် Surprise အဖြစ် ပေါ်ပါမည်။'
+                  : card.cake.placement === 'cover'
+                    ? 'မျက်နှာဖုံးဖွင့်ပြီးသည်နှင့် ချက်ချင်း ကိတ်မုန့် ပေါ်ပါမည်။'
+                    : 'ရွေးချယ်ထားသော စာမျက်နှာ အပြီးတွင် ကိတ်မုန့် ပေါ်ပါမည်။'}
+              </small>
+            </label>
+            <div
+              className="shelf-filter"
+              role="group"
+              aria-label="ကိတ်မုန့် နေရာ အမြန်ရွေးရန်"
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '6px',
+                margin: '-4px 0 12px',
+              }}
+            >
+              <button
+                type="button"
+                className={`filter-pill ${!card.cake.placement || card.cake.placement === 'end' ? 'active' : ''}`}
+                onClick={() => update({ placement: 'end' })}
+              >
+                နောက်ဆုံးတွင် (Default)
+              </button>
+              <button
+                type="button"
+                className={`filter-pill ${card.cake.placement === 'cover' ? 'active' : ''}`}
+                onClick={() => update({ placement: 'cover' })}
+              >
+                အဖုံးအပြီး
+              </button>
+              {card.pages.map((p, idx) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`filter-pill ${card.cake.placement === p.id ? 'active' : ''}`}
+                  onClick={() => update({ placement: p.id })}
+                >
+                  စာမျက်နှာ {idx + 1} အပြီး
+                </button>
+              ))}
+            </div>
+
             <label>
               Cake သား
               <select
