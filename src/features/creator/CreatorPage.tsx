@@ -353,6 +353,11 @@ export function CreatorPage({
                     <CanvasWorkspace
                       card={card}
                       pageId={previewPageId}
+                      onSelectPage={(id) => {
+                        setSelectedPageId(id)
+                        setSelectedPhotoId(null)
+                        setSelectedElementId(null)
+                      }}
                       selectedId={selectedPhotoId}
                       onSelect={(id) => {
                         setSelectedPhotoId(id)
