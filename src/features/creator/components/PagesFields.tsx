@@ -25,7 +25,7 @@ export function PagesFields({
   selectedPhotoId,
   onSelectPhoto,
   selectedElementId = null,
-  onSelectElement = () => {},
+  onSelectElement = () => { },
 }: {
   card: CardConfig
   onChange: (card: CardConfig) => void
@@ -284,7 +284,7 @@ export function PagesFields({
                   <ImagePlus size={22} aria-hidden="true" />
                   <div className="compact-dropzone-text">
                     <label className="button ghost compact-file-btn">
-                      ပုံရွေးမယ် / ဆွဲထည့်မယ်
+                      Image Picker
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
@@ -297,9 +297,6 @@ export function PagesFields({
                         }}
                       />
                     </label>
-                    <span className="compact-file-badge">
-                      JPG, PNG, WebP · 15 MB အထိ (တစ်ကတ်လုံး {card.photos.length}/{MAX_PHOTOS} ပုံ)
-                    </span>
                   </div>
                 </div>
               </div>

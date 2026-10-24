@@ -25,12 +25,35 @@ export const legacyCardSchema = z.object({
   theme: z.enum(['lavender', 'rose', 'gold']),
 })
 const colorSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/)
-export const fontSchema = z.enum([
+export const fontOptions = [
   'Noto Sans Myanmar',
   'Padauk',
   'Plus Jakarta Sans',
   'Playfair Display',
-])
+  'Fraunces',
+  'handwriting',
+  'serif',
+  'sans',
+  'AJ 02',
+  'AJ 04',
+  'Aka02 Regular',
+  'Aka03 Regular',
+  'Aka05 Regular',
+  'Aka06 Regular',
+  'Aka07 Bold',
+  'Aka08 Regular',
+  'Aka09 Regular',
+  'Aka 007',
+] as const
+
+export const fontSchema = Object.assign(
+  z
+    .string()
+    .min(1)
+    .max(100)
+    .refine((val) => val !== 'unknown', { message: 'Invalid font' }),
+  { options: fontOptions },
+)
 const textStyleFields = {
   font: fontSchema,
   bold: z.boolean(),

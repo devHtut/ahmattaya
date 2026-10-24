@@ -5,9 +5,14 @@ import { occasions } from '../templates/templates'
 import { PhotoCanvas } from './PhotoCanvas'
 import { ElementCanvas } from './ElementCanvas'
 
+import { resolveFontFamily, getCustomFonts } from '../fonts/fonts-catalog'
+
 function textStyle(style: CardAppearance['heading']): CSSProperties {
+  const fontFamily =
+    resolveFontFamily(style.font) ||
+    `'${style.font}', 'Noto Sans Myanmar', sans-serif`
   return {
-    fontFamily: `'${style.font}', 'Noto Sans Myanmar', sans-serif`,
+    fontFamily,
     fontSize: `max(var(--card-min-type, 11px), ${style.size / 6}cqw)`,
     fontWeight: style.bold ? 700 : 400,
     fontStyle: style.italic ? 'italic' : 'normal',
@@ -34,6 +39,7 @@ export function CardPreview({
   onSelectElement?: (id: string | null) => void
   onCommitElement?: (id: string, frame: ElementFrame) => void
 }) {
+  getCustomFonts()
   const page = card.pages.find((item) => item.id === pageId)
   const background = page ? page.background : card.background
   const { url: backgroundUrl, failed: backgroundFailed } = useImageAsset(

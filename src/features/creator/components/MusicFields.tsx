@@ -89,7 +89,7 @@ export function MusicFields({
           />
           <span>
             <strong>သီချင်း မထည့်ဘူး</strong>
-            <small>တိတ်တိတ်လေး ဖတ်ရှုစေချင်တဲ့အခါ</small>
+            <small>တိတ်တိတ်လေး ဖတ်စေချင်တဲ့အခါ</small>
           </span>
         </label>
         {musicTracks.map((track) => (
@@ -167,10 +167,6 @@ export function MusicFields({
               }}
             />
           </label>
-          <p className="field-hint">
-            ဖိုင်ကို ဆွဲထည့်လည်း ရပါတယ်။ MP3 / M4A / WAV / OGG / WebM · 20 MB
-            အထိ၊ 15 မိနစ်အထိ။ Browser အလိုက် ဖွင့်နိုင်တဲ့ format ကွာနိုင်ပါတယ်။
-          </p>
         </div>
         {card.music.custom && (
           <button
@@ -237,8 +233,6 @@ export function MusicFields({
         </p>
       )}
       <p className="editor-note">
-        ကိုယ်ပိုင်သီချင်းကို ဒီ browser မှာ သိမ်းပြီး Cloud သိမ်းမယ်နှိပ်ရင်
-        သီချင်းပါ တင်ပေးပါတယ်။ ကိုယ်တိုင်အသုံးပြုခွင့်ရှိတဲ့ သီချင်းကို ရွေးပါ။
         ဖိတ်စာဖွင့်ချိန် သီချင်းပါ ဖွင့်မဖွင့်ကို “အဖွင့်ဖိတ်စာ” မှာ
         ရွေးနိုင်ပါတယ်။
       </p>

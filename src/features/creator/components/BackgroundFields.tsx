@@ -131,7 +131,7 @@ export function BackgroundFields({
             <ImagePlus size={22} aria-hidden="true" />
             <div className="compact-dropzone-text">
               <label className="button ghost compact-file-btn">
-                နောက်ခံပုံ ရွေးမယ် / ဆွဲထည့်မယ်
+                Background Image Picker
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -143,9 +143,6 @@ export function BackgroundFields({
                   }}
                 />
               </label>
-              <span className="compact-file-badge">
-                JPG, PNG, WebP · 15 MB အထိ
-              </span>
             </div>
           </div>
         )}

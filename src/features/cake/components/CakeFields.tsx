@@ -73,10 +73,6 @@ export function CakeFields({
             >
               အကြမ်းထည်ကနေ စမယ်
             </button>
-            <p className="field-hint">
-              Design အသစ်ရွေးရင် လက်ရှိ Cake settings ကို အစားထိုးပါမယ်။
-              အတွင်းစာမျက်နှာတွေ မပြောင်းပါ။
-            </p>
           </fieldset>
           <div className="fields">
             <label>

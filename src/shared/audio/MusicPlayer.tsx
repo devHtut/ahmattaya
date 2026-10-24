@@ -53,9 +53,6 @@ export function MusicPlayer({
           သီချင်းဖိုင် ပြန်ရွေးပေးပါ။
         </p>
       )}
-      <p className="field-hint">
-        Play / Pause နဲ့ အသံကို ထိန်းချုပ်နိုင်ပါတယ်။
-      </p>
     </div>
   )
 }

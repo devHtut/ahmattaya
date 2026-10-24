@@ -3,6 +3,8 @@ import { BackgroundFields } from './BackgroundFields'
 import type { CardAppearance, CardConfig } from '../../../shared/models/card'
 import { fontSchema } from '../../../shared/models/card'
 import { palettes } from '../../../shared/templates/card-styles'
+import { TEXT_FONTS } from '../../../shared/ui/ElementShapes'
+import { getCustomFonts } from '../../../shared/fonts/fonts-catalog'
 
 const colorLabels: { key: keyof CardAppearance['colors']; label: string }[] = [
   { key: 'background', label: 'နောက်ခံရောင်' },
@@ -19,6 +21,9 @@ export function StyleFields({
 }) {
   const [target, setTarget] = useState<'heading' | 'body'>('heading')
   const style = card.appearance[target]
+  const standardFonts = TEXT_FONTS
+  const customFonts = getCustomFonts()
+
   const updateText = (change: Partial<typeof style>) =>
     onChange({
       ...card,
@@ -115,11 +120,28 @@ export function StyleFields({
                 updateText({ font: fontSchema.parse(e.target.value) })
               }
             >
-              {fontSchema.options.map((font) => (
-                <option key={font} value={font}>
-                  {font}
-                </option>
-              ))}
+              <optgroup label="အခြေခံ Fonts (Standard)">
+                {standardFonts.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.label}
+                  </option>
+                ))}
+              </optgroup>
+              {customFonts.length > 0 && (
+                <optgroup
+                  label={`ထည့်ထားသော မြန်မာ Fonts (${customFonts.length})ခု`}
+                >
+                  {customFonts.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {!standardFonts.some((f) => f.id === style.font) &&
+                !customFonts.some((f) => f.id === style.font) && (
+                  <option value={style.font}>{style.font}</option>
+                )}
             </select>
           </label>
           <label>
@@ -165,10 +187,6 @@ export function StyleFields({
             </select>
           </label>
         </div>
-        <p className="field-hint">
-          မြန်မာစာအတွက် Noto Sans Myanmar သို့မဟုတ် Padauk ရွေးနိုင်ပါတယ်။
-          English font ရွေးလည်း မြန်မာစာကို ဆက်ဖတ်နိုင်ပါတယ်။
-        </p>
       </fieldset>
     </div>
   )

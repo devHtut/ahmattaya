@@ -62,6 +62,8 @@ export function getAllAvailableFonts(): FontOption[] {
 
 export function resolveFontFamily(fontId?: string): string | undefined {
   if (!fontId || fontId === 'inherit' || fontId === 'system') return undefined
+  const match = TEXT_FONTS.find((f) => f.id === fontId)
+  if (match) return match.family
   if (fontId === 'serif') return `'Fraunces', serif`
   if (fontId === 'sans') return `'Nunito Sans', sans-serif`
   if (fontId === 'handwriting') return `'Playwrite CU', cursive`
