@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { CloudConnection } from '../publishing/CloudConnection'
 import { PublishCard } from '../publishing/PublishCard'
+import {
+  CloudSyncButton,
+  type CloudSyncHandle,
+} from '../publishing/CloudSyncButton'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Check,
@@ -45,9 +48,8 @@ export function EditorToolbar({
   }
 
   const shareDialog = useRef<HTMLDialogElement>(null)
-  const cloudDialog = useRef<HTMLDialogElement>(null)
   const exportDialog = useRef<HTMLDialogElement>(null)
-  const [cloudOpened, setCloudOpened] = useState(false)
+  const cloudSyncRef = useRef<CloudSyncHandle>(null)
   const [shareOpened, setShareOpened] = useState(false)
 
   const handleExplicitSave = useCallback(() => {
@@ -193,17 +195,7 @@ export function EditorToolbar({
         </span>
       </div>
 
-      <button
-        className="icon-button"
-        aria-label="Cloud ကတ်များ"
-        title="တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cross-Device Cloud Sync)"
-        onClick={() => {
-          setCloudOpened(true)
-          cloudDialog.current?.showModal()
-        }}
-      >
-        <Cloud size={17} />
-      </button>
+      <CloudSyncButton ref={cloudSyncRef} workspace={w} />
 
       <div className="bar-history">
         <button
@@ -424,8 +416,7 @@ export function EditorToolbar({
             }}
             onClick={() => {
               shareDialog.current?.close()
-              setCloudOpened(true)
-              cloudDialog.current?.showModal()
+              cloudSyncRef.current?.open()
             }}
           >
             <Cloud size={14} />
@@ -441,41 +432,6 @@ export function EditorToolbar({
             <Eye size={16} /> ကိုယ့်ကတ် နမူနာကြည့်မယ်
           </Link>
         </div>
-      </dialog>
-
-      <dialog
-        ref={cloudDialog}
-        onClose={() => {
-          if (!cloudDialog.current?.open) setCloudOpened(false)
-        }}
-        className="share-dialog"
-        aria-labelledby="cloud-heading"
-      >
-        <div className="share-dialog-header">
-          <h2 id="cloud-heading">တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cloud Sync)</h2>
-          <button
-            className="icon-button"
-            aria-label="ပိတ်မယ်"
-            onClick={() => cloudDialog.current?.close()}
-          >
-            <X size={16} />
-          </button>
-        </div>
-        <p className="share-dialog-desc">
-          အီးမေးလ်ဖြင့် အကောင့်ဝင်ထားပါက လက်ရှိဖန်တီးထားသော ကတ်များကို အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာများမှလည်း အချိန်မရွေး ပြန်လည်ဖွင့်ဖောက်ပြင်ဆင်နိုင်မည် ဖြစ်ပါသည်။
-        </p>
-        {(w.saveStatus === 'error' || w.saveStatus === 'blocked') && (
-          <p role="alert" className="music-error">
-            လက်ရှိပြင်ထားတာတွေ မသိမ်းရသေးပါ။ Editor မှာ သိမ်းဆည်းမှုအခြေအနေကို
-            ပြန်စစ်ပေးပါ။
-          </p>
-        )}
-        {cloudOpened && (
-          <CloudConnection
-            workspace={w}
-            onRestored={() => cloudDialog.current?.close()}
-          />
-        )}
       </dialog>
     </header>
   )

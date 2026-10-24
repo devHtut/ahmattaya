@@ -1,12 +1,9 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Cloud, Copy, Plus, RotateCcw, Trash2, X } from 'lucide-react'
+import { Copy, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from '../creator/components/DraftStatus'
-import { CloudConnection } from '../publishing/CloudConnection'
-import { useCloudIdentity } from '../publishing/useCloudIdentity'
-import { isPermanentAccount } from '../../shared/cloud/account'
 
 export function ProjectsPage({
   workspace: w,
@@ -15,11 +12,7 @@ export function ProjectsPage({
 }) {
   const [tab, setTab] = useState<'projects' | 'trash'>('projects')
   const [selected, setSelected] = useState<string[]>([])
-  const [cloudOpened, setCloudOpened] = useState(false)
   const confirmation = useRef<HTMLDialogElement>(null)
-  const cloudDialog = useRef<HTMLDialogElement>(null)
-  const identity = useCloudIdentity()
-  const isPermanent = isPermanentAccount(identity.user)
   const navigate = useNavigate()
   const isTrash = tab === 'trash'
   const items = w.projects
@@ -214,73 +207,6 @@ export function ProjectsPage({
       {items.length === 0 && (
         <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
       )}
-      <div className="cloud-sync-banner">
-        <div className="cloud-sync-banner-info">
-          <div
-            className={`cloud-sync-icon-badge ${isPermanent ? 'success' : ''}`}
-          >
-            <Cloud size={20} />
-          </div>
-          <div>
-            <h3>
-              {isPermanent
-                ? 'Cloud နှင့် ချိတ်ဆက်ထားပြီးပါပြီ'
-                : 'ကတ်များကို Cloud ပေါ် သိမ်းဆည်းထားမလား'}
-            </h3>
-            <p>
-              {isPermanent
-                ? `${identity.user?.email} ဖြင့် ချိတ်ဆက်ထားပြီး အခြားစက်များမှ အချိန်မရွေး ဝင်ရောက်နိုင်ပါသည်`
-                : 'အခြားဖုန်း သို့မဟုတ် ကွန်ပျူတာများမှ အချိန်မရွေး ပြန်ဖွင့်ပြင်ဆင်နိုင်ရန် အကောင့်ဝင်ထားပါ (အခမဲ့)'}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          className="button secondary cloud-sync-banner-btn"
-          onClick={() => {
-            setCloudOpened(true)
-            cloudDialog.current?.showModal()
-          }}
-        >
-          <Cloud size={15} />
-          <span>
-            {isPermanent ? 'Cloud စီမံရန်' : 'အကောင့်ဝင်ရန် / ဖွင့်ရန်'}
-          </span>
-        </button>
-      </div>
-
-      <dialog
-        ref={cloudDialog}
-        onClose={() => {
-          if (!cloudDialog.current?.open) setCloudOpened(false)
-        }}
-        className="share-dialog"
-        aria-labelledby="cloud-dialog-heading"
-      >
-        <div className="share-dialog-header">
-          <h2 id="cloud-dialog-heading">
-            တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cloud Sync)
-          </h2>
-          <button
-            className="icon-button"
-            aria-label="ပိတ်မယ်"
-            onClick={() => cloudDialog.current?.close()}
-          >
-            <X size={16} />
-          </button>
-        </div>
-        <p className="share-dialog-desc">
-          အီးမေးလ်ဖြင့် အကောင့်ဝင်ထားပါက လက်ရှိဖန်တီးထားသော ကတ်များကို အခြားဖုန်း
-          သို့မဟုတ် ကွန်ပျူတာများမှလည်း အချိန်မရွေး ပြန်လည်ဖွင့်ဖောက်ပြင်ဆင်နိုင်မည်
-          ဖြစ်ပါသည်။
-        </p>
-        {cloudOpened && (
-          <CloudConnection
-            workspace={w}
-            onRestored={() => cloudDialog.current?.close()}
-          />
-        )}
-      </dialog>
     </main>
   )
 }

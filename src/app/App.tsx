@@ -8,6 +8,7 @@ import { PreviewPage } from '../features/receiver/PreviewPage'
 import { ProjectsPage } from '../features/projects/ProjectsPage'
 import { EditorToolbar } from '../features/projects/EditorToolbar'
 import { useCreatorDraft } from '../features/creator/hooks/useCreatorDraft'
+import { CloudSyncButton } from '../features/publishing/CloudSyncButton'
 
 const ReceiverRoutes = lazy(
   () => import('../features/receiver/PublishedCardPage'),
@@ -72,6 +73,7 @@ function EditorApp() {
                 <FolderKanban size={16} />
                 <span>ကတ်များ</span>
               </Link>
+              <CloudSyncButton workspace={workspace} />
               {workspace.hasActiveProject ? (
                 <Link
                   to="/create"
