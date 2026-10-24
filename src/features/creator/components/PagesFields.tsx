@@ -168,7 +168,7 @@ export function PagesFields({
         <div className="cover-content-container">
           <div className="fields cover-fields">
             <label>
-              အခမ်းအနား
+              အထိမ်းအမှတ်
               <select
                 value={card.occasion}
                 onChange={(e) =>

@@ -374,7 +374,7 @@ export function PreviewPage({
               aria-label="မင်္ဂလာဖိတ်ကြားလွှာ အချက်အလက်များ"
             >
               <Reveal>
-                <p className="scene-kicker">မင်္ဂလာအခမ်းအနား အစီအစဉ်</p>
+                <p className="scene-kicker">မင်္ဂလာ အစီအစဉ်</p>
                 <WeddingEventCard
                   wedding={card.event?.wedding}
                   cardId={cardId}

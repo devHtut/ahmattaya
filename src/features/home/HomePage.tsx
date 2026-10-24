@@ -74,7 +74,7 @@ export function HomePage() {
 
       <section className="occasion-section page-width">
         <span className="eyebrow">Which Occasion?</span>
-        <h2>ဖန်တီးချင်တဲ့ အခမ်းအနား ရွေးပါ</h2>
+        <h2>ဖန်တီးချင်တဲ့ အထိမ်းအမှတ် ရွေးပါ</h2>
         <div className="occasion-grid">
           {occasions.map((item) => (
             <Link

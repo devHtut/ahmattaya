@@ -160,7 +160,7 @@ export function TemplatesPage({
         <div
           className="album-filter"
           role="group"
-          aria-label="အခမ်းအနားအလိုက် စစ်ထုတ်ရန်"
+          aria-label="အထိမ်းအမှတ်အလိုက် စစ်ထုတ်ရန်"
         >
           <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
             All

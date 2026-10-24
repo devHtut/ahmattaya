@@ -365,7 +365,7 @@ export function EventFields({
           ဒီကတ်သည် <strong>{card.occasion}</strong> ပုံစံ ဖြစ်နေပါသည်။
           မင်္ဂလာပွဲရက်စွဲ၊ ခန်းမနေရာ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ်
           နှစ်ပတ်လည် / မွေးနေ့ Timeline အသုံးပြုလိုပါက အပေါ်က “စာသား” အဆင့်တွင်
-          အခမ်းအနားကို “မင်္ဂလာဖိတ်စာ”၊ “နှစ်ပတ်လည်” သို့မဟုတ် “မွေးနေ့” အဖြစ်
+          အထိမ်းအမှတ်ကို “မင်္ဂလာဖိတ်စာ”၊ “နှစ်ပတ်လည်” သို့မဟုတ် “မွေးနေ့” အဖြစ်
           ပြောင်းလဲပေးပါ။
         </p>
       </div>
@@ -788,14 +788,14 @@ export function EventFields({
                     className={`alarm-mode-btn ${displayMode === 'years-months' ? 'active' : ''}`}
                     onClick={() => handleModeChange('years-months')}
                   >
-                    နှစ် နှင့် လ (Years & Months)
+                    နှစ် နှင့် လ
                   </button>
                   <button
                     type="button"
                     className={`alarm-mode-btn ${displayMode === 'days' ? 'active' : ''}`}
                     onClick={() => handleModeChange('days')}
                   >
-                    ရက်ပေါင်း (Total Days)
+                    ရက်ပေါင်း
                   </button>
                 </div>
               )}
@@ -876,7 +876,7 @@ export function EventFields({
                       >
                         <ChevronDown size={16} />
                       </button>
-                      <span className="alarm-digit-label">နှစ် (Years)</span>
+                      <span className="alarm-digit-label">Years</span>
                     </div>
 
                     <div className="alarm-separator">:</div>
@@ -914,7 +914,7 @@ export function EventFields({
                       >
                         <ChevronDown size={16} />
                       </button>
-                      <span className="alarm-digit-label">လ (Months)</span>
+                      <span className="alarm-digit-label">Months</span>
                     </div>
                   </>
                 ) : (

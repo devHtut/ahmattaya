@@ -67,7 +67,7 @@ export function WeddingEventCard({
         <div className="wedding-info-card">
           <div className="wedding-header">
             <span className="wedding-badge">
-              <Heart size={14} className="heart-icon" /> မင်္ဂလာအခမ်းအနား
+              <Heart size={14} className="heart-icon" /> မင်္ဂလာ အစီအစဉ်
             </span>
             {coupleNames && <h3 className="wedding-couple">{coupleNames}</h3>}
           </div>
