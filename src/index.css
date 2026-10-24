@@ -526,35 +526,20 @@ legend {
   gap: 6px;
   padding: 8px 12px;
   border-radius: 10px;
-  border: 1px solid transparent;
   font-size: 12px;
   font-weight: 700;
   color: var(--ink-soft);
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: color 0.15s ease;
 }
 .bar-link:hover {
-  color: var(--ink);
-  background: var(--card);
-  border-color: var(--line);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(60, 40, 20, 0.08);
+  color: var(--accent);
 }
 .bar-link.active {
   color: var(--accent-deep);
   background: var(--accent-soft);
-  border-color: rgba(184, 75, 41, 0.25);
 }
 .bar-link.active:hover {
   color: var(--accent-deep);
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 10px rgba(184, 75, 41, 0.15);
 }
 
 /* File menu */
