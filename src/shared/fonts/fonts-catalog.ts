@@ -60,3 +60,11 @@ export function getCustomFonts(): FontOption[] {
 export function getAllAvailableFonts(): FontOption[] {
   return [...TEXT_FONTS, ...getCustomFonts()]
 }
+
+export function resolveFontFamily(fontId?: string): string | undefined {
+  if (!fontId || fontId === 'inherit' || fontId === 'system') return undefined
+  if (fontId === 'serif') return `'Fraunces', serif`
+  if (fontId === 'sans') return `'Nunito Sans', sans-serif`
+  if (fontId === 'handwriting') return `'Playwrite CU', cursive`
+  return `'${fontId}', 'Noto Sans Myanmar', sans-serif`
+}
