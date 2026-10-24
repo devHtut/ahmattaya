@@ -163,7 +163,7 @@ export function TemplatesPage({
           aria-label="အခမ်းအနားအလိုက် စစ်ထုတ်ရန်"
         >
           <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
-            အားလုံး
+            All
           </button>
           {occasions.map((item) => (
             <button

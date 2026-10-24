@@ -11,7 +11,6 @@ import {
   ExternalLink,
   Plus,
   RotateCcw,
-  Sparkles,
   Trash2,
   Users,
   X,
@@ -644,8 +643,7 @@ export function EventFields({
                 color: 'var(--ink, #1e293b)',
               }}
             >
-              <Sparkles size={16} color="var(--accent, #e11d48)" /> မွေးနေ့
-              အမှတ်တရ Timeline ထည့်သွင်းမည်
+              မွေးနေ့ အမှတ်တရ Timeline ထည့်သွင်းမည်
             </strong>
             <p
               style={{
