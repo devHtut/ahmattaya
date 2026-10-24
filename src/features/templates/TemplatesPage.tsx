@@ -156,27 +156,29 @@ export function TemplatesPage({
       {['error', 'blocked'].includes(w.saveStatus) && (
         <DraftStatus status={w.saveStatus} onRetry={w.retrySave} />
       )}
-      <div
-        className="album-filter"
-        role="group"
-        aria-label="အခမ်းအနားအလိုက် စစ်ထုတ်ရန်"
-      >
-        <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
-          All
-        </button>
-        {occasions.map((item) => (
-          <button
-            key={item.id}
-            aria-pressed={filter === item.id}
-            onClick={() => setParams({ occasion: item.id })}
-          >
-            {item.icon} {item.name}
+      <div className="album-toolbar">
+        <div
+          className="album-filter"
+          role="group"
+          aria-label="အခမ်းအနားအလိုက် စစ်ထုတ်ရန်"
+        >
+          <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
+            အားလုံး
           </button>
-        ))}
+          {occasions.map((item) => (
+            <button
+              key={item.id}
+              aria-pressed={filter === item.id}
+              onClick={() => setParams({ occasion: item.id })}
+            >
+              {item.icon} {item.name}
+            </button>
+          ))}
+        </div>
+        <p className="album-count" role="status">
+          Total : {templates.length}
+        </p>
       </div>
-      <p className="album-count" role="status">
-        နမူနာ {templates.length} ခု
-      </p>
       <div className="album-grid">
         {templates.map((template) => {
           const card = createTemplateCard(template.id)!

@@ -3434,11 +3434,18 @@ footer {
 .album {
   padding-block: 40px 80px;
 }
+.album-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 28px 0 24px;
+}
 .album-filter {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 24px 0 16px;
 }
 .album-filter button {
   border: 1px solid var(--line);
@@ -3462,8 +3469,11 @@ footer {
 }
 .album-count {
   color: var(--ink-soft);
-  font-size: 12px;
-  margin-bottom: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0;
+  white-space: nowrap;
 }
 .album-grid {
   display: grid;
