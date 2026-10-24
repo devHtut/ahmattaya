@@ -59,7 +59,7 @@ function EditorApp() {
               <Link
                 to="/templates"
                 className={`bar-link ${location.pathname === '/templates' ? 'active' : ''}`}
-                title="နမူနာများ"
+                title="Templates"
               >
                 <LayoutTemplate size={16} />
                 <span>နမူနာ</span>

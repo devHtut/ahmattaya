@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { occasions, createCard } from '../../shared/templates/templates'
 import { CardPreview } from '../../shared/ui/CardPreview'
 
@@ -17,7 +17,7 @@ export function HomePage() {
       <section className="foyer-lead page-width">
         <div className="foyer-copy">
           <span className="pill">
-            <Sparkles size={14} /> ကိုယ်ပိုင် ဒီဇိုင်းနဲ့ ကတ်ဖန်တီးရုံ
+            Build Cards With Love
           </span>
           <h1>
             ရင်ထဲက စကားလေးတွေကို
@@ -26,8 +26,7 @@ export function HomePage() {
           </h1>
           <p>
             ချစ်ရသူတွေအတွက် မွေးနေ့ဆုတောင်း၊ မင်္ဂလာဖိတ်စာနဲ့
-            အထူးအခိုက်အတန့်လေးတွေကို ကိုယ်ပိုင်ပုံစံနဲ့ ဖန်တီးလိုက်ပါ။ ကြေး
-            ကောက်စရာမလို — သင်ပဲ ဒီဇိုင်နာပါ။
+            အထူးအခိုက်အတန့်လေးတွေကို ကိုယ်တိုင်ဖန်တီးလိုက်ပါ။
           </p>
           <div className="foyer-actions">
             <Link className="button primary" to="/create">
@@ -37,9 +36,6 @@ export function HomePage() {
               နမူနာများ ကြည့်မယ်
             </Link>
           </div>
-          <p className="foyer-note">
-            အခမဲ့ · ဒီ browser ထဲမှာ သိမ်းပါမယ် · မြန်မာနဲ့ English
-          </p>
         </div>
 
         <div className="foyer-table" aria-hidden="true">
@@ -58,26 +54,26 @@ export function HomePage() {
           <div className="craft-item">
             <span className="craft-num">၁</span>
             <h3>နမူနာ ရွေးပါ</h3>
-            <p>အသင့်ပုံစံတစ်ခုကနေ စတင်ပါ၊ ဒါမှမဟုတ် ဗလာစာမျက်နှာနဲ့ စပါ။</p>
+            <p>အသင့်ရှိပြီးသားပုံစံတစ်ခုကနေစတင်ပါ၊ ဒါမှမဟုတ် Blank Cardနဲ့ စပါ။</p>
           </div>
           <div className="craft-item">
             <span className="craft-num">၂</span>
-            <h3>ကိုယ့်စကား ရေးပါ</h3>
+            <h3>ရင်ထဲက ခံစားချက်လေးတွေ ထည့်ပါ</h3>
             <p>
-              အမည်၊ ခေါင်းစဉ်၊ စကားလေးတွေ၊ ပုံတွေ၊ သီချင်းနဲ့ ကိတ်မုန့်ကိတ်မုန့်
+              အမည်၊ ခေါင်းစဉ်၊ စကားလေးတွေ၊ ပုံတွေ၊ သီချင်းနဲ့ ကိတ်မုန့်
               ထည့်ပါ။
             </p>
           </div>
           <div className="craft-item">
             <span className="craft-num">၃</span>
             <h3>ချစ်ရသူဆီ ပို့ပါ</h3>
-            <p>ဖိတ်စာကို ဖွင့်ကြည့်ပြီး၊ မျှဝေဖို့ link လေးကို ကော်ပီပါ။</p>
+            <p>ဖိတ်စာကို ဖွင့်ကြည့်ပြီး၊ မျှဝေဖို့ link လေးကို Copy ပါ။</p>
           </div>
         </div>
       </section>
 
       <section className="occasion-section page-width">
-        <span className="eyebrow">ဘယ်အမှတ်တရလေးလဲ</span>
+        <span className="eyebrow">Which Occasion?</span>
         <h2>ဖန်တီးချင်တဲ့ အခမ်းအနား ရွေးပါ</h2>
         <div className="occasion-grid">
           {occasions.map((item) => (

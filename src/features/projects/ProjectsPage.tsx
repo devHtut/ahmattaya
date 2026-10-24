@@ -28,10 +28,9 @@ export function ProjectsPage({
     <main id="main-content" className="page-width shelf-page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">ကတ်များ စာ/စာ</span>
-          <h1>ကျွန်တော့် ကတ်များ</h1>
+          <h1>My Cards</h1>
           <p className="muted">
-            ဒီ browser ထဲမှာ သိမ်းထားတဲ့ ကတ်များ · ပြင်ဆင်နေဆဲအမှတ်တရများ
+            ပြင်ဆင်နေဆဲအမှတ်တရများ
           </p>
         </div>
         <button
@@ -64,7 +63,7 @@ export function ProjectsPage({
             setSelected([])
           }}
         >
-          ဖျက်ထားတာ ({w.projects.filter((p) => p.deleted).length})
+          ဖျက်ထားသောကတ်များ ({w.projects.filter((p) => p.deleted).length})
         </button>
       </div>
       {isTrash && items.length > 0 && (
@@ -127,85 +126,85 @@ export function ProjectsPage({
           </button>
         </div>
       </dialog>
-          <div className="shelf-grid">
-            {items.map((project) => (
-              <article className="shelf-card" key={project.id}>
-                <div className="shelf-thumb" aria-hidden="true">
-                  <div>
-                    <CardPreview card={project.card} />
-                  </div>
-                </div>
-                <div className="shelf-card-body">
-                  {isTrash && (
-                    <label className="trash-card-select">
-                      <input
-                        type="checkbox"
-                        aria-label={`${project.name} ကို ရွေးမယ်`}
-                        checked={selected.includes(project.id)}
-                        onChange={(e) =>
-                          setSelected((ids) =>
-                            e.target.checked
-                              ? [...ids, project.id]
-                              : ids.filter((id) => id !== project.id),
-                          )
-                        }
-                      />
-                      <span>ရွေးမယ်</span>
-                    </label>
-                  )}
-                  <h2>{project.name}</h2>
-                  <p className="muted">
-                    နောက်ဆုံး ပြင်တာ ·{' '}
-                    {new Date(project.updatedAt).toLocaleString()}
-                  </p>
-                  <div className="shelf-card-actions">
-                    {isTrash ? (
-                      <button
-                        className="button secondary"
-                        onClick={() => {
-                          w.trash(project.id, false)
-                          setSelected((ids) =>
-                            ids.filter((id) => id !== project.id),
-                          )
-                        }}
-                      >
-                        <RotateCcw size={16} /> ပြန်ယူမယ်
-                      </button>
-                    ) : (
-                      <>
-                        <Link
-                          className="button primary"
-                          to="/create"
-                          onClick={() => w.open(project.id)}
-                        >
-                          ဆက်ပြင်မယ်
-                        </Link>
-                        <button
-                          className="icon-button"
-                          aria-label="မိတ္တူပွားမယ် (Duplicate)"
-                          title="မိတ္တူပွားမယ် (Duplicate)"
-                          onClick={() => {
-                            w.duplicate(project.id)
-                            navigate('/create')
-                          }}
-                        >
-                          <Copy size={16} />
-                        </button>
-                        <button
-                          className="icon-button"
-                          aria-label="ဖျက်မယ်"
-                          title="ဖျက်မယ်"
-                          onClick={() => w.trash(project.id, true)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+      <div className="shelf-grid">
+        {items.map((project) => (
+          <article className="shelf-card" key={project.id}>
+            <div className="shelf-thumb" aria-hidden="true">
+              <div>
+                <CardPreview card={project.card} />
+              </div>
+            </div>
+            <div className="shelf-card-body">
+              {isTrash && (
+                <label className="trash-card-select">
+                  <input
+                    type="checkbox"
+                    aria-label={`${project.name} ကို ရွေးမယ်`}
+                    checked={selected.includes(project.id)}
+                    onChange={(e) =>
+                      setSelected((ids) =>
+                        e.target.checked
+                          ? [...ids, project.id]
+                          : ids.filter((id) => id !== project.id),
+                      )
+                    }
+                  />
+                  <span>ရွေးမယ်</span>
+                </label>
+              )}
+              <h2>{project.name}</h2>
+              <p className="muted">
+                {' '}
+                {new Date(project.updatedAt).toLocaleString()} တွင်နောက်ဆုံးပြင်ဆင်ခဲ့သည်
+              </p>
+              <div className="shelf-card-actions">
+                {isTrash ? (
+                  <button
+                    className="button secondary"
+                    onClick={() => {
+                      w.trash(project.id, false)
+                      setSelected((ids) =>
+                        ids.filter((id) => id !== project.id),
+                      )
+                    }}
+                  >
+                    <RotateCcw size={16} /> ပြန်ယူမယ်
+                  </button>
+                ) : (
+                  <>
+                    <Link
+                      className="button primary"
+                      to="/create"
+                      onClick={() => w.open(project.id)}
+                    >
+                      ဆက်ပြင်မယ်
+                    </Link>
+                    <button
+                      className="icon-button"
+                      aria-label="မိတ္တူပွားမယ် (Duplicate)"
+                      title="မိတ္တူပွားမယ် (Duplicate)"
+                      onClick={() => {
+                        w.duplicate(project.id)
+                        navigate('/create')
+                      }}
+                    >
+                      <Copy size={16} />
+                    </button>
+                    <button
+                      className="icon-button"
+                      aria-label="ဖျက်မယ်"
+                      title="ဖျက်မယ်"
+                      onClick={() => w.trash(project.id, true)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
       {items.length === 0 && (
         <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
       )}

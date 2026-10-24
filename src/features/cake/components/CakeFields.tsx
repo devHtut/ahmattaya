@@ -189,7 +189,7 @@ export function CakeFields({
                 gap: '8px',
               }}
             >
-              📱 လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် စမ်းကြည့်မည် (WebAR)
+              (WebAR) စမ်းကြည့်မယ်
             </button>
           </div>
         </>

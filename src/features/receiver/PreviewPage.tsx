@@ -66,6 +66,9 @@ export function PreviewPage({
 
   const isWedding = card.occasion === 'wedding-invitation'
   const isAnniversary = card.occasion === 'anniversary'
+  const isBirthdayTimeline =
+    card.occasion === 'birthday' && Boolean(card.event?.anniversary?.enabled)
+  const hasTimeline = isAnniversary || isBirthdayTimeline
 
   const cakePlacement = card.cake.placement || 'end'
   const hasValidPagePlacement =
@@ -85,7 +88,7 @@ export function PreviewPage({
     }
   })
   if (isWedding) scenes.push('story-wedding')
-  if (isAnniversary) scenes.push('story-anniversary')
+  if (hasTimeline) scenes.push('story-anniversary')
   if (card.cake.enabled && effectiveCakePlacement === 'end') {
     scenes.push('story-cake')
   }
@@ -382,18 +385,27 @@ export function PreviewPage({
             </section>
           )}
 
-          {isAnniversary && (
+          {hasTimeline && (
             <section
               id="story-anniversary"
               className="story-scene scene-anniversary"
-              aria-label="နှစ်ပတ်လည် အမှတ်တရ မှတ်တိုင်များ"
+              aria-label={
+                isBirthdayTimeline
+                  ? 'မွေးနေ့ အမှတ်တရ မှတ်တိုင်များ'
+                  : 'နှစ်ပတ်လည် အမှတ်တရ မှတ်တိုင်များ'
+              }
             >
               <Reveal>
-                <p className="scene-kicker">ချစ်သက်တမ်း မှတ်တမ်းများ</p>
+                <p className="scene-kicker">
+                  {isBirthdayTimeline
+                    ? 'လွန်ခဲ့သော နှစ်များ၏ မွေးနေ့မှတ်တမ်း'
+                    : 'ချစ်သက်တမ်း မှတ်တမ်းများ'}
+                </p>
                 <AnniversaryTimeline
                   anniversary={card.event?.anniversary}
                   coupleNames={card.title}
                   colors={card.appearance.colors}
+                  isBirthday={isBirthdayTimeline}
                 />
               </Reveal>
               <ScrollHint target={getNextScene('story-anniversary')} />

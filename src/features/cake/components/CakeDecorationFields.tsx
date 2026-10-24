@@ -58,8 +58,7 @@ export function CakeDecorationFields({
       </div>
       {editor.tools.mode === 'orbit' && (
         <p className="field-hint">
-          Cake ပေါ်မှာ ဆွဲပြီး လှည့်ကြည့်နိုင်ပါတယ်။ ဆွဲ/စိုက်ဖို့ Mode တစ်ခုကို
-          ရွေးပါ။
+          Cake ပေါ်မှာ ဆွဲပြီး လှည့်ကြည့်နိုင်ပါတယ်။
         </p>
       )}
       {editor.tools.mode === 'cream' && (

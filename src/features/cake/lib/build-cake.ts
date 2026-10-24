@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { buildCreamStroke, buildCandle } from './build-decorations.ts'
 import { flavorColors, type CakeRecipe } from '../../../shared/models/cake.ts'
 
@@ -13,7 +14,6 @@ export function disposeCake(group: THREE.Object3D) {
         : [object.material])
         materials.add(material)
     }
-    if (object instanceof THREE.InstancedMesh) object.dispose()
   })
   geometries.forEach((item) => item.dispose())
   materials.forEach((item) => item.dispose())
@@ -76,30 +76,36 @@ export function buildCake(recipe: CakeRecipe): THREE.Group {
     cap.castShadow = true
     cap.receiveShadow = true
     group.add(cap)
-    const trim = new THREE.Mesh(
-      new THREE.TorusGeometry(radius + 0.015, 0.025, 8, 64),
-      accent,
-    )
-    trim.rotation.x = Math.PI / 2
+    const trimGeometry = new THREE.TorusGeometry(radius + 0.015, 0.025, 8, 64)
+    trimGeometry.rotateX(Math.PI / 2)
+    const trim = new THREE.Mesh(trimGeometry, accent)
     trim.position.y = bottom + 0.03
     group.add(trim)
     if (beadGeometry) {
       const count = Math.round(radius * 34)
-      const beads = new THREE.InstancedMesh(beadGeometry, accent, count)
-      const matrix = new THREE.Matrix4()
+      const beadGeometries: THREE.BufferGeometry[] = []
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2
-        matrix.makeTranslation(
+        const single = beadGeometry.clone()
+        single.translate(
           Math.cos(angle) * radius,
           bottom + 0.66,
           Math.sin(angle) * radius,
         )
-        beads.setMatrixAt(i, matrix)
+        beadGeometries.push(single)
       }
-      beads.instanceMatrix.needsUpdate = true
-      beads.castShadow = true
-      group.add(beads)
+      const mergedBeads = BufferGeometryUtils.mergeGeometries(beadGeometries)
+      beadGeometries.forEach((g) => g.dispose())
+      if (mergedBeads) {
+        const beads = new THREE.Mesh(mergedBeads, accent)
+        beads.name = `beads-${tier + 1}`
+        beads.castShadow = true
+        group.add(beads)
+      }
     }
+  }
+  if (beadGeometry) {
+    beadGeometry.dispose()
   }
   if (recipe.decoration === 'berries') {
     const top = recipe.tiers * 0.67
@@ -121,5 +127,7 @@ export function buildCake(recipe: CakeRecipe): THREE.Group {
   for (const stroke of recipe.strokes)
     group.add(buildCreamStroke(stroke, recipe))
   for (const candle of recipe.candles) group.add(buildCandle(candle, recipe))
+  group.updateMatrixWorld(true)
   return group
 }
+

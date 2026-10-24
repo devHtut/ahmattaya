@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Calendar,
   Camera,
   Check,
+  ChevronDown,
+  ChevronUp,
+  Clock,
   Copy,
   Download,
   ExternalLink,
   Plus,
+  RotateCcw,
+  Sparkles,
   Trash2,
   Users,
   X,
@@ -14,6 +19,7 @@ import {
 import type { CardConfig } from '../../../shared/models/card'
 import {
   createAnniversaryEvent,
+  createBirthdayTimelineItems,
   createWeddingEvent,
   type TimelineItem,
 } from '../../../shared/models/event'
@@ -25,6 +31,11 @@ import {
   type RsvpResponse,
 } from '../../../shared/rsvp/rsvp-storage'
 import { compressPhoto } from '../lib/compress-photo'
+import {
+  calcAnniversaryDuration,
+  formatMyanmarDate,
+  toMyanmarDigits,
+} from '../../../shared/lib/anniversary-calc'
 
 export function EventFields({
   card,
@@ -168,20 +179,195 @@ export function EventFields({
 
   const isWedding = card.occasion === 'wedding-invitation'
   const isAnniversary = card.occasion === 'anniversary'
+  const isBirthday = card.occasion === 'birthday'
+  const isBirthdayTimelineEnabled =
+    isBirthday && Boolean(card.event?.anniversary?.enabled)
+
+  // Auto-migrate any anniversary leftover samples or non-year duration in birthday cards
+  useEffect(() => {
+    if (!isBirthday || !isBirthdayTimelineEnabled) return
+    const hasAnniversarySample =
+      anniversary.timeline?.some(
+        (item) =>
+          item.id === 't-1' ||
+          item.id === 't-2' ||
+          item.title === 'ပထမဆုံး တွေ့ဆုံခြင်း' ||
+          item.title === 'လက်တွဲခရီး ၁ နှစ်ပြည့်',
+      )
+    const hasNonYearDuration =
+      Boolean(anniversary.durationText) &&
+      (anniversary.durationText!.includes('လ') ||
+        anniversary.durationText!.includes('ရက်'))
+    const hasDate = Boolean(anniversary.date || anniversary.rawDate)
+
+    if (hasAnniversarySample || hasNonYearDuration || hasDate) {
+      const cleanTimeline = hasAnniversarySample
+        ? createBirthdayTimelineItems()
+        : anniversary.timeline
+      const cleanYears = anniversary.yearsValue ?? anniversary.yearsCount ?? 1
+      onChange({
+        ...card,
+        event: {
+          ...card.event,
+          anniversary: {
+            ...anniversary,
+            timeline: cleanTimeline,
+            yearsValue: cleanYears,
+            yearsCount: cleanYears,
+            monthsValue: 0,
+            daysValue: 0,
+            durationText: `${toMyanmarDigits(cleanYears)} နှစ်ပြည့်`,
+            date: '',
+            rawDate: '',
+          },
+        },
+      })
+    }
+  }, [
+    isBirthday,
+    isBirthdayTimelineEnabled,
+    anniversary,
+    card,
+    onChange,
+  ])
+
+  // Duration calculations and Alarm state
+  function getFormattedDuration(
+    mode: 'years-months' | 'days',
+    years: number,
+    months: number,
+    days: number,
+  ): string {
+    if (mode === 'days') {
+      return days > 0 ? `${toMyanmarDigits(days)} ရက်မြောက်နေ့` : '၀ ရက်'
+    }
+    if (years > 0 && months > 0) {
+      return `${toMyanmarDigits(years)} နှစ် ${toMyanmarDigits(months)} လ`
+    }
+    if (years > 0 && months === 0) {
+      return `${toMyanmarDigits(years)} နှစ်ပြည့်`
+    }
+    if (years === 0 && months > 0) {
+      return `${toMyanmarDigits(months)} လပြည့်`
+    }
+    return '၀ လ'
+  }
+
+  const displayMode = anniversary.displayMode || 'years-months'
+  const yearsVal = anniversary.yearsValue ?? anniversary.yearsCount ?? 0
+  const monthsVal = anniversary.monthsValue ?? 0
+  const daysVal = anniversary.daysValue ?? 0
+  const rawDate = anniversary.rawDate || ''
+
+  function handleDateSelect(isoDate: string) {
+    if (!isoDate) {
+      updateAnniversary({ rawDate: '', date: '' })
+      return
+    }
+    const myanmarDate = formatMyanmarDate(isoDate)
+    const calc = calcAnniversaryDuration(isoDate)
+    const currentMode = anniversary.displayMode || 'years-months'
+    const newDurationText =
+      currentMode === 'days' ? calc.formattedDays : calc.formattedYearsMonths
+
+    updateAnniversary({
+      rawDate: isoDate,
+      date: myanmarDate,
+      yearsValue: calc.years,
+      yearsCount: calc.years,
+      monthsValue: calc.months,
+      daysValue: calc.days,
+      durationText: newDurationText,
+    })
+  }
+
+  function handleModeChange(mode: 'years-months' | 'days') {
+    const newText = getFormattedDuration(mode, yearsVal, monthsVal, daysVal)
+    updateAnniversary({
+      displayMode: mode,
+      durationText: newText,
+    })
+  }
+
+  function handleStep(field: 'years' | 'months' | 'days', delta: number) {
+    let y = yearsVal
+    let m = monthsVal
+    let d = daysVal
+
+    if (field === 'years') {
+      y = Math.max(0, Math.min(120, y + delta))
+    } else if (field === 'months') {
+      m = Math.max(0, Math.min(11, m + delta))
+    } else if (field === 'days') {
+      d = Math.max(0, Math.min(36500, d + delta))
+    }
+
+    const newText = isBirthday
+      ? `${toMyanmarDigits(y)} နှစ်ပြည့်`
+      : getFormattedDuration(displayMode, y, m, d)
+
+    updateAnniversary({
+      yearsValue: y,
+      yearsCount: y,
+      monthsValue: isBirthday ? 0 : m,
+      daysValue: isBirthday ? 0 : d,
+      durationText: newText,
+      date: isBirthday ? '' : anniversary.date,
+      rawDate: isBirthday ? '' : anniversary.rawDate,
+    })
+  }
+
+  function handleDigitChange(
+    field: 'years' | 'months' | 'days',
+    valStr: string,
+  ) {
+    const parsed = parseInt(valStr, 10)
+    const val = isNaN(parsed) ? 0 : Math.max(0, parsed)
+    let y = yearsVal
+    let m = monthsVal
+    let d = daysVal
+
+    if (field === 'years') {
+      y = Math.min(120, val)
+    } else if (field === 'months') {
+      m = Math.min(11, val)
+    } else if (field === 'days') {
+      d = Math.min(36500, val)
+    }
+
+    const newText = isBirthday
+      ? `${toMyanmarDigits(y)} နှစ်ပြည့်`
+      : getFormattedDuration(displayMode, y, m, d)
+
+    updateAnniversary({
+      yearsValue: y,
+      yearsCount: y,
+      monthsValue: isBirthday ? 0 : m,
+      daysValue: isBirthday ? 0 : d,
+      durationText: newText,
+      date: isBirthday ? '' : anniversary.date,
+      rawDate: isBirthday ? '' : anniversary.rawDate,
+    })
+  }
+
+  function handleRecalculateToToday() {
+    if (!rawDate) return
+    handleDateSelect(rawDate)
+  }
 
   const attendingCount = rsvps
     .filter((r) => r.attending)
     .reduce((sum, r) => sum + r.guestCount, 0)
   const declineCount = rsvps.filter((r) => !r.attending).length
 
-  if (!isWedding && !isAnniversary) {
+  if (!isWedding && !isAnniversary && !isBirthday) {
     return (
       <div className="fields">
         <p className="field-hint">
           ဒီကတ်သည် <strong>{card.occasion}</strong> ပုံစံ ဖြစ်နေပါသည်။
           မင်္ဂလာပွဲရက်စွဲ၊ ခန်းမနေရာ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ်
-          နှစ်ပတ်လည် Timeline အသုံးပြုလိုပါက အပေါ်က “စာသား” အဆင့်တွင်
-          အခမ်းအနားကို “မင်္ဂလာဖိတ်စာ” သို့မဟုတ် “နှစ်ပတ်လည်” အဖြစ်
+          နှစ်ပတ်လည် / မွေးနေ့ Timeline အသုံးပြုလိုပါက အပေါ်က “စာသား” အဆင့်တွင်
+          အခမ်းအနားကို “မင်္ဂလာဖိတ်စာ”၊ “နှစ်ပတ်လည်” သို့မဟုတ် “မွေးနေ့” အဖြစ်
           ပြောင်းလဲပေးပါ။
         </p>
       </div>
@@ -446,86 +632,377 @@ export function EventFields({
         </>
       )}
 
-      {isAnniversary && (
-        <div className="anniversary-form-group">
-          <label>
-            နှစ်ပတ်လည် သက်တမ်း / ကာလ
-            <input
-              type="text"
-              maxLength={80}
-              placeholder="ဥပမာ — ၁ နှစ်နဲ့ ၃ လ၊ ၃ နှစ်ပြည့်၊ ၆ လပြည့်"
-              value={anniversary.durationText || ''}
-              onChange={(e) =>
-                updateAnniversary({ durationText: e.target.value })
-              }
-            />
-            <small className="field-hint">
-              ၁ နှစ်ပြည့် သာမက “၁ နှစ်နဲ့ ၃ လ”၊ “၆ လပြည့်” စသဖြင့် လွတ်လပ်စွာ
-              ရေးသားနိုင်ပါသည်။
-            </small>
-          </label>
-
-          <div
-            className="duration-preset-pills"
-            role="group"
-            aria-label="အမြန်ရွေးချယ်နိုင်သော ကာလများ"
+      {isBirthday && (
+        <div className="birthday-timeline-toggle-card">
+          <div className="toggle-info">
+            <strong
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '14px',
+                color: 'var(--ink, #1e293b)',
+              }}
+            >
+              <Sparkles size={16} color="var(--accent, #e11d48)" /> မွေးနေ့
+              အမှတ်တရ Timeline ထည့်သွင်းမည်
+            </strong>
+            <p
+              style={{
+                margin: '4px 0 0',
+                fontSize: '12px',
+                color: 'var(--ink-soft, #64748b)',
+                lineHeight: 1.5,
+              }}
+            >
+              လွန်ခဲ့သော နှစ်များက ကျင်းပခဲ့သော မွေးနေ့ပုံရိပ်များ၊ အမှတ်တရ
+              မှတ်တမ်းများနှင့် ရက်စွဲများကို Timeline အနေဖြင့် ပြသလိုပါက
+              ဖွင့်ပေးပါ။
+            </p>
+          </div>
+          <label
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '6px',
-              margin: '4px 0 16px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              userSelect: 'none',
             }}
           >
-            {[
-              '၆ လပြည့်',
-              '၁ နှစ်ပြည့်',
-              '၁ နှစ်နဲ့ ၃ လ',
-              '၂ နှစ်ပြည့်',
-              '၃ နှစ်ပြည့်',
-              '၃ နှစ်နဲ့ ၆ လ',
-              '၅ နှစ်ပြည့်',
-              '၁၀ နှစ်ပြည့်',
-            ].map((preset) => {
-              const currentVal =
-                anniversary.durationText?.trim() ||
-                (anniversary.yearsCount
-                  ? `${anniversary.yearsCount} နှစ်ပြည့်`
-                  : '')
-              const isActive = currentVal === preset
-              return (
-                <button
-                  key={preset}
-                  type="button"
-                  className={`filter-pill ${isActive ? 'active' : ''}`}
-                  onClick={() => {
-                    const match = preset.match(/(\d+)\s*နှစ်/)
-                    updateAnniversary({
-                      durationText: preset,
-                      yearsCount: match
-                        ? parseInt(match[1], 10)
-                        : anniversary.yearsCount,
-                    })
-                  }}
-                >
-                  {preset}
-                </button>
-              )
-            })}
-          </div>
-
-          <label>
-            နှစ်ပတ်လည် ရက်စွဲ
             <input
-              type="text"
-              maxLength={80}
-              placeholder="ဥပမာ — ၂၀၂၆ ခုနှစ်၊ ဒီဇင်ဘာလ"
-              value={anniversary.date}
-              onChange={(e) => updateAnniversary({ date: e.target.value })}
+              type="checkbox"
+              checked={isBirthdayTimelineEnabled}
+              onChange={(e) => {
+                const checked = e.target.checked
+                if (checked) {
+                  const hasAnniversarySample =
+                    !anniversary.timeline ||
+                    anniversary.timeline.length === 0 ||
+                    anniversary.timeline.some(
+                      (item) =>
+                        item.id === 't-1' ||
+                        item.id === 't-2' ||
+                        item.title === 'ပထမဆုံး တွေ့ဆုံခြင်း',
+                    )
+                  const timeline = hasAnniversarySample
+                    ? createBirthdayTimelineItems()
+                    : anniversary.timeline
+                  const y = anniversary.yearsValue ?? anniversary.yearsCount ?? 1
+
+                  updateAnniversary({
+                    enabled: true,
+                    yearsValue: y,
+                    yearsCount: y,
+                    monthsValue: 0,
+                    daysValue: 0,
+                    durationText: `${toMyanmarDigits(y)} နှစ်ပြည့်`,
+                    date: '',
+                    rawDate: '',
+                    timeline,
+                  })
+                } else {
+                  updateAnniversary({
+                    enabled: false,
+                  })
+                }
+              }}
+              style={{
+                width: '18px',
+                height: '18px',
+                accentColor: 'var(--accent, #e11d48)',
+                cursor: 'pointer',
+              }}
             />
           </label>
+        </div>
+      )}
 
+      {(isAnniversary || isBirthdayTimelineEnabled) && (
+        <div className="anniversary-form-group">
+          {/* 1. Date Picker with Auto-calc (Anniversary only) */}
+          {!isBirthday && isAnniversary && (
+            <label>
+              နှစ်ပတ်လည် စတင်ခဲ့သည့် နေ့စွဲ
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'center',
+                  marginTop: '6px',
+                }}
+              >
+                <input
+                  type="date"
+                  value={rawDate}
+                  onChange={(e) => handleDateSelect(e.target.value)}
+                  style={{
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    border: '1.5px solid var(--line, #e2e8f0)',
+                    background: 'var(--paper, #fff)',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    color: 'var(--ink, #1e293b)',
+                    cursor: 'pointer',
+                    flex: 1,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              {anniversary.date && (
+                <small
+                  className="field-hint"
+                  style={{
+                    color: 'var(--accent, #e11d48)',
+                    fontWeight: 600,
+                    display: 'block',
+                    marginTop: '4px',
+                  }}
+                >
+                  📅 မြန်မာရက်စွဲပြသမှု — {anniversary.date}
+                </small>
+              )}
+              <small className="field-hint">
+                ရက်စွဲ ရွေးချယ်လိုက်ပါက ယနေ့ (Today) အထိ သက်တမ်းကာလ (နှစ်၊ လ၊ ရက်)
+                ကို အလိုအလျောက် တွက်ချက်ပေးပါမည်။
+              </small>
+            </label>
+          )}
+
+          {/* 2. Alarm Digital Counter UI */}
+          <div style={{ marginTop: isBirthday ? '4px' : '14px' }}>
+            <span
+              style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--ink, #1e293b)',
+                display: 'block',
+                marginBottom: '6px',
+              }}
+            >
+              {isBirthday ? 'မွေးနေ့ သက်တမ်း / အသက်' : 'နှစ်ပတ်လည် သက်တမ်းကာလ'}
+            </span>
+
+            <div className="alarm-counter-container">
+              {/* Mode switch: Years & Months vs Total Days (Anniversary only) */}
+              {!isBirthday && (
+                <div className="alarm-mode-selector">
+                  <button
+                    type="button"
+                    className={`alarm-mode-btn ${displayMode === 'years-months' ? 'active' : ''}`}
+                    onClick={() => handleModeChange('years-months')}
+                  >
+                    နှစ် နှင့် လ (Years & Months)
+                  </button>
+                  <button
+                    type="button"
+                    className={`alarm-mode-btn ${displayMode === 'days' ? 'active' : ''}`}
+                    onClick={() => handleModeChange('days')}
+                  >
+                    ရက်ပေါင်း (Total Days)
+                  </button>
+                </div>
+              )}
+
+              {/* Digital Alarm Display */}
+              <div className="alarm-clock-display">
+                {isBirthday ? (
+                  /* Birthday: Single Years Group only */
+                  <div
+                    className="alarm-digit-group"
+                    style={{ minWidth: '110px' }}
+                  >
+                    <button
+                      type="button"
+                      className="alarm-step-btn"
+                      onClick={() => handleStep('years', 1)}
+                      aria-label="၁ နှစ် တိုးမည်"
+                      title="၁ နှစ် တိုးမည်"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      className="alarm-digit-card"
+                      value={String(yearsVal).padStart(2, '0')}
+                      onChange={(e) =>
+                        handleDigitChange(
+                          'years',
+                          e.target.value.replace(/\D/g, ''),
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="alarm-step-btn"
+                      onClick={() => handleStep('years', -1)}
+                      aria-label="၁ နှစ် လျှော့မည်"
+                      title="၁ နှစ် လျှော့မည်"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+                    <span className="alarm-digit-label">နှစ်ပြည့် (Years)</span>
+                  </div>
+                ) : displayMode === 'years-months' ? (
+                  <>
+                    {/* Years Group */}
+                    <div className="alarm-digit-group">
+                      <button
+                        type="button"
+                        className="alarm-step-btn"
+                        onClick={() => handleStep('years', 1)}
+                        aria-label="၁ နှစ် တိုးမည်"
+                        title="၁ နှစ် တိုးမည်"
+                      >
+                        <ChevronUp size={16} />
+                      </button>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        className="alarm-digit-card"
+                        value={String(yearsVal).padStart(2, '0')}
+                        onChange={(e) =>
+                          handleDigitChange(
+                            'years',
+                            e.target.value.replace(/\D/g, ''),
+                          )
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="alarm-step-btn"
+                        onClick={() => handleStep('years', -1)}
+                        aria-label="၁ နှစ် လျှော့မည်"
+                        title="၁ နှစ် လျှော့မည်"
+                      >
+                        <ChevronDown size={16} />
+                      </button>
+                      <span className="alarm-digit-label">နှစ် (Years)</span>
+                    </div>
+
+                    <div className="alarm-separator">:</div>
+
+                    {/* Months Group */}
+                    <div className="alarm-digit-group">
+                      <button
+                        type="button"
+                        className="alarm-step-btn"
+                        onClick={() => handleStep('months', 1)}
+                        aria-label="၁ လ တိုးမည်"
+                        title="၁ လ တိုးမည်"
+                      >
+                        <ChevronUp size={16} />
+                      </button>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        className="alarm-digit-card"
+                        value={String(monthsVal).padStart(2, '0')}
+                        onChange={(e) =>
+                          handleDigitChange(
+                            'months',
+                            e.target.value.replace(/\D/g, ''),
+                          )
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="alarm-step-btn"
+                        onClick={() => handleStep('months', -1)}
+                        aria-label="၁ လ လျှော့မည်"
+                        title="၁ လ လျှော့မည်"
+                      >
+                        <ChevronDown size={16} />
+                      </button>
+                      <span className="alarm-digit-label">လ (Months)</span>
+                    </div>
+                  </>
+                ) : (
+                  /* Days Group */
+                  <div className="alarm-digit-group days-group">
+                    <button
+                      type="button"
+                      className="alarm-step-btn"
+                      onClick={() => handleStep('days', 10)}
+                      aria-label="၁၀ ရက် တိုးမည်"
+                      title="၁၀ ရက် တိုးမည်"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      className="alarm-digit-card"
+                      value={String(daysVal).padStart(2, '0')}
+                      onChange={(e) =>
+                        handleDigitChange(
+                          'days',
+                          e.target.value.replace(/\D/g, ''),
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="alarm-step-btn"
+                      onClick={() => handleStep('days', -10)}
+                      aria-label="၁၀ ရက် လျှော့မည်"
+                      title="၁၀ ရက် လျှော့မည်"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+                    <span className="alarm-digit-label">ရက် (Total Days)</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Status and Recalculate */}
+              <div
+                className="alarm-calc-row"
+                style={isBirthday ? { justifyContent: 'center' } : undefined}
+              >
+                <div className="alarm-preview-badge">
+                  <Clock size={14} />
+                  <span>
+                    ပြသမှု —{' '}
+                    <strong className="alarm-preview-highlight">
+                      {isBirthday
+                        ? `${toMyanmarDigits(yearsVal || 1)} နှစ်ပြည့်`
+                        : anniversary.durationText || 'သတ်မှတ်မထားပါ'}
+                    </strong>
+                  </span>
+                </div>
+                {!isBirthday && rawDate && (
+                  <button
+                    type="button"
+                    className="button secondary"
+                    onClick={handleRecalculateToToday}
+                    title="ယနေ့ရက်စွဲဖြင့် အလိုအလျောက် ပြန်လည်တွက်ချက်မည်"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '12px',
+                      padding: '6px 12px',
+                    }}
+                  >
+                    <RotateCcw size={13} /> ယနေ့အထိ ပြန်တွက်မည်
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Timeline Builder */}
           <fieldset className="palette-preset" style={{ marginTop: '18px' }}>
-            <legend>အမှတ်တရ Timeline မှတ်တိုင်များ</legend>
+            <legend>
+              {isBirthday
+                ? 'မွေးနေ့ အမှတ်တရ Timeline မှတ်တိုင်များ'
+                : 'အမှတ်တရ Timeline မှတ်တိုင်များ'}
+            </legend>
 
             <div className="timeline-add-box">
               <label>
@@ -533,7 +1010,11 @@ export function EventFields({
                 <input
                   type="text"
                   maxLength={40}
-                  placeholder="ဥပမာ — ၂၀၂၁ ခုနှစ် သို့မဟုတ် စတင်တွေ့ဆုံချိန်"
+                  placeholder={
+                    isBirthday
+                      ? 'ဥပမာ — ၁ နှစ်ပြည့် သို့မဟုတ် အသက် ၁၈ နှစ်'
+                      : 'ဥပမာ — ၂၀၂၁ ခုနှစ် သို့မဟုတ် စတင်တွေ့ဆုံချိန်'
+                  }
                   value={timelineYear}
                   onChange={(e) => setTimelineYear(e.target.value)}
                 />
@@ -544,7 +1025,11 @@ export function EventFields({
                 <input
                   type="text"
                   maxLength={100}
-                  placeholder="ဥပမာ — ပထမဆုံး ခရီးအတူသွားခြင်း"
+                  placeholder={
+                    isBirthday
+                      ? 'ဥပမာ — ပထမဆုံး မွေးနေ့ပွဲ အမှတ်တရ'
+                      : 'ဥပမာ — ပထမဆုံး ခရီးအတူသွားခြင်း'
+                  }
                   value={timelineTitle}
                   onChange={(e) => setTimelineTitle(e.target.value)}
                 />
@@ -555,7 +1040,11 @@ export function EventFields({
                 <textarea
                   maxLength={400}
                   rows={3}
-                  placeholder="ဒီအချိန်ကာလရဲ့ အမှတ်တရလေးတွေကို ရေးသားပါ…"
+                  placeholder={
+                    isBirthday
+                      ? 'ဒီမွေးနေ့မှာ ချစ်ခင်ရသူတွေနဲ့ ပျော်ရွှင်စွာ ဖြတ်သန်းခဲ့ရတဲ့ အမှတ်တရလေးတွေကို ရေးသားပါ…'
+                      : 'ဒီအချိန်ကာလရဲ့ အမှတ်တရလေးတွေကို ရေးသားပါ…'
+                  }
                   value={timelineDesc}
                   onChange={(e) => setTimelineDesc(e.target.value)}
                 />
@@ -757,3 +1246,4 @@ export function EventFields({
     </div>
   )
 }
+

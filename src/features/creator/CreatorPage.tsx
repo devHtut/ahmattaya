@@ -52,55 +52,55 @@ const steps: {
   icon: typeof Mail
   view: CanvasView
 }[] = [
-  {
-    id: 'opening',
-    label: 'ဖိတ်စာ',
-    title: 'အဖွင့်ဖိတ်စာ',
-    hint: 'လက်ခံသူ ပထမဆုံး တွေ့ရမယ့် စာအိတ် သို့မဟုတ် လက်ဆောင်ဘူးလေး။',
-    icon: Mail,
-    view: 'opening',
-  },
-  {
-    id: 'pages',
-    label: 'စာမျက်နှာများ',
-    title: 'ကတ်အဖုံးနှင့် စာမျက်နှာများ',
-    hint: 'ကတ်အဖုံးနှင့် စာမျက်နှာများ၏ စာသား၊ နောက်ခံ၊ အရောင်နှင့် ဓာတ်ပုံများကို ပြင်ဆင်ပါ။',
-    icon: Palette,
-    view: 'pages',
-  },
-  {
-    id: 'event',
-    label: 'အခမ်းအနား',
-    title: 'ပွဲအချက်အလက် / မှတ်တမ်း',
-    hint: 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ် နှစ်ပတ်လည် မှတ်တမ်း။',
-    icon: Calendar,
-    view: 'event',
-  },
-  {
-    id: 'cake',
-    label: 'ကိတ်မုန့်',
-    title: 'ကိတ်မုန့် အလှဆင်',
-    hint: 'မွေးနေ့အတွက် ကိတ်မုန့်လေး ပုံဖော်ပြီး ဖယောင်းတိုင် ထားပါ။',
-    icon: Cake,
-    view: 'cake',
-  },
-  {
-    id: 'music',
-    label: 'သံစဉ်',
-    title: 'နောက်ခံ သံစဉ်',
-    hint: 'ကတ်ဖွင့်ချိန် တေးလေးတစ်ပုဒ် သီဆိုစေချင်လား။',
-    icon: Music,
-    view: 'pages',
-  },
-  {
-    id: 'publish',
-    label: 'မျှဝေမယ်',
-    title: 'စစ်ဆေး & မျှဝေမယ်',
-    hint: 'ကတ်လေးကို အစအဆုံး စစ်ဆေးပြီး Reviewer သို့မဟုတ် လက်ခံသူထံ မျှဝေလိုက်ပါ။',
-    icon: Send,
-    view: 'pages',
-  },
-]
+    {
+      id: 'opening',
+      label: 'ဖိတ်စာ',
+      title: 'အဖွင့်ဖိတ်စာ',
+      hint: 'လက်ခံသူ ပထမဆုံး တွေ့ရမယ့် စာအိတ် သို့မဟုတ် လက်ဆောင်ဘူးလေး။',
+      icon: Mail,
+      view: 'opening',
+    },
+    {
+      id: 'pages',
+      label: 'စာမျက်နှာများ',
+      title: 'ကတ်အဖုံးနှင့် စာမျက်နှာများ',
+      hint: 'ကတ်အဖုံးနှင့် စာမျက်နှာများ၏ စာသား၊ နောက်ခံ၊ အရောင်နှင့် ဓာတ်ပုံများကို ပြင်ဆင်ပါ။',
+      icon: Palette,
+      view: 'pages',
+    },
+    {
+      id: 'event',
+      label: 'အခမ်းအနား',
+      title: 'ပွဲအချက်အလက် / မှတ်တမ်း',
+      hint: 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ် နှစ်ပတ်လည် မှတ်တမ်း။',
+      icon: Calendar,
+      view: 'event',
+    },
+    {
+      id: 'cake',
+      label: 'ကိတ်မုန့်',
+      title: 'ကိတ်မုန့် အလှဆင်',
+      hint: 'ကိတ်မုန့်လေး ပုံဖော်ပြီး ဖယောင်းတိုင်လေးတွေ စိုက်ပါ။',
+      icon: Cake,
+      view: 'cake',
+    },
+    {
+      id: 'music',
+      label: 'သံစဉ်',
+      title: 'နောက်ခံ သံစဉ်',
+      hint: 'ကတ်ဖွင့်ချိန် တေးလေးတစ်ပုဒ် သီဆိုစေချင်လား။',
+      icon: Music,
+      view: 'pages',
+    },
+    {
+      id: 'publish',
+      label: 'မျှဝေမယ်',
+      title: 'စစ်ဆေး & မျှဝေမယ်',
+      hint: 'ကတ်လေးကို အစအဆုံး စစ်ဆေးပြီး Reviewer သို့မဟုတ် လက်ခံသူထံ မျှဝေလိုက်ပါ။',
+      icon: Send,
+      view: 'pages',
+    },
+  ]
 
 export function CreatorPage({
   card,
@@ -242,8 +242,18 @@ export function CreatorPage({
                 },
                 ...(card.occasion === 'wedding-invitation'
                   ? [{ id: 'event' as CanvasView, label: 'မင်္ဂလာပွဲ' }]
-                  : card.occasion === 'anniversary'
-                    ? [{ id: 'event' as CanvasView, label: 'မှတ်တမ်း' }]
+                  : card.occasion === 'anniversary' ||
+                    (card.occasion === 'birthday' &&
+                      card.event?.anniversary?.enabled)
+                    ? [
+                      {
+                        id: 'event' as CanvasView,
+                        label:
+                          card.occasion === 'birthday'
+                            ? 'မွေးနေ့မှတ်တမ်း'
+                            : 'မှတ်တမ်း',
+                      },
+                    ]
                     : []),
                 { id: 'cake', label: 'ကိတ်မုန့်' },
               ] as { id: CanvasView; label: string }[]
@@ -332,17 +342,21 @@ export function CreatorPage({
                       cardId={workspace?.project.id}
                       coupleNames={card.title}
                     />
-                  ) : card.occasion === 'anniversary' ? (
+                  ) : card.occasion === 'anniversary' ||
+                    (card.occasion === 'birthday' &&
+                      card.event?.anniversary?.enabled) ? (
                     <AnniversaryTimeline
                       anniversary={card.event?.anniversary}
                       coupleNames={card.title}
                       colors={card.appearance.colors}
+                      isBirthday={card.occasion === 'birthday'}
                     />
                   ) : (
                     <div className="bench-event-empty">
                       <p>
-                        မင်္ဂလာဖိတ်စာ သို့မဟုတ် နှစ်ပတ်လည်ကတ်များတွင်သာ
-                        အခမ်းအနား အထူးကဏ္ဍများ ပါဝင်ပါသည်။
+                        မင်္ဂလာဖိတ်စာ၊ နှစ်ပတ်လည် သို့မဟုတ် မွေးနေ့မှတ်တမ်း
+                        ဖွင့်ထားသော ကတ်များတွင်သာ အခမ်းအနား အထူးကဏ္ဍများ
+                        ပါဝင်ပါသည်။
                       </p>
                     </div>
                   )}
@@ -394,40 +408,40 @@ export function CreatorPage({
                     onSelectPhoto={
                       view === 'pages'
                         ? (id) => {
-                            setSelectedPhotoId(id)
-                            if (id) setSelectedElementId(null)
-                          }
+                          setSelectedPhotoId(id)
+                          if (id) setSelectedElementId(null)
+                        }
                         : undefined
                     }
                     onCommitPhoto={
                       view === 'pages'
                         ? (id, frame) =>
-                            onChange({
-                              ...card,
-                              photos: card.photos.map((photo) =>
-                                photo.id === id ? { ...photo, frame } : photo,
-                              ),
-                            })
+                          onChange({
+                            ...card,
+                            photos: card.photos.map((photo) =>
+                              photo.id === id ? { ...photo, frame } : photo,
+                            ),
+                          })
                         : undefined
                     }
                     selectedElementId={view === 'pages' ? selectedElementId : null}
                     onSelectElement={
                       view === 'pages'
                         ? (id) => {
-                            setSelectedElementId(id)
-                            if (id) setSelectedPhotoId(null)
-                          }
+                          setSelectedElementId(id)
+                          if (id) setSelectedPhotoId(null)
+                        }
                         : undefined
                     }
                     onCommitElement={
                       view === 'pages'
                         ? (id, frame) =>
-                            onChange({
-                              ...card,
-                              elements: (card.elements ?? []).map((el) =>
-                                el.id === id ? { ...el, frame } : el,
-                              ),
-                            })
+                          onChange({
+                            ...card,
+                            elements: (card.elements ?? []).map((el) =>
+                              el.id === id ? { ...el, frame } : el,
+                            ),
+                          })
                         : undefined
                     }
                   />
@@ -525,21 +539,13 @@ export function CreatorPage({
               )}
             </div>
           )}
-
-          <p className="stage-caption">
-            {view === 'opening'
-              ? 'လက်ခံသူ ပထမဆုံး ဖွင့်တွေ့ရမယ့် အထုပ်'
-              : view === 'cake'
-                ? 'ကိတ်မုန့် ပုံစံ'
-                : 'ကတ်ရဲ့ လက်ရှိပုံစံ (ဘယ်/ညာ လှန်ကြည့်နိုင်ပါသည်)'}
-          </p>
         </section>
 
         {/* The working sheet */}
         <section className="maker-panel" aria-labelledby="step-heading">
           <div className="panel-head">
             <span className="step-kicker">
-              အဆင့် {stepIndex + 1} / {steps.length}
+              Step {stepIndex + 1} / {steps.length}
             </span>
             <h2 id="step-heading">{stepDef.title}</h2>
             <p>{stepDef.hint}</p>

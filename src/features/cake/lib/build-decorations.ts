@@ -165,17 +165,23 @@ export function buildCandle(
   }
   const wick = new THREE.Mesh(
     new THREE.CylinderGeometry(0.006, 0.006, 0.045, 6),
-    new THREE.MeshBasicMaterial({ color: '#3c2932' }),
+    new THREE.MeshStandardMaterial({ color: '#3c2932', roughness: 0.8 }),
   )
   wick.position.y = flameHeight - 0.035
   group.add(wick)
+  const flameGeometry = new THREE.SphereGeometry(0.035, 10, 10)
+  flameGeometry.scale(1, 1.8, 1)
   const flame = new THREE.Mesh(
-    new THREE.SphereGeometry(0.035, 10, 10),
-    new THREE.MeshBasicMaterial({ color: '#ffc66b' }),
+    flameGeometry,
+    new THREE.MeshStandardMaterial({
+      color: '#ffc66b',
+      emissive: new THREE.Color('#ff8800'),
+      emissiveIntensity: 0.6,
+      roughness: 0.3,
+    }),
   )
   flame.name = 'flame'
   flame.position.y = flameHeight + 0.015
-  flame.scale.set(1, 1.8, 1)
   group.add(flame)
   group.traverse((item) => {
     item.userData.candleId = candle.id

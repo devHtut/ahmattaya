@@ -138,8 +138,7 @@ export function TemplatesPage({
     <main id="main-content" className="page-width album">
       <div className="page-head">
         <div>
-          <span className="eyebrow">နမူနာများ</span>
-          <h1>နမူနာ စာမျက်နှာများ</h1>
+          <h1>Templates</h1>
           <p className="muted">
             အသင့်ပြင်ထားသော ပုံစံကို ရွေးချယ်ပြီး စိတ်ကြိုက် ပြင်ဆင်ဖန်တီးပါ။
           </p>
@@ -163,7 +162,7 @@ export function TemplatesPage({
         aria-label="အခမ်းအနားအလိုက် စစ်ထုတ်ရန်"
       >
         <button aria-pressed={filter === 'all'} onClick={() => setParams({})}>
-          အားလုံး
+          All
         </button>
         {occasions.map((item) => (
           <button
@@ -196,7 +195,7 @@ export function TemplatesPage({
                 <h2>{template.name}</h2>
                 <p>{template.description}</p>
                 <div className="album-badges">
-                  <span>{card.pages.length + 1} စာမျက်နှာ</span>
+                  <span>စာမျက်နှာ {card.pages.length + 1} ခုပါသည်</span>
                   {card.cake.enabled && <span>🎂 ကိတ်မုန့်</span>}
                   {card.music.trackId !== 'none' && <span>🎵 သံစဉ်</span>}
                 </div>

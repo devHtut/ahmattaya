@@ -20,10 +20,16 @@ export const timelineItemSchema = z.object({
 })
 
 export const anniversaryEventSchema = z.object({
-  yearsCount: z.number().int().min(1).max(100).default(1),
+  yearsCount: z.number().int().min(0).max(100).default(1),
   durationText: z.string().max(80).optional(),
   date: z.string().max(80).default(''),
   timeline: z.array(timelineItemSchema).max(12).default([]),
+  displayMode: z.enum(['years-months', 'days']).optional(),
+  yearsValue: z.number().int().min(0).max(100).optional(),
+  monthsValue: z.number().int().min(0).max(11).optional(),
+  daysValue: z.number().int().min(0).max(36500).optional(),
+  rawDate: z.string().max(40).optional(),
+  enabled: z.boolean().optional(),
 })
 
 export const eventSchema = z.object({
@@ -70,3 +76,34 @@ export function createAnniversaryEvent(): AnniversaryEvent {
     ],
   }
 }
+
+export function createBirthdayTimelineItems(): TimelineItem[] {
+  return [
+    {
+      id: 'b-1',
+      year: '၁ နှစ်ပြည့်',
+      title: 'ပထမဆုံး မွေးနေ့အမှတ်တရ',
+      description: 'ချစ်စရာ ကိတ်မုန့်လေးနဲ့ မိသားစုရဲ့ ပထမဆုံး မွေးနေ့ အမှတ်တရ…',
+    },
+    {
+      id: 'b-2',
+      year: 'အမှတ်တရ',
+      title: 'ပျော်ရွှင်စရာ မွေးနေ့ပါတီ',
+      description:
+        'သူငယ်ချင်းများ၊ ချစ်ခင်ရသူများနှင့် အတူတူ ပျော်ရွှင်စွာ ဖြတ်သန်းခဲ့သော အမှတ်တရ…',
+    },
+  ]
+}
+
+export function createBirthdayAnniversaryEvent(): AnniversaryEvent {
+  return {
+    yearsCount: 1,
+    yearsValue: 1,
+    durationText: '၁ နှစ်ပြည့်',
+    date: '',
+    rawDate: '',
+    enabled: true,
+    timeline: createBirthdayTimelineItems(),
+  }
+}
+
