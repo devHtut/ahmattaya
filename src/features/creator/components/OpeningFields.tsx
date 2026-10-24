@@ -33,7 +33,7 @@ export function OpeningFields({
         value={value || ''}
         onChange={(e) => onChangeFont(e.target.value)}
       >
-        <option value="">မူရင်းဖောင့် (Default)</option>
+        <option value="">Default</option>
         <optgroup label="အခြေခံ Fonts (Standard)">
           {standardFonts.map((f) => (
             <option key={f.id} value={f.id}>
@@ -42,7 +42,7 @@ export function OpeningFields({
           ))}
         </optgroup>
         {customFonts.length > 0 && (
-          <optgroup label={`ထည့်ထားသော မြန်မာ Fonts (${customFonts.length})`}>
+          <optgroup label={`ထည့်ထားသော မြန်မာ Fonts (${customFonts.length})ခု`}>
             {customFonts.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.label}
@@ -54,56 +54,30 @@ export function OpeningFields({
     </div>
   )
 
-  const isCustomEmoji = !openingEmojis.includes(
-    card.opening.emoji as (typeof openingEmojis)[number],
-  )
 
   return (
     <div className="fields opening-fields">
       <label>
-        အဖွင့်ပုံစံ
+        အမျိုးအစား
         <select
           value={card.opening.style}
           onChange={(e) =>
             update({ style: e.target.value as OpeningConfig['style'] })
           }
         >
-          <option value="envelope">✉️ စာအိတ်လေး (Classic Envelope)</option>
-          <option value="gift">🎁 လက်ဆောင်ဘူးလေး (Gift Box)</option>
-          <option value="scroll">📜 ရှေးဟောင်း စာလိပ်လေး (Vintage Scroll)</option>
-          <option value="heart">💖 အသည်းပုံ ကတ်လေး (Heart Locket)</option>
-          <option value="ribbon">🎀 ဖဲကြိုးချည် ဖိတ်စာ (Ribbon Tied Card)</option>
-          <option value="gate">🏛️ နန်းတွင်း ခေါက်ဖိတ်စာ (Gatefold Doors)</option>
+          <option value="envelope">✉️ Classic Envelope</option>
+          <option value="gift">🎁 Gift Box</option>
+          <option value="scroll">📜 Vintage Scroll</option>
+          <option value="heart">💖 Heart Locket</option>
+          <option value="ribbon">🎀 Ribbon Tied Card</option>
+          <option value="gate">🏛️ Gatefold Doors</option>
         </select>
       </label>
-
-      {/* Kicker (A LITTLE SURPRISE FOR YOU) */}
-      <div className="opening-section-box">
-        <label className="shadow-toggle" style={{ marginBottom: card.opening.showKicker !== false ? '8px' : '0' }}>
-          <input
-            type="checkbox"
-            checked={card.opening.showKicker !== false}
-            onChange={(e) => update({ showKicker: e.target.checked })}
-          />{' '}
-          အထက်ခေါင်းစဉ်ငယ် (Kicker) ပြသမည်
-        </label>
-        {card.opening.showKicker !== false && (
-          <label style={{ marginTop: '8px' }}>
-            <span>ခေါင်းစဉ်ငယ် စာသား</span>
-            <input
-              maxLength={100}
-              placeholder="ဥပမာ A LITTLE SURPRISE FOR YOU"
-              value={card.opening.kicker ?? 'A LITTLE SURPRISE FOR YOU'}
-              onChange={(e) => update({ kicker: e.target.value })}
-            />
-          </label>
-        )}
-      </div>
 
       {/* Title & Font */}
       <div className="opening-section-box">
         <label>
-          အဖွင့်ခေါင်းစဉ်
+          ခေါင်းစဉ်
           <input
             maxLength={120}
             value={card.opening.title}
@@ -112,7 +86,7 @@ export function OpeningFields({
         </label>
         {renderFontSelect(
           'opening-title-font',
-          'ခေါင်းစဉ် ဖောင့် (Font)',
+          'Heading Font',
           card.opening.titleFont,
           (titleFont) => update({ titleFont }),
         )}
@@ -121,7 +95,7 @@ export function OpeningFields({
       {/* Message & Font */}
       <div className="opening-section-box">
         <label>
-          အဖွင့်စာသား
+          စာသား
           <textarea
             rows={3}
             maxLength={300}
@@ -131,7 +105,7 @@ export function OpeningFields({
         </label>
         {renderFontSelect(
           'opening-message-font',
-          'အဖွင့်စာသား ဖောင့် (Font)',
+          'Message Font',
           card.opening.messageFont,
           (messageFont) => update({ messageFont }),
         )}
@@ -140,7 +114,7 @@ export function OpeningFields({
       {/* Button & Font */}
       <div className="opening-section-box">
         <label>
-          ဖွင့်ရန် ခလုတ်စာသား
+          ခလုတ်စာသား
           <input
             maxLength={50}
             value={card.opening.buttonText}
@@ -149,7 +123,7 @@ export function OpeningFields({
         </label>
         {renderFontSelect(
           'opening-button-font',
-          'ခလုတ် ဖောင့် (Font)',
+          'Button Font',
           card.opening.buttonFont,
           (buttonFont) => update({ buttonFont }),
         )}
@@ -159,10 +133,10 @@ export function OpeningFields({
       <div className="color-controls">
         {(
           [
-            { key: 'background', label: 'အဖွင့် နောက်ခံ' },
+            { key: 'background', label: 'နောက်ခံအရောင်' },
             { key: 'color', label: 'စာအိတ် / ဘူးအရောင်' },
             { key: 'sealColor', label: 'Seal / ဖဲကြိုးအရောင်' },
-            { key: 'textColor', label: 'အဖွင့် စာသားရောင်' },
+            { key: 'textColor', label: 'စာသားအရောင်' },
           ] as const
         ).map(({ key, label }) => (
           <label className="color-control" key={key}>
@@ -179,7 +153,7 @@ export function OpeningFields({
 
       {/* Emoji Customization */}
       <fieldset className="opening-emoji-picker">
-        <legend>အလှဆင် Emoji (ရွေးချယ်ရန် သို့မဟုတ် စိတ်ကြိုက်ထည့်ရန်)</legend>
+        <legend>အလှဆင် Emoji</legend>
         <div role="group" aria-label="ဖိတ်စာ Emoji">
           {openingEmojis.map((emoji) => (
             <button
@@ -192,27 +166,6 @@ export function OpeningFields({
             </button>
           ))}
         </div>
-        <div className="custom-emoji-input-wrap">
-          <label htmlFor="custom-emoji-input" className="field-sublabel">
-            ကိုယ်ပိုင် Emoji (သို့မဟုတ် သင်္ကေတ စာလုံး) ထည့်မည်
-          </label>
-          <div className="custom-emoji-row">
-            <span className="custom-emoji-preview" aria-hidden="true">
-              {card.opening.emoji || '✨'}
-            </span>
-            <input
-              id="custom-emoji-input"
-              type="text"
-              maxLength={10}
-              placeholder="ဥပမာ 🌹, 👑, 🥳 သို့မဟုတ် စာလုံး"
-              value={isCustomEmoji ? card.opening.emoji : ''}
-              onChange={(e) => {
-                const val = e.target.value.trim()
-                update({ emoji: val || '💌' })
-              }}
-            />
-          </div>
-        </div>
       </fieldset>
 
       {/* Animations */}
@@ -224,14 +177,14 @@ export function OpeningFields({
             update({ animation: e.target.value as OpeningConfig['animation'] })
           }
         >
-          <option value="gentle">✨ ညင်သာစွာ လှုပ်ရှားမယ် (Gentle Float)</option>
-          <option value="sparkles">⭐ ကြယ်လေးတွေနဲ့ ဖွင့်မယ် (Sparkle Stars)</option>
-          <option value="confetti">🎉 ရောင်စုံ စက္ကူမှုန်များ ကြဲမယ် (Confetti Burst)</option>
-          <option value="hearts">💖 အသည်းပုံလေးများ ပျံဝဲမယ် (Floating Hearts)</option>
-          <option value="glow">🌟 ရွှေရောင် အလင်းတန်း ဖြာထွက်မယ် (Golden Glow)</option>
-          <option value="bounce">🎈 ခုန်ပေါက် လှုပ်ရှားမယ် (Playful Bounce)</option>
-          <option value="fade">🌫️ ညင်သာစွာ ပျောက်ကွယ်မယ် (Smooth Fade)</option>
-          <option value="none">🚫 Animation မထည့်ဘူး (None)</option>
+          <option value="gentle">✨ Gentle Float</option>
+          <option value="sparkles">⭐ Sparkle Stars</option>
+          <option value="confetti">🎉 Confetti Burst</option>
+          <option value="hearts">💖 Floating Hearts</option>
+          <option value="glow">🌟 Golden Glow</option>
+          <option value="bounce">🎈 Playful Bounce</option>
+          <option value="fade">🌫️ Smooth Fade</option>
+          <option value="none">🚫 None</option>
         </select>
       </label>
 
@@ -245,8 +198,8 @@ export function OpeningFields({
       </label>
 
       <p className="field-hint">
-        အမည်တွေကို “ကတ်အဖုံး & စာမျက်နှာများ” မှာ ပြင်နိုင်ပါတယ်။ Preview က ခလုတ်ကို
-        နှိပ်ပြီး animation စမ်းကြည့်နိုင်ပါသည်။ ဒီနေရာတွင် သီချင်းမဖွင့်ပါ။
+        အမည်တွေကို “ကတ်အဖုံး & စာမျက်နှာများ” မှာ ပြင်နိုင်ပါတယ်။ Preview ခလုတ်ကို
+        နှိပ်ပြီး animation စမ်းကြည့်နိုင်ပါသည်။ ဒီနေရာတွင် သံစဥ်မပွင့်လာသေးပါ။
       </p>
     </div>
   )

@@ -45,7 +45,7 @@ export const openingSchema = z.object({
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#b49bdc'),
   sealColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#8b5cf6'),
   textColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#453362'),
-  emoji: z.string().max(20).default('💌'),
+  emoji: z.enum(openingEmojis).default('💌'),
   kicker: z.string().max(100).default('A LITTLE SURPRISE FOR YOU'),
   showKicker: z.boolean().default(true),
   title: z.string().max(120).default('သင့်အတွက် အမှတ်တရလေး'),

@@ -43,10 +43,10 @@ export const TEXT_BACKGROUNDS = [
 ]
 
 export const TEXT_FONTS: FontOption[] = [
-  { id: 'handwriting', label: 'လက်ရေးစတိုင် (Handwriting)', family: "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive" },
-  { id: 'serif', label: 'ကျက်သရေရှိ Serif (Playfair / Fraunces)', family: "'Playfair Display', 'Fraunces', 'Cinzel', 'Noto Serif Myanmar', serif" },
-  { id: 'sans', label: 'ရိုးရှင်းသပ်ရပ် Sans (Padauk)', family: "'Padauk', 'Noto Sans Myanmar', sans-serif" },
-  { id: 'Padauk', label: 'Padauk (ပိတောက်မြန်မာဖောင့်)', family: "'Padauk', sans-serif" },
+  { id: 'handwriting', label: 'Handwriting', family: "'Caveat', 'Segoe Print', 'Noto Sans Myanmar', cursive" },
+  { id: 'serif', label: 'Serif (Playfair / Fraunces)', family: "'Playfair Display', 'Fraunces', 'Cinzel', 'Noto Serif Myanmar', serif" },
+  { id: 'sans', label: 'Sans (Padauk)', family: "'Padauk', 'Noto Sans Myanmar', sans-serif" },
+  { id: 'Padauk', label: 'Padauk (ပိတောက်)', family: "'Padauk', sans-serif" },
   { id: 'Noto Sans Myanmar', label: 'Noto Sans Myanmar', family: "'Noto Sans Myanmar', sans-serif" },
   { id: 'Playfair Display', label: 'Playfair Display', family: "'Playfair Display', serif" },
   { id: 'Fraunces', label: 'Fraunces Display', family: "'Fraunces', serif" },

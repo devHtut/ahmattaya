@@ -1,11 +1,8 @@
 import { TEXT_FONTS, type FontOption } from '../ui/ElementShapes'
 
-// Dynamically discover any TTF, OTF, or WOFF font files placed in assets/fonts/ or public/fonts/
+// Dynamically discover any TTF, OTF, or WOFF font files placed in assets/fonts/
 const customFontModules = import.meta.glob(
-  [
-    '/assets/fonts/*.{ttf,TTF,otf,OTF,woff,woff2}',
-    '/public/fonts/*.{ttf,TTF,otf,OTF,woff,woff2}',
-  ],
+  '/assets/fonts/*.{ttf,TTF,otf,OTF,woff,woff2}',
   { eager: true, query: '?url', import: 'default' },
 ) as Record<string, string>
 
@@ -19,7 +16,9 @@ export function getCustomFonts(): FontOption[] {
     const filename = path.split('/').pop() ?? ''
     const fontName = filename
       .replace(/\.(ttf|otf|woff2?)$/i, '')
-      .replace(/[-_]/g, ' ')
+      .replace(/_[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i, '')
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s+/g, ' ')
       .trim()
 
     if (!fontName || seen.has(fontName.toLowerCase())) continue

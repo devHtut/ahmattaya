@@ -5,7 +5,6 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Clock,
   Copy,
   Download,
   ExternalLink,
@@ -962,17 +961,6 @@ export function EventFields({
                 className="alarm-calc-row"
                 style={isBirthday ? { justifyContent: 'center' } : undefined}
               >
-                <div className="alarm-preview-badge">
-                  <Clock size={14} />
-                  <span>
-                    ပြသမှု —{' '}
-                    <strong className="alarm-preview-highlight">
-                      {isBirthday
-                        ? `${toMyanmarDigits(yearsVal || 1)} နှစ်ပြည့်`
-                        : anniversary.durationText || 'သတ်မှတ်မထားပါ'}
-                    </strong>
-                  </span>
-                </div>
                 {!isBirthday && rawDate && (
                   <button
                     type="button"
