@@ -126,7 +126,7 @@ function getSteps(occasion: Occasion): StepDefinition[] {
       id: 'publish',
       label: 'မျှဝေမယ်',
       title: 'စစ်ဆေး & မျှဝေမယ်',
-      hint: 'ကတ်လေးကို အစအဆုံး စစ်ဆေးပြီး Reviewer သို့မဟုတ် လက်ခံသူထံ မျှဝေလိုက်ပါ။',
+      hint: 'ကတ်လေးကို အစအဆုံး စစ်ဆေးပြီး လက်ခံသူထံ မျှဝေလိုက်ပါ။',
       icon: Send,
       view: 'pages',
     },

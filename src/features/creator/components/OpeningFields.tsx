@@ -5,6 +5,8 @@ import {
 } from '../../../shared/models/opening'
 import { TEXT_FONTS } from '../../../shared/ui/ElementShapes'
 import { getCustomFonts } from '../../../shared/fonts/fonts-catalog'
+import { palettes } from '../../../shared/templates/card-styles'
+import { RotateCcw } from 'lucide-react'
 
 export function OpeningFields({
   card,
@@ -130,26 +132,124 @@ export function OpeningFields({
       </div>
 
       {/* Colors */}
-      <div className="color-controls">
-        {(
-          [
-            { key: 'background', label: 'နောက်ခံအရောင်' },
-            { key: 'color', label: 'စာအိတ် / ဘူးအရောင်' },
-            { key: 'sealColor', label: 'Seal / ဖဲကြိုးအရောင်' },
-            { key: 'textColor', label: 'စာသားအရောင်' },
-          ] as const
-        ).map(({ key, label }) => (
-          <label className="color-control" key={key}>
-            <span>{label}</span>
-            <input
-              type="color"
-              value={card.opening[key]}
-              onChange={(e) => update({ [key]: e.target.value })}
-            />
-            <span className="hex-value">{card.opening[key]}</span>
-          </label>
-        ))}
-      </div>
+      <fieldset className="opening-colors-section">
+        <div
+          className="color-palette-legend-row"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '8px',
+          }}
+        >
+          <legend style={{ marginBottom: 0 }}>လိုက်ဖက်တဲ့ အရောင်တွဲများ</legend>
+          {!(
+            card.opening.background.toLowerCase() ===
+              card.appearance.colors.surface.toLowerCase() &&
+            card.opening.color.toLowerCase() ===
+              card.appearance.colors.background.toLowerCase() &&
+            card.opening.sealColor.toLowerCase() ===
+              card.appearance.colors.accent.toLowerCase() &&
+            card.opening.textColor.toLowerCase() ===
+              card.appearance.colors.text.toLowerCase()
+          ) && (
+            <button
+              type="button"
+              className="text-reset-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--accent, #7c3aed)',
+                fontSize: '11px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                padding: '2px 4px',
+              }}
+              onClick={() =>
+                update({
+                  background: card.appearance.colors.surface,
+                  color: card.appearance.colors.background,
+                  sealColor: card.appearance.colors.accent,
+                  textColor: card.appearance.colors.text,
+                })
+              }
+              title="Cover အရောင်အတိုင်းထားမယ်"
+            >
+              <RotateCcw size={12} />
+              <span>Cover အရောင်အတိုင်းထားမယ်</span>
+            </button>
+          )}
+        </div>
+
+        <div className="palette-grid">
+          {palettes.map((palette) => {
+            const isSelected =
+              card.opening.background.toLowerCase() ===
+                palette.colors.surface.toLowerCase() &&
+              card.opening.color.toLowerCase() ===
+                palette.colors.background.toLowerCase() &&
+              card.opening.sealColor.toLowerCase() ===
+                palette.colors.accent.toLowerCase() &&
+              card.opening.textColor.toLowerCase() ===
+                palette.colors.text.toLowerCase()
+
+            return (
+              <button
+                key={palette.id}
+                type="button"
+                className="palette-choice"
+                aria-pressed={isSelected}
+                onClick={() =>
+                  update({
+                    background: palette.colors.surface,
+                    color: palette.colors.background,
+                    sealColor: palette.colors.accent,
+                    textColor: palette.colors.text,
+                  })
+                }
+              >
+                <span className="palette-swatches" aria-hidden="true">
+                  <span style={{ backgroundColor: palette.colors.surface }} />
+                  <span style={{ backgroundColor: palette.colors.background }} />
+                  <span style={{ backgroundColor: palette.colors.accent }} />
+                  <span style={{ backgroundColor: palette.colors.text }} />
+                </span>
+                <span>{palette.name}</span>
+              </button>
+            )
+          })}
+        </div>
+      </fieldset>
+
+      <fieldset style={{ marginTop: '12px' }}>
+        <legend>ကိုယ်ပိုင် အရောင်ရွေးမယ်</legend>
+        <div className="color-controls">
+          {(
+            [
+              { key: 'background', label: 'နောက်ခံအရောင်' },
+              { key: 'color', label: 'စာအိတ် / ဘူးအရောင်' },
+              { key: 'sealColor', label: 'Seal / ဖဲကြိုးအရောင်' },
+              { key: 'textColor', label: 'စာသားအရောင်' },
+            ] as const
+          ).map(({ key, label }) => (
+            <label className="color-control" key={key}>
+              <span>{label}</span>
+              <input
+                type="color"
+                value={card.opening[key]}
+                onChange={(e) => update({ [key]: e.target.value })}
+              />
+              <span className="hex-value">{card.opening[key]}</span>
+            </label>
+          ))}
+        </div>
+        <p className="field-hint">
+          နောက်ခံနဲ့ စာသားရောင် ကွဲကွဲပြားပြား ရွေးပေးရင် ပိုဖတ်ရလွယ်ပါတယ်။
+        </p>
+      </fieldset>
 
       {/* Emoji Customization */}
       <fieldset className="opening-emoji-picker">
