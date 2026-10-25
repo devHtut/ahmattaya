@@ -404,7 +404,7 @@ export function PreviewPage({
                 <AnniversaryTimeline
                   anniversary={card.event?.anniversary}
                   coupleNames={card.title}
-                  colors={card.appearance.colors}
+                  colors={card.event?.anniversary?.colors ?? card.appearance.colors}
                   isBirthday={isBirthdayTimeline}
                 />
               </Reveal>

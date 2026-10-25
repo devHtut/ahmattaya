@@ -19,6 +19,15 @@ export const timelineItemSchema = z.object({
   photo: z.string().max(300000).optional(),
 })
 
+const colorHexSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/)
+export const eventColorsSchema = z.object({
+  background: colorHexSchema,
+  surface: colorHexSchema,
+  text: colorHexSchema,
+  accent: colorHexSchema,
+})
+export type EventColors = z.infer<typeof eventColorsSchema>
+
 export const anniversaryEventSchema = z.object({
   yearsCount: z.number().int().min(0).max(100).default(1),
   durationText: z.string().max(80).optional(),
@@ -30,6 +39,7 @@ export const anniversaryEventSchema = z.object({
   daysValue: z.number().int().min(0).max(36500).optional(),
   rawDate: z.string().max(40).optional(),
   enabled: z.boolean().optional(),
+  colors: eventColorsSchema.optional(),
 })
 
 export const eventSchema = z.object({

@@ -71,11 +71,13 @@ export function AnniversaryTimeline({
 
   if (!hasTimeline && !hasDateOrYears) return null
 
-  const containerStyle = colors
+  const effectiveColors = anniversary.colors ?? colors
+  const containerStyle = effectiveColors
     ? ({
-      '--accent': colors.accent,
-      '--card': colors.surface,
-      '--ink': colors.text,
+      '--accent': effectiveColors.accent,
+      '--card': effectiveColors.surface,
+      '--ink': effectiveColors.text,
+      '--background': effectiveColors.background,
     } as React.CSSProperties)
     : undefined
 

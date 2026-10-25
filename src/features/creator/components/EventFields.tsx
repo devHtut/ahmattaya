@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react'
 import type { CardConfig } from '../../../shared/models/card'
+import { ColorPaletteFields } from './ColorPaletteFields'
 import {
   createAnniversaryEvent,
   createBirthdayTimelineItems,
@@ -980,6 +981,21 @@ export function EventFields({
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Timeline Colors Section */}
+          <div className="timeline-colors-section" style={{ marginTop: '18px' }}>
+            <ColorPaletteFields
+              colors={anniversary.colors ?? card.appearance.colors}
+              onChangeColors={(newColors) =>
+                updateAnniversary({ colors: newColors })
+              }
+              isCustomized={Boolean(anniversary.colors)}
+              onResetToDefault={() => updateAnniversary({ colors: undefined })}
+              legend="Timeline အရောင်တွဲများ"
+              resetButtonText="Cover အရောင်အတိုင်းထားမယ်"
+              showCustomPickers={true}
+            />
           </div>
 
           {/* 3. Timeline Builder */}

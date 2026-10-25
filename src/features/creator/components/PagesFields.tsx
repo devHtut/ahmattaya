@@ -3,6 +3,7 @@ import { BackgroundFields } from './BackgroundFields'
 import { StyleFields } from './StyleFields'
 import { WordsFields } from './WordsFields'
 import { TextStyleFields } from './TextStyleFields'
+import { ColorPaletteFields } from './ColorPaletteFields'
 import { occasions, changeOccasion } from '../../../shared/templates/templates'
 import { ImagePlus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { ElementFields } from './ElementFields'
@@ -237,6 +238,20 @@ export function PagesFields({
                 onChange={(e) => updatePage({ message: e.target.value })}
               />
             </label>
+          </div>
+
+          <div className="page-colors-section" style={{ marginTop: '14px' }}>
+            <ColorPaletteFields
+              colors={page.colors ?? card.appearance.colors}
+              onChangeColors={(newColors) =>
+                updatePage({ colors: newColors })
+              }
+              isCustomized={Boolean(page.colors)}
+              onResetToDefault={() => updatePage({ colors: undefined })}
+              legend="စာမျက်နှာ အရောင်တွဲများ"
+              resetButtonText="Cover အရောင်အတိုင်းထားမယ်"
+              showCustomPickers={true}
+            />
           </div>
 
           <div className="page-typography-section" style={{ marginTop: '14px' }}>

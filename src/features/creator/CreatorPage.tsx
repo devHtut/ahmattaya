@@ -380,7 +380,7 @@ export function CreatorPage({
                     <AnniversaryTimeline
                       anniversary={card.event?.anniversary}
                       coupleNames={card.title}
-                      colors={card.appearance.colors}
+                      colors={card.event?.anniversary?.colors ?? card.appearance.colors}
                       isBirthday={card.occasion === 'birthday'}
                     />
                   ) : (

@@ -4799,9 +4799,9 @@ footer {
 }
 
 .anniversary-badge {
-  background: #fefcbf;
-  color: #744210;
-  border-color: #faf089;
+  background: color-mix(in srgb, var(--accent, #c05621) 14%, var(--card, #fffaf0));
+  color: var(--accent, #c05621);
+  border: 1px solid color-mix(in srgb, var(--accent, #c05621) 32%, transparent);
 }
 
 /* Wedding Event Receiver Container */

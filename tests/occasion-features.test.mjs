@@ -141,3 +141,63 @@ test('rsvp storage supports save, list, delete, clear and CSV export', () => {
   clearRsvpResponses(testProjectId)
   assert.equal(listRsvpResponses(testProjectId).length, 0)
 })
+
+test('supports per-page and timeline custom colors', () => {
+  const card = createCard('birthday')
+  card.pages.push({
+    id: 'p-custom-color',
+    title: 'Custom Colored Page',
+    message: 'Testing custom palette',
+    paper: 'blank',
+    photos: [],
+    colors: {
+      background: '#eee5fb',
+      surface: '#fdfbff',
+      text: '#493769',
+      accent: '#8055c6',
+    },
+  })
+
+  const anniversary = {
+    ...createAnniversaryEvent(),
+    colors: {
+      background: '#dcf3e8',
+      surface: '#f6fff9',
+      text: '#245c49',
+      accent: '#2d8063',
+    },
+  }
+  card.event = { anniversary }
+
+  const parsed = cardSchema.safeParse(card)
+  assert.equal(parsed.success, true)
+  if (parsed.success) {
+    assert.deepEqual(parsed.data.pages[0]?.colors, {
+      background: '#eee5fb',
+      surface: '#fdfbff',
+      text: '#493769',
+      accent: '#8055c6',
+    })
+    assert.deepEqual(parsed.data.event?.anniversary?.colors, {
+      background: '#dcf3e8',
+      surface: '#f6fff9',
+      text: '#245c49',
+      accent: '#2d8063',
+    })
+  }
+
+  // Rejects invalid color format
+  assert.equal(
+    cardSchema.safeParse({
+      ...card,
+      pages: [
+        {
+          ...card.pages[0],
+          colors: { background: 'invalid-hex', surface: '#fff', text: '#000', accent: '#123' },
+        },
+      ],
+    }).success,
+    false,
+  )
+})
+

@@ -51,7 +51,11 @@ export function CardPreview({
   const elements = (card.elements ?? []).filter(
     (el) => el.pageId === (page?.id ?? 'cover'),
   )
-  const { colors, heading, body } = card.appearance
+  const { colors: baseColors, heading, body } = card.appearance
+  const colors = {
+    ...baseColors,
+    ...(page?.colors ?? {}),
+  }
   const isCover = !page
   const effectiveHeading = {
     ...heading,

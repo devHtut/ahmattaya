@@ -60,13 +60,16 @@ const textStyleFields = {
   italic: z.boolean(),
   align: z.enum(['left', 'center', 'right']),
 }
+export const cardColorsSchema = z.object({
+  background: colorSchema,
+  surface: colorSchema,
+  text: colorSchema,
+  accent: colorSchema,
+})
+export type CardColors = z.infer<typeof cardColorsSchema>
+
 export const appearanceSchema = z.object({
-  colors: z.object({
-    background: colorSchema,
-    surface: colorSchema,
-    text: colorSchema,
-    accent: colorSchema,
-  }),
+  colors: cardColorsSchema,
   heading: z.object({
     ...textStyleFields,
     size: z.number().int().min(18).max(48),
@@ -130,6 +133,7 @@ export const pageSchema = z.object({
   background: backgroundSchema.nullable().default(null),
   heading: pageHeadingStyleSchema.optional(),
   body: pageBodyStyleSchema.optional(),
+  colors: cardColorsSchema.optional(),
 })
 export type CardPage = z.infer<typeof pageSchema>
 export const v3PhotoSchema = z.object({
