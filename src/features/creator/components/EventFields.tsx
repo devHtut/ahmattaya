@@ -1093,7 +1093,7 @@ export function EventFields({
               </label>
 
               <label>
-                အမှတ်တရ စကား / ဇာတ်လမ်း
+                အမှတ်တရ စာသားများ
                 <textarea
                   maxLength={400}
                   rows={3}
@@ -1252,7 +1252,7 @@ export function EventFields({
                 }
                 legend="Timeline စာလုံးပုံစံ ပြင်မယ်"
                 headingLabel="ခေါင်းစဉ်"
-                bodyLabel="စာသား / ဇာတ်လမ်း"
+                bodyLabel="စာသား"
               />
             </div>
 

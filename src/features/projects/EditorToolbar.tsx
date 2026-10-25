@@ -52,6 +52,15 @@ export function EditorToolbar({
   const cloudSyncRef = useRef<CloudSyncHandle>(null)
   const [shareOpened, setShareOpened] = useState(false)
 
+  useEffect(() => {
+    const handleOpenShare = () => {
+      setShareOpened(true)
+      shareDialog.current?.showModal()
+    }
+    window.addEventListener('open-share-dialog', handleOpenShare)
+    return () => window.removeEventListener('open-share-dialog', handleOpenShare)
+  }, [])
+
   const handleExplicitSave = useCallback(() => {
     w.saveNow()
     setSavedFlash(true)

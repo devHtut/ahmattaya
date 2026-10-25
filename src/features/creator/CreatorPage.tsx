@@ -720,9 +720,15 @@ export function CreatorPage({
               ))}
             </div>
             {isLast ? (
-              <Link to="/preview" className="button primary publish-action-btn">
-                <Eye size={15} /> ကတ်ကို စစ်ဆေးမယ် 🚀
-              </Link>
+              <button
+                type="button"
+                className="button primary publish-action-btn"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-share-dialog'))
+                }}
+              >
+                <Share2 size={15} /> Share
+              </button>
             ) : (
               <button className="button primary" onClick={() => go(1)}>
                 နောက်အဆင့် <ArrowRight size={15} />
