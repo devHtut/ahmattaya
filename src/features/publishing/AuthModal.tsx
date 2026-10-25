@@ -181,30 +181,29 @@ export function AuthModal({
       onClose={handleClose}
       aria-labelledby="auth-modal-title"
     >
-      <div className="share-dialog-header">
-        <h2 id="auth-modal-title" className="auth-modal-title">
-          {mode === 'signin' && (
-            <>
-              <LogIn size={20} className="auth-title-icon" />
-              <span>အကောင့်ဝင်ရန် (Sign In)</span>
-            </>
-          )}
-          {mode === 'signup' && (
-            <>
-              <UserPlus size={20} className="auth-title-icon" />
-              <span>အကောင့်သစ်ဖွင့်ရန် (Sign Up)</span>
-            </>
-          )}
-          {mode === 'otp' && (
-            <>
-              <KeyRound size={20} className="auth-title-icon" />
-              <span>Email OTP အတည်ပြုရန်</span>
-            </>
-          )}
-        </h2>
+      <div className="auth-modal-header">
+        <div className="auth-modal-title-wrap">
+          <div className="auth-title-icon-badge">
+            {mode === 'signin' && <LogIn size={18} />}
+            {mode === 'signup' && <UserPlus size={18} />}
+            {mode === 'otp' && <KeyRound size={18} />}
+          </div>
+          <div>
+            <h2 id="auth-modal-title" className="auth-modal-title">
+              {mode === 'signin' && 'အကောင့်ဝင်ရန်'}
+              {mode === 'signup' && 'အကောင့်သစ်ဖွင့်ရန်'}
+              {mode === 'otp' && 'Email OTP အတည်ပြုရန်'}
+            </h2>
+            <span className="auth-modal-subtitle">
+              {mode === 'signin' && 'Sign In'}
+              {mode === 'signup' && 'Sign Up'}
+              {mode === 'otp' && 'Confirmation Code'}
+            </span>
+          </div>
+        </div>
         <button
           type="button"
-          className="icon-button"
+          className="auth-modal-close-btn"
           aria-label="ပိတ်မယ်"
           onClick={handleClose}
         >

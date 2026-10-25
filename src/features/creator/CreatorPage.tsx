@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  LogIn,
   Mail,
   Music,
   Palette,
@@ -36,10 +35,6 @@ import { OpeningInvitation } from '../../shared/ui/OpeningInvitation'
 import { OpeningFields } from './components/OpeningFields'
 import { MusicFields } from './components/MusicFields'
 import { PagesFields } from './components/PagesFields'
-import { CloudConnection } from '../publishing/CloudConnection'
-import { AuthModal } from '../publishing/AuthModal'
-import { useCloudIdentity } from '../publishing/useCloudIdentity'
-import { isPermanentAccount } from '../../shared/cloud/account'
 import { createPage } from './lib/pages'
 import type { ProjectWorkspace } from './hooks/useCreatorDraft'
 
@@ -155,9 +150,6 @@ export function CreatorPage({
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
   const [selectedPageId, setSelectedPageId] = useState('cover')
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-  const cloudIdentity = useCloudIdentity()
-  const isPermanent = isPermanentAccount(cloudIdentity.user)
 
   const cakeEditor = useCakeEditor(card.cake, (cake) =>
     onChange({ ...card, cake }),
@@ -669,39 +661,6 @@ export function CreatorPage({
                   </div>
                 </div>
 
-                {!isPermanent ? (
-                  <div className="publish-signin-section">
-                    <div className="publish-section-head">
-                      <Share2 size={16} />
-                      <h4>Upload to Cloud and Share</h4>
-                    </div>
-                    <p className="field-hint">
-                      ကတ်ကို Cloud ပေါ်သို့ တင်ပြီး လုံခြုံသော Link သို့မဟုတ် QR
-                      ဖိတ်စာကတ်ပြားဖြင့် မျှဝေနိုင်ရန် Sign In အရင်ဝင်ရောက်ပေးပါ။
-                    </p>
-                    <button
-                      type="button"
-                      className="button primary publish-signin-btn"
-                      onClick={() => setAuthModalOpen(true)}
-                    >
-                      <LogIn size={15} />
-                      Sign In
-                    </button>
-                  </div>
-                ) : (
-                  <div className="publish-cloud-section">
-                    <div className="publish-section-head">
-                      <Share2 size={16} />
-                      <h4>Upload to Cloud and Share</h4>
-                    </div>
-                    <p className="field-hint">
-                      ကတ်ကို Cloud ပေါ်သို့ တင်ပြီး လုံခြုံသော Link သို့မဟုတ် QR
-                      ဖိတ်စာကတ်ပြားဖြင့် Reviewer များ၊ မိတ်ဆွေများထံ တိုက်ရိုက်
-                      ပေးပို့နိုင်ပါသည်။
-                    </p>
-                    {workspace && <CloudConnection workspace={workspace} />}
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -737,11 +696,6 @@ export function CreatorPage({
           </div>
         </section>
       </div>
-
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
     </div>
   )
 }

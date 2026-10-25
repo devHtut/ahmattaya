@@ -7,7 +7,6 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 import {
   Check,
-  Cloud,
   Download,
   Eye,
   FileImage,
@@ -370,7 +369,7 @@ export function EditorToolbar({
         aria-labelledby="share-heading"
       >
         <div className="share-dialog-header">
-          <h2 id="share-heading">ကတ်ကို မျှဝေရန် (Share Card)</h2>
+          <h2 id="share-heading">မျှဝေရန်</h2>
           <button
             className="icon-button"
             aria-label="ပိတ်မယ်"
@@ -380,12 +379,11 @@ export function EditorToolbar({
           </button>
         </div>
         <p className="share-dialog-desc">
-          ဒီကတ်ကို ချစ်ရသူဆီ ပေးပို့ရန် Receiver Link နှင့် QR Code ကို အကောင့်ဖွင့်စရာမလိုဘဲ တိုက်ရိုက်ထုတ်ယူနိုင်ပါသည်။
+          ကတ်လက်ခံသူဆီ ပေးပို့ရန် Receiver Link နှင့် QR Code ကို ရယူပါ။
         </p>
         {(w.saveStatus === 'error' || w.saveStatus === 'blocked') && (
           <p role="alert" className="music-error">
-            လက်ရှိပြင်ထားတာတွေ မသိမ်းရသေးပါ။ Editor မှာ သိမ်းဆည်းမှုအခြေအနေကို
-            ပြန်စစ်ပေးပါ။
+            Save မလုပ်ရသေးပါ။ Editor မှာပြန်စစ်ပေးပါ။
           </p>
         )}
         {shareOpened && (
@@ -394,53 +392,6 @@ export function EditorToolbar({
             publishBlocked={w.saveStatus === 'blocked' || w.saveStatus === 'error'}
           />
         )}
-        <div
-          style={{
-            marginTop: '1.25rem',
-            padding: '0.85rem 1rem',
-            borderRadius: '10px',
-            background: 'var(--paper-soft, rgba(0, 0, 0, 0.03))',
-            border: '1px solid var(--line, rgba(0, 0, 0, 0.08))',
-            fontSize: '12px',
-            color: 'var(--ink-soft, #64748b)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <span>
-            💡 တခြား Device / ဖုန်းများမှာပါ ကတ်ကို ဆက်လက်ပြင်ဆင်လိုပါက
-          </span>
-          <button
-            type="button"
-            className="button ghost"
-            style={{
-              fontSize: '11px',
-              padding: '5px 10px',
-              whiteSpace: 'nowrap',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-            }}
-            onClick={() => {
-              shareDialog.current?.close()
-              cloudSyncRef.current?.open()
-            }}
-          >
-            <Cloud size={14} />
-            Cloud Sync သွားရန်
-          </button>
-        </div>
-        <div className="share-dialog-actions" style={{ marginTop: '1.25rem' }}>
-          <Link
-            className="button ghost"
-            to="/preview"
-            onClick={() => shareDialog.current?.close()}
-          >
-            <Eye size={16} /> ကိုယ့်ကတ် နမူနာကြည့်မယ်
-          </Link>
-        </div>
       </dialog>
     </header>
   )

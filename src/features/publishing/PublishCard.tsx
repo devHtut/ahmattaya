@@ -106,11 +106,11 @@ export function PublishCard({
         remove && publication
           ? await unpublish(client, publication.id)
           : await publishProject(client, effectiveOwner, project, {
-              onSaved: (receipt) => w.recordCloudSave(project.id, receipt),
-              onProgress: (p) => {
-                if (alive.current) setProgress(p)
-              },
-            })
+            onSaved: (receipt) => w.recordCloudSave(project.id, receipt),
+            onProgress: (p) => {
+              if (alive.current) setProgress(p)
+            },
+          })
       if (alive.current) {
         setPublication(result)
         setFeedback(
@@ -143,13 +143,8 @@ export function PublishCard({
   return (
     <section className="publish-card" aria-labelledby="publish-heading">
       <h3 id="publish-heading">
-        <Link2 size={18} /> ချစ်ရသူဆီ ပို့မယ် (Receiver Link)
+        <Link2 size={18} /> ချစ်ရသူဆီ ပို့မယ်
       </h3>
-      <p className="field-hint">
-        Publish နှိပ်ရင် လက်ရှိပြင်ဆင်ထားသော ကတ်အွန်လိုင်းမိတ္တူကို ထုတ်ပေးပါမည်။
-        Link ရရှိသူတိုင်း မည်သည့် Device / Browser မှမဆို ဖွင့်ဖတ်ကြည့်ရှုနိုင်ပြီး
-        ပြင်ဆင်ခွင့် မရှိပါ။
-      </p>
       {loading && <p role="status">Share link ကို စစ်နေပါတယ်…</p>}
       <button
         className="button primary"
@@ -225,8 +220,7 @@ export function PublishCard({
             {publication?.published_at &&
               new Date(publication.published_at).toLocaleString()}{' '}
             · Publish ပြန်လုပ်ရင် ဒီ link အတိုင်းပဲ ဖြစ်ပါတယ်။ Link ပိတ်ရင်
-            အသစ်ဖွင့်ကြည့်လို့မရတော့ပါ။ အရင်ဖွင့်ပြီးသား မိတ္တူတွေကိုတော့
-            ပြန်ဖျက်ပေးလို့ မရပါ။
+            အသစ်ဖွင့်ကြည့်လို့မရတော့ပါ။
           </p>
         </div>
       )}

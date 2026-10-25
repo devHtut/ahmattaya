@@ -2,6 +2,9 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Cloud, X } from 'lucide-react'
 import { CloudConnection } from './CloudConnection'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
+import { useCloudIdentity } from './useCloudIdentity'
+import { isPermanentAccount } from '../../shared/cloud/account'
+import { AuthModal } from './AuthModal'
 
 export interface CloudSyncHandle {
   open: () => void
@@ -11,13 +14,24 @@ export const CloudSyncButton = forwardRef<
   CloudSyncHandle,
   { workspace: ProjectWorkspace }
 >(({ workspace }, ref) => {
+  const identity = useCloudIdentity()
+  const isPermanent = isPermanentAccount(identity.user)
   const [cloudOpened, setCloudOpened] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
   const cloudDialog = useRef<HTMLDialogElement>(null)
+
+  const handleOpen = () => {
+    if (!isPermanent) {
+      setAuthModalOpen(true)
+    } else {
+      setCloudOpened(true)
+      cloudDialog.current?.showModal()
+    }
+  }
 
   useImperativeHandle(ref, () => ({
     open() {
-      setCloudOpened(true)
-      cloudDialog.current?.showModal()
+      handleOpen()
     },
   }))
 
@@ -27,14 +41,20 @@ export const CloudSyncButton = forwardRef<
         type="button"
         className="icon-button"
         aria-label="Cloud ကတ်များ"
-        title="တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cross-Device Cloud Sync)"
-        onClick={() => {
-          setCloudOpened(true)
-          cloudDialog.current?.showModal()
-        }}
+        title={isPermanent ? 'တခြားစက်များနှင့် ချိတ်ဆက်ရန် (Cloud Sync)' : 'အကောင့်ဝင်ရန် (Sign In)'}
+        onClick={handleOpen}
       >
         <Cloud size={17} />
       </button>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={() => {
+          setCloudOpened(true)
+          cloudDialog.current?.showModal()
+        }}
+      />
 
       <dialog
         ref={cloudDialog}
