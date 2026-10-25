@@ -279,7 +279,7 @@ export function ElementFields({
                           {isSticker
                             ? (el.text || 'Sticker')
                             : isText
-                              ? (el.text ? `"${el.text.slice(0, 16)}${el.text.length > 16 ? '...' : ''}"` : 'စာတို (Text Box)')
+                              ? (el.text ? `"${el.text.slice(0, 16)}${el.text.length > 16 ? '...' : ''}"` : 'Text Box')
                               : (def?.label ?? 'ပစ္စည်း')}
                         </span>
                         <span className="layer-item-sub">

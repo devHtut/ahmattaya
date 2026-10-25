@@ -38,7 +38,7 @@ export function AnniversaryTimeline({
     <div className="anniversary-timeline-container" style={containerStyle}>
       <div className="anniversary-header">
         <span className="anniversary-badge">
-          {isBirthday ? ' မွေးနေ့ အမှတ်တရ' : ' နှစ်ပတ်လည် အမှတ်တရ'}
+          {isBirthday ? ' မွေးနေ့မှာ ပျော်ရွှင်ပါစေ' : ' အတူရှိနေပေးလို့ ကျေးဇူးတင်ပါတယ်'}
         </span>
         {coupleNames && <h3 className="anniversary-couple">{coupleNames}</h3>}
 
@@ -53,7 +53,7 @@ export function AnniversaryTimeline({
 
         {anniversary.date && !isBirthday && (
           <p className="anniversary-date-line">
-            <Clock size={14} /> စတင်ခဲ့သည့် နေ့ရက် —{' '}
+            <Clock size={14} /> Date —{' '}
             <strong>{anniversary.date}</strong>
           </p>
         )}

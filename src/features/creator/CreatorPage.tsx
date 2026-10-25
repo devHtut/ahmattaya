@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -20,6 +20,7 @@ import {
 import {
   MAX_PAGES,
   type CardConfig,
+  type Occasion,
 } from '../../shared/models/card'
 import { occasions } from '../../shared/templates/templates'
 import { CardPreview } from '../../shared/ui/CardPreview'
@@ -44,14 +45,43 @@ export type MakerStep =
 
 type CanvasView = 'opening' | 'pages' | 'cake' | 'event'
 
-const steps: {
+type StepDefinition = {
   id: MakerStep
   label: string
   title: string
   hint: string
   icon: typeof Mail
   view: CanvasView
-}[] = [
+}
+
+function getSteps(occasion: Occasion): StepDefinition[] {
+  const isBirthday = occasion === 'birthday'
+  const isAnniversary = occasion === 'anniversary'
+  const isWedding = occasion === 'wedding-invitation'
+
+  const eventLabel = isBirthday
+    ? 'မွေးနေ့မှတ်တမ်း'
+    : isAnniversary
+      ? 'အမှတ်တရ'
+      : 'အစီအစဉ်'
+
+  const eventTitle = isBirthday
+    ? 'မွေးနေ့ အမှတ်တရ မှတ်တမ်း'
+    : isAnniversary
+      ? 'နှစ်ပတ်လည် အမှတ်တရ မှတ်တမ်း'
+      : isWedding
+        ? 'မင်္ဂလာပွဲ အစီအစဉ်'
+        : 'ပွဲအစီအစဉ်'
+
+  const eventHint = isBirthday
+    ? 'မွေးနေ့အသက်နှင့် လွန်ခဲ့သောနှစ်များက မွေးနေ့အမှတ်တရပုံရိပ် Timeline ကို ပြင်ဆင်ပါ။'
+    : isAnniversary
+      ? 'နှစ်ပတ်လည် မင်္ဂလာသက်တမ်းနှင့် အတူဖြတ်သန်းခဲ့သော အမှတ်တရ Timeline ကို ပြင်ဆင်ပါ။'
+      : isWedding
+        ? 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps နှင့် RSVP ဧည့်စာရင်း အချက်အလက်များ။'
+        : 'ပွဲရက်စွဲ၊ အစီအစဉ်နှင့် အမှတ်တရ အချက်အလက်များ။'
+
+  return [
     {
       id: 'opening',
       label: 'ဖိတ်စာ',
@@ -70,9 +100,9 @@ const steps: {
     },
     {
       id: 'event',
-      label: 'အစီအစဉ်',
-      title: 'ပွဲအစီအစဉ် / အချက်အလက်',
-      hint: 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps၊ RSVP ဧည့်စာရင်း သို့မဟုတ် နှစ်ပတ်လည် မှတ်တမ်း။',
+      label: eventLabel,
+      title: eventTitle,
+      hint: eventHint,
       icon: Calendar,
       view: 'event',
     },
@@ -101,6 +131,7 @@ const steps: {
       view: 'pages',
     },
   ]
+}
 
 export function CreatorPage({
   card,
@@ -183,8 +214,9 @@ export function CreatorPage({
     setTouchStartX(null)
   }
 
-  const stepIndex = steps.findIndex((s) => s.id === step)
-  const stepDef = steps[stepIndex]
+  const steps = useMemo(() => getSteps(card.occasion), [card.occasion])
+  const stepIndex = Math.max(0, steps.findIndex((s) => s.id === step))
+  const stepDef = steps[stepIndex] ?? steps[0]
   const isFirst = stepIndex <= 0
   const isLast = stepIndex >= steps.length - 1
 
