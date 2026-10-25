@@ -1055,55 +1055,6 @@ export function EventFields({
             </div>
           </div>
 
-          {/* Timeline Colors Section */}
-          <div className="timeline-colors-section" style={{ marginTop: '18px' }}>
-            <ColorPaletteFields
-              colors={anniversary.colors ?? card.appearance.colors}
-              onChangeColors={(newColors) =>
-                updateAnniversary({ colors: newColors })
-              }
-              isCustomized={Boolean(anniversary.colors)}
-              onResetToDefault={() => updateAnniversary({ colors: undefined })}
-              legend="Timeline အရောင်တွဲများ"
-              resetButtonText="Cover အရောင်အတိုင်းထားမယ်"
-              showCustomPickers={true}
-            />
-          </div>
-
-          {/* Timeline Typography Section */}
-          <div className="timeline-typography-section" style={{ marginTop: '14px' }}>
-            <TextStyleFields
-              heading={{
-                ...card.appearance.heading,
-                ...(anniversary.heading ?? {}),
-              }}
-              body={{
-                ...card.appearance.body,
-                ...(anniversary.body ?? {}),
-              }}
-              onChangeHeading={(change) =>
-                updateAnniversary({
-                  heading: { ...(anniversary.heading ?? {}), ...change },
-                })
-              }
-              onChangeBody={(change) =>
-                updateAnniversary({
-                  body: { ...(anniversary.body ?? {}), ...change },
-                })
-              }
-              isCustomized={Boolean(anniversary.heading || anniversary.body)}
-              onResetToDefault={() =>
-                updateAnniversary({
-                  heading: undefined,
-                  body: undefined,
-                })
-              }
-              legend="Timeline စာလုံးပုံစံ ပြင်မယ်"
-              headingLabel="ခေါင်းစဉ်"
-              bodyLabel="စာသား / ဇာတ်လမ်း"
-            />
-          </div>
-
           {/* 3. Timeline Builder */}
           <fieldset className="palette-preset" style={{ marginTop: '18px' }}>
             <legend>
@@ -1254,6 +1205,55 @@ export function EventFields({
               >
                 <Plus size={14} /> Timeline ထဲ ထည့်မယ်
               </button>
+            </div>
+
+            {/* Timeline Colors Section */}
+            <div className="timeline-colors-section" style={{ marginTop: '16px' }}>
+              <ColorPaletteFields
+                colors={anniversary.colors ?? card.appearance.colors}
+                onChangeColors={(newColors) =>
+                  updateAnniversary({ colors: newColors })
+                }
+                isCustomized={Boolean(anniversary.colors)}
+                onResetToDefault={() => updateAnniversary({ colors: undefined })}
+                legend="Timeline အရောင်တွဲများ"
+                resetButtonText="Cover အရောင်အတိုင်းထားမယ်"
+                showCustomPickers={true}
+              />
+            </div>
+
+            {/* Timeline Typography Section */}
+            <div className="timeline-typography-section" style={{ marginTop: '14px' }}>
+              <TextStyleFields
+                heading={{
+                  ...card.appearance.heading,
+                  ...(anniversary.heading ?? {}),
+                }}
+                body={{
+                  ...card.appearance.body,
+                  ...(anniversary.body ?? {}),
+                }}
+                onChangeHeading={(change) =>
+                  updateAnniversary({
+                    heading: { ...(anniversary.heading ?? {}), ...change },
+                  })
+                }
+                onChangeBody={(change) =>
+                  updateAnniversary({
+                    body: { ...(anniversary.body ?? {}), ...change },
+                  })
+                }
+                isCustomized={Boolean(anniversary.heading || anniversary.body)}
+                onResetToDefault={() =>
+                  updateAnniversary({
+                    heading: undefined,
+                    body: undefined,
+                  })
+                }
+                legend="Timeline စာလုံးပုံစံ ပြင်မယ်"
+                headingLabel="ခေါင်းစဉ်"
+                bodyLabel="စာသား / ဇာတ်လမ်း"
+              />
             </div>
 
             <ul className="timeline-builder-list" style={{ marginTop: '16px' }}>
