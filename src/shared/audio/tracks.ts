@@ -14,7 +14,7 @@ export const musicTracks: MusicTrack[] = [
   {
     id: 'little-celebration',
     title: 'ပျော်ရွှင်စရာ နေ့လေး',
-    description: 'လင်းလက်တဲ့ bell သံစဉ်လေး · မွေးနေ့နဲ့ ပွဲနေ့များအတွက်',
+    description: 'Sparkling bell tunes for birthdays and festivals',
     mood: 'ပျော်ရွှင်',
     src: '/music/little-celebration.wav',
     seconds: 18,
@@ -24,7 +24,7 @@ export const musicTracks: MusicTrack[] = [
   {
     id: 'soft-promise',
     title: 'နူးညံ့တဲ့ ကတိလေး',
-    description: 'နူးညံ့တဲ့ keys သံစဉ်လေး · မင်္ဂလာနေ့အတွက်',
+    description: 'Gentle keys for wedding and special days',
     mood: 'နူးညံ့',
     src: '/music/soft-promise.wav',
     seconds: 25,
@@ -34,7 +34,7 @@ export const musicTracks: MusicTrack[] = [
   {
     id: 'memory-evening',
     title: 'အမှတ်တရ ညနေခင်း',
-    description: 'အေးအေးဆေးဆေး arpeggio · နှစ်ပတ်လည်နဲ့ အမှတ်တရများအတွက်',
+    description: 'Arpeggio for anniversaries and memories',
     mood: 'အေးချမ်း',
     src: '/music/memory-evening.wav',
     seconds: 28,

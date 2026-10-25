@@ -177,7 +177,7 @@ export function MusicFields({
                 trackId:
                   card.music.trackId === 'custom' ? 'none' : card.music.trackId,
               })
-              setFeedback('ကိုယ့်သီချင်းကို ဖယ်ပြီးပါပြီ။')
+              setFeedback('သီချင်းကို ဖယ်ပြီးပါပြီ။')
             }}
           >
             <Trash2 size={15} /> ကိုယ့်သီချင်း ဖယ်မယ်
