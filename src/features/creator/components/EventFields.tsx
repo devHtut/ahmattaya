@@ -776,7 +776,7 @@ export function EventFields({
                 marginBottom: '6px',
               }}
             >
-              {isBirthday ? 'မွေးနေ့ သက်တမ်း / အသက်' : 'နှစ်ပတ်လည် သက်တမ်းကာလ'}
+              {isBirthday ? 'မွေးနေ့' : 'နှစ်ပတ်လည်'}
             </span>
 
             <div className="alarm-counter-container">
@@ -839,7 +839,7 @@ export function EventFields({
                     >
                       <ChevronDown size={16} />
                     </button>
-                    <span className="alarm-digit-label">နှစ်ပြည့် (Years)</span>
+                    <span className="alarm-digit-label">Years</span>
                   </div>
                 ) : displayMode === 'years-months' ? (
                   <>
@@ -985,9 +985,7 @@ export function EventFields({
           {/* 3. Timeline Builder */}
           <fieldset className="palette-preset" style={{ marginTop: '18px' }}>
             <legend>
-              {isBirthday
-                ? 'မွေးနေ့ အမှတ်တရ Timeline မှတ်တိုင်များ'
-                : 'အမှတ်တရ Timeline မှတ်တိုင်များ'}
+              {isBirthday ? 'မွေးနေ့ အမှတ်တရ Timeline' : 'အမှတ်တရ Timeline'}
             </legend>
 
             <div className="timeline-add-box">

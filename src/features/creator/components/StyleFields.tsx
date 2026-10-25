@@ -1,10 +1,7 @@
-import { useState } from 'react'
 import { BackgroundFields } from './BackgroundFields'
 import type { CardAppearance, CardConfig } from '../../../shared/models/card'
-import { fontSchema } from '../../../shared/models/card'
 import { palettes } from '../../../shared/templates/card-styles'
-import { TEXT_FONTS } from '../../../shared/ui/ElementShapes'
-import { getCustomFonts } from '../../../shared/fonts/fonts-catalog'
+import { TextStyleFields } from './TextStyleFields'
 
 const colorLabels: { key: keyof CardAppearance['colors']; label: string }[] = [
   { key: 'background', label: 'နောက်ခံရောင်' },
@@ -19,16 +16,6 @@ export function StyleFields({
   card: CardConfig
   onChange: (card: CardConfig) => void
 }) {
-  const [target, setTarget] = useState<'heading' | 'body'>('heading')
-  const style = card.appearance[target]
-  const standardFonts = TEXT_FONTS
-  const customFonts = getCustomFonts()
-
-  const updateText = (change: Partial<typeof style>) =>
-    onChange({
-      ...card,
-      appearance: { ...card.appearance, [target]: { ...style, ...change } },
-    })
   return (
     <div className="style-fields">
       <BackgroundFields card={card} onChange={onChange} />
@@ -95,99 +82,31 @@ export function StyleFields({
           နောက်ခံနဲ့ စာသားရောင် ကွဲကွဲပြားပြား ရွေးပေးရင် ပိုဖတ်ရလွယ်ပါတယ်။
         </p>
       </fieldset>
-      <fieldset>
-        <legend>စာလုံးပုံစံ ပြင်မယ်</legend>
-        <div className="text-target" role="group" aria-label="ပြင်မယ့် စာသား">
-          <button
-            aria-pressed={target === 'heading'}
-            onClick={() => setTarget('heading')}
-          >
-            ခေါင်းစဉ်
-          </button>
-          <button
-            aria-pressed={target === 'body'}
-            onClick={() => setTarget('body')}
-          >
-            ဆုတောင်းစာ
-          </button>
-        </div>
-        <div className="fields">
-          <label>
-            Font
-            <select
-              value={style.font}
-              onChange={(e) =>
-                updateText({ font: fontSchema.parse(e.target.value) })
-              }
-            >
-              <optgroup label="အခြေခံ Fonts (Standard)">
-                {standardFonts.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.label}
-                  </option>
-                ))}
-              </optgroup>
-              {customFonts.length > 0 && (
-                <optgroup
-                  label={`ထည့်ထားသော မြန်မာ Fonts (${customFonts.length})ခု`}
-                >
-                  {customFonts.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.label}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
-              {!standardFonts.some((f) => f.id === style.font) &&
-                !customFonts.some((f) => f.id === style.font) && (
-                  <option value={style.font}>{style.font}</option>
-                )}
-            </select>
-          </label>
-          <label>
-            စာလုံးအရွယ် — {style.size}px
-            <input
-              type="range"
-              min={target === 'heading' ? 18 : 12}
-              max={target === 'heading' ? 48 : 24}
-              step={1}
-              value={style.size}
-              onChange={(e) => updateText({ size: Number(e.target.value) })}
-            />
-          </label>
-          <div
-            className="text-toggles"
-            role="group"
-            aria-label="စာလုံး အထူနှင့် အစောင်း"
-          >
-            <button
-              aria-pressed={style.bold}
-              onClick={() => updateText({ bold: !style.bold })}
-            >
-              <strong>Bold</strong>
-            </button>
-            <button
-              aria-pressed={style.italic}
-              onClick={() => updateText({ italic: !style.italic })}
-            >
-              <em>Italic</em>
-            </button>
-          </div>
-          <label>
-            စာသား နေရာချမှု
-            <select
-              value={style.align}
-              onChange={(e) =>
-                updateText({ align: e.target.value as typeof style.align })
-              }
-            >
-              <option value="left">ဘယ်ဘက်</option>
-              <option value="center">အလယ်</option>
-              <option value="right">ညာဘက်</option>
-            </select>
-          </label>
-        </div>
-      </fieldset>
+      <TextStyleFields
+        heading={card.appearance.heading}
+        body={card.appearance.body}
+        onChangeHeading={(change) =>
+          onChange({
+            ...card,
+            appearance: {
+              ...card.appearance,
+              heading: { ...card.appearance.heading, ...change },
+            },
+          })
+        }
+        onChangeBody={(change) =>
+          onChange({
+            ...card,
+            appearance: {
+              ...card.appearance,
+              body: { ...card.appearance.body, ...change },
+            },
+          })
+        }
+        legend="စာလုံးပုံစံ ပြင်မယ်"
+        headingLabel="ခေါင်းစဉ်"
+        bodyLabel="ဆုတောင်းစာ"
+      />
     </div>
   )
 }

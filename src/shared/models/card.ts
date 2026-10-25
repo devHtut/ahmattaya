@@ -100,6 +100,24 @@ const imageDataSchema = z
       (encoded.length / 4) * 3 - padding <= MAX_PHOTO_BYTES
     )
   }, 'Photo exceeds 200 KB')
+export const pageHeadingStyleSchema = z.object({
+  font: fontSchema.optional(),
+  size: z.number().int().min(18).max(48).optional(),
+  bold: z.boolean().optional(),
+  italic: z.boolean().optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+})
+export type PageHeadingStyle = z.infer<typeof pageHeadingStyleSchema>
+
+export const pageBodyStyleSchema = z.object({
+  font: fontSchema.optional(),
+  size: z.number().int().min(12).max(24).optional(),
+  bold: z.boolean().optional(),
+  italic: z.boolean().optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+})
+export type PageBodyStyle = z.infer<typeof pageBodyStyleSchema>
+
 export const pageSchema = z.object({
   id: z
     .string()
@@ -110,6 +128,8 @@ export const pageSchema = z.object({
   message: z.string().max(2000),
   paper: z.enum(['blank', 'lined']),
   background: backgroundSchema.nullable().default(null),
+  heading: pageHeadingStyleSchema.optional(),
+  body: pageBodyStyleSchema.optional(),
 })
 export type CardPage = z.infer<typeof pageSchema>
 export const v3PhotoSchema = z.object({

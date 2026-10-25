@@ -1,4 +1,4 @@
-import { Heart, Sparkles, Clock } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import type { AnniversaryEvent } from '../../../shared/models/event'
 import type { CardAppearance } from '../../../shared/models/card'
 
@@ -28,28 +28,22 @@ export function AnniversaryTimeline({
 
   const containerStyle = colors
     ? ({
-        '--accent': colors.accent,
-        '--card': colors.surface,
-        '--ink': colors.text,
-      } as React.CSSProperties)
+      '--accent': colors.accent,
+      '--card': colors.surface,
+      '--ink': colors.text,
+    } as React.CSSProperties)
     : undefined
 
   return (
     <div className="anniversary-timeline-container" style={containerStyle}>
       <div className="anniversary-header">
         <span className="anniversary-badge">
-          {isBirthday ? (
-            <Sparkles size={14} className="heart-icon" />
-          ) : (
-            <Heart size={14} className="heart-icon" />
-          )}
           {isBirthday ? ' မွေးနေ့ အမှတ်တရ' : ' နှစ်ပတ်လည် အမှတ်တရ'}
         </span>
         {coupleNames && <h3 className="anniversary-couple">{coupleNames}</h3>}
 
         {durationLabel ? (
           <div className="anniversary-milestone-highlight">
-            <Sparkles size={20} className="sparkle-icon" />
             <span className="years-number">{durationLabel}</span>
             <span className="years-text">
               {isBirthday ? 'မွေးနေ့အမှတ်တရ မှတ်တိုင်' : 'ချစ်သက်တမ်း မှတ်တိုင်'}

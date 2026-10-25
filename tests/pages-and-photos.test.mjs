@@ -121,3 +121,42 @@ test('rejects unsupported and oversized image inputs before decoding', () => {
   assert.ok(validatePhotoFile({ type: 'image/png', size: 16 * 1024 * 1024 }))
   assert.ok(validatePhotoFile({ type: 'image/png', size: 0 }))
 })
+
+test('each page can independently override heading and body font style or inherit from cover', () => {
+  const card = createCard('birthday')
+  const page1 = createPage('page-1')
+  page1.heading = { font: 'Aka03 Regular', size: 36, bold: true, align: 'center' }
+  page1.body = { font: 'Padauk', size: 16, italic: true, align: 'left' }
+  const page2 = createPage('page-2')
+
+  card.pages = [page1, page2]
+  assert.equal(cardSchema.safeParse(card).success, true)
+
+  // Invalid font rejected
+  assert.equal(
+    cardSchema.safeParse({
+      ...card,
+      pages: [{ ...page1, heading: { ...page1.heading, font: 'unknown' } }],
+    }).success,
+    false,
+  )
+
+  // Invalid heading size rejected
+  assert.equal(
+    cardSchema.safeParse({
+      ...card,
+      pages: [{ ...page1, heading: { ...page1.heading, size: 55 } }],
+    }).success,
+    false,
+  )
+
+  // Invalid body size rejected
+  assert.equal(
+    cardSchema.safeParse({
+      ...card,
+      pages: [{ ...page1, body: { ...page1.body, size: 30 } }],
+    }).success,
+    false,
+  )
+})
+

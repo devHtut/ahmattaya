@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BackgroundFields } from './BackgroundFields'
 import { StyleFields } from './StyleFields'
 import { WordsFields } from './WordsFields'
+import { TextStyleFields } from './TextStyleFields'
 import { occasions, changeOccasion } from '../../../shared/templates/templates'
 import { ImagePlus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { ElementFields } from './ElementFields'
@@ -236,6 +237,39 @@ export function PagesFields({
                 onChange={(e) => updatePage({ message: e.target.value })}
               />
             </label>
+          </div>
+
+          <div className="page-typography-section" style={{ marginTop: '14px' }}>
+            <TextStyleFields
+              heading={{
+                ...card.appearance.heading,
+                ...(page.heading ?? {}),
+              }}
+              body={{
+                ...card.appearance.body,
+                ...(page.body ?? {}),
+              }}
+              onChangeHeading={(change) =>
+                updatePage({
+                  heading: { ...(page.heading ?? {}), ...change },
+                })
+              }
+              onChangeBody={(change) =>
+                updatePage({
+                  body: { ...(page.body ?? {}), ...change },
+                })
+              }
+              isCustomized={Boolean(page.heading || page.body)}
+              onResetToDefault={() =>
+                updatePage({
+                  heading: undefined,
+                  body: undefined,
+                })
+              }
+              legend="စာလုံးပုံစံ ပြင်မယ်"
+              headingLabel="ခေါင်းစဉ်"
+              bodyLabel="စာသား"
+            />
           </div>
         </div>
       )}

@@ -53,6 +53,14 @@ export function CardPreview({
   )
   const { colors, heading, body } = card.appearance
   const isCover = !page
+  const effectiveHeading = {
+    ...heading,
+    ...(page?.heading ?? {}),
+  }
+  const effectiveBody = {
+    ...body,
+    ...(page?.body ?? {}),
+  }
   return (
     <div className="card-page-frame">
       <article
@@ -116,10 +124,13 @@ export function CardPreview({
                 A LITTLE MOMENT, JUST FOR YOU
               </span>
             )}
-            <h2 className="reveal-step-3" style={textStyle(heading)}>
+            <h2 className="reveal-step-3" style={textStyle(effectiveHeading)}>
               {page ? page.title || 'စာမျက်နှာအသစ်' : card.title}
             </h2>
-            <p className="card-message reveal-step-4" style={textStyle(body)}>
+            <p
+              className="card-message reveal-step-4"
+              style={textStyle(effectiveBody)}
+            >
               {(page ? page.message : card.message) ||
                 'ရင်ထဲက စကားလေးတွေကို ဒီနေရာမှာ ရေးသားနိုင်ပါတယ်။'}
             </p>

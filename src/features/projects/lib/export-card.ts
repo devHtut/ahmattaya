@@ -81,9 +81,11 @@ export async function downloadCardImage(
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas not supported')
 
-  const { colors, heading, body } = card.appearance
+  const { colors } = card.appearance
   const page = card.pages.find((p) => p.id === pageId)
   const isCover = !page
+  const heading = { ...card.appearance.heading, ...(page?.heading ?? {}) }
+  const body = { ...card.appearance.body, ...(page?.body ?? {}) }
 
   // Background
   const gradient = ctx.createLinearGradient(0, 0, width, height)
