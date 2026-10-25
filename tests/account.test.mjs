@@ -3,8 +3,12 @@ import assert from 'node:assert/strict'
 import {
   accountEmail,
   accountCode,
+  accountPassword,
   requestAccountCode,
   confirmAccountCode,
+  signInWithEmailPassword,
+  signUpWithEmailPassword,
+  confirmSignUpCode,
   signOutAccount,
   accountMessage,
   isPermanentAccount,
@@ -43,6 +47,15 @@ function api(initial = null) {
         calls.push(['verify', data])
         user = permanent
         return { data: { user, session: { user } }, error: null }
+      },
+      signInWithPassword: async (data) => {
+        calls.push(['login', data])
+        user = permanent
+        return { data: { user, session: { user } }, error: null }
+      },
+      signUp: async (data) => {
+        calls.push(['signup', data])
+        return { data: { user: guest }, error: null }
       },
       signOut: async (data) => {
         calls.push(['out', data])
@@ -155,3 +168,34 @@ test('pending email confirmation can resume without treating an unconfirmed emai
   assert.equal(attempt.mode, 'link')
   assert.equal((await confirmAccountCode(c, attempt, '123456')).id, id)
 })
+
+test('password validation rejects short or empty passwords', () => {
+  assert.equal(accountPassword('123456'), '123456')
+  assert.equal(accountPassword('  securepass123  '), 'securepass123')
+  assert.throws(() => accountPassword('12345'), { code: 'invalid-password' })
+  assert.throws(() => accountPassword('   '), { code: 'invalid-password' })
+})
+
+test('signInWithEmailPassword logs in existing confirmed account', async () => {
+  const c = api()
+  const user = await signInWithEmailPassword(c, 'test@example.com', 'password123')
+  assert.equal(user.id, id)
+  assert.deepEqual(c.calls, [
+    ['login', { email: 'test@example.com', password: 'password123' }],
+  ])
+})
+
+test('signUpWithEmailPassword registers and verifies with 6-digit OTP', async () => {
+  const c = api()
+  const attempt = await signUpWithEmailPassword(c, 'new@example.com', 'secret123')
+  assert.equal(attempt.mode, 'signup')
+  assert.equal(attempt.email, 'new@example.com')
+
+  const verified = await confirmSignUpCode(c, attempt, '654321')
+  assert.equal(verified.id, id)
+  assert.deepEqual(c.calls, [
+    ['signup', { email: 'new@example.com', password: 'secret123' }],
+    ['verify', { email: 'new@example.com', token: '654321', type: 'signup' }],
+  ])
+})
+

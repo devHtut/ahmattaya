@@ -17,6 +17,11 @@ export function accountCode(input: string) {
   if (!/^\d{6,10}$/.test(code)) throw new AccountError('invalid-code')
   return code
 }
+export function accountPassword(input: string) {
+  const password = input.trim()
+  if (password.length < 6) throw new AccountError('invalid-password')
+  return password
+}
 export function isPermanentAccount(user: User | null) {
   return Boolean(
     user && !user.is_anonymous && user.email && user.email_confirmed_at,
@@ -96,11 +101,126 @@ export async function signOutAccount(client: SupabaseClient) {
   const { error } = await client.auth.signOut({ scope: 'local' })
   if (error) throw error
 }
+
+export async function signInWithEmailPassword(
+  client: SupabaseClient,
+  inputEmail: string,
+  inputPassword: string,
+) {
+  const email = accountEmail(inputEmail)
+  const password = accountPassword(inputPassword)
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password,
+  })
+  if (error) throw error
+  if (!data.user || !isPermanentAccount(data.user)) {
+    throw new AccountError('not-confirmed')
+  }
+  return data.user
+}
+
+export type SignUpAttempt = {
+  email: string
+  mode: 'link' | 'signup'
+  ownerId?: string
+}
+
+export async function signUpWithEmailPassword(
+  client: SupabaseClient,
+  inputEmail: string,
+  inputPassword: string,
+): Promise<SignUpAttempt> {
+  const email = accountEmail(inputEmail)
+  const password = accountPassword(inputPassword)
+  const user = await verifiedIdentity(client)
+  if (isPermanentAccount(user)) throw new AccountError('already-signed-in')
+
+  if (user) {
+    const { data, error } = await client.auth.updateUser({ email, password })
+    if (error) throw error
+    if (data.user?.id !== user.id) throw new AccountError('identity-changed')
+    return { email, mode: 'link', ownerId: user.id }
+  }
+
+  const { error } = await client.auth.signUp({ email, password })
+  if (error) throw error
+  return { email, mode: 'signup' }
+}
+
+export async function confirmSignUpCode(
+  client: SupabaseClient,
+  attempt: SignUpAttempt,
+  inputCode: string,
+) {
+  const token = accountCode(inputCode)
+  const current = await verifiedIdentity(client)
+  if (
+    attempt.mode === 'link' &&
+    (!current || isPermanentAccount(current) || current.id !== attempt.ownerId)
+  )
+    throw new AccountError('identity-changed')
+
+  const { data, error } = await client.auth.verifyOtp({
+    email: accountEmail(attempt.email),
+    token,
+    type: attempt.mode === 'link' ? 'email_change' : 'signup',
+  })
+  if (error) throw error
+  if (
+    !data.session ||
+    !isPermanentAccount(data.user) ||
+    (attempt.mode === 'link' && data.user?.id !== attempt.ownerId)
+  )
+    throw new AccountError('not-confirmed')
+
+  const verified = await verifiedIdentity(client)
+  if (!isPermanentAccount(verified) || verified?.id !== data.user?.id)
+    throw new AccountError('not-confirmed')
+  return verified!
+}
+
+export async function resendSignUpCode(
+  client: SupabaseClient,
+  attempt: SignUpAttempt,
+) {
+  const email = accountEmail(attempt.email)
+  if (attempt.mode === 'link') {
+    const { error } = await client.auth.updateUser({ email })
+    if (error) throw error
+  } else {
+    const { error } = await client.auth.resend({
+      type: 'signup',
+      email,
+    })
+    if (error) throw error
+  }
+}
+
 export function accountMessage(error: unknown) {
   const code =
     error && typeof error === 'object' && 'code' in error ? error.code : ''
+  const message =
+    error && typeof error === 'object' && 'message' in error
+      ? String(error.message).toLowerCase()
+      : ''
   if (code === 'invalid-email') return 'Email လိပ်စာကို မှန်အောင် ဖြည့်ပေးပါ။'
-  if (code === 'invalid-code') return 'Email ထဲက ဂဏန်း code ကို ဖြည့်ပေးပါ။'
+  if (code === 'invalid-password')
+    return 'စကားဝှက် (Password) သည် အနည်းဆုံး ၆ လုံး ရှိရပါမည်။'
+  if (code === 'invalid-code') return 'Email ထဲက ဂဏန်း ၆ လုံး code ကို ဖြည့်ပေးပါ။'
+  if (
+    code === 'invalid_credentials' ||
+    message.includes('invalid login credentials') ||
+    message.includes('invalid credentials')
+  )
+    return 'Email သို့မဟုတ် Password မမှန်ကန်ပါ။ ပြန်စစ်ဆေးပေးပါ။'
+  if (
+    code === 'email_not_confirmed' ||
+    message.includes('email not confirmed')
+  )
+    return 'Email ကို အတည်မပြုရသေးပါ။ သင့် email သို့ ပို့ထားသော OTP code ဖြင့် အတည်ပြုပေးပါ။'
+  if (code === 'weak_password')
+    return 'Password အားနည်းနေပါသည်။ ပိုမိုခိုင်မာသော Password ရွေးချယ်ပေးပါ။'
   if (code === 'otp_expired' || code === 'otp_disabled')
     return 'Code မမှန်တာ သို့မဟုတ် သက်တမ်းကုန်တာ ဖြစ်နိုင်ပါတယ်။ Code အသစ်တောင်းပြီး ပြန်ကြိုးစားပါ။'
   if (
@@ -108,7 +228,7 @@ export function accountMessage(error: unknown) {
     code === 'user_already_exists' ||
     code === 'identity_already_exists'
   )
-    return 'ဒီ email မှာ Account ရှိပြီးသားပါ။ လက်ရှိ Guest ကတ်တွေကို မပြောင်းထားပါ။ ဒီ Guest ကို ချိတ်ဖို့ မသုံးရသေးတဲ့ email ရွေးပေးပါ။ ရှိပြီးသား Account နှစ်ခုကို ပေါင်းခြင်း မရသေးပါ။'
+    return 'ဒီ email မှာ Account ရှိပြီးသားပါ။ Sign In ဝင်ရောက်နိုင်ပါသည်။'
   if (code === 'email_address_not_authorized')
     return 'Email ပို့ဖို့ server မှာ SMTP ပြင်ဆင်ရန် လိုနေပါတယ်။'
   if (
