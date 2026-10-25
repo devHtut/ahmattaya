@@ -152,7 +152,7 @@ export function CardPreview({
             အမှတ်တရ · AhMatTaYa
           </span>
         </div>
-        <div className="elements-canvas-wrapper">
+        <div className="elements-canvas-wrapper reveal-step-element">
           <ElementCanvas
             elements={elements}
             selectedId={selectedElementId}

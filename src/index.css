@@ -1329,6 +1329,12 @@ legend {
 }
 
 /* Photos on the page */
+.photo-canvas-wrapper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
 .photo-canvas-layer {
   position: absolute;
   inset: 0;
@@ -2936,6 +2942,11 @@ legend {
     0 34px 70px -24px rgba(60, 40, 20, 0.38),
     0 0 0 1px rgba(255, 255, 255, 0.5);
 }
+.story-card .photo-canvas-wrapper,
+.story-card .elements-canvas-wrapper {
+  overflow: hidden;
+  border-radius: inherit;
+}
 .scene-kicker {
   font:
     800 10px 'Nunito Sans',
@@ -3040,7 +3051,8 @@ legend {
 .receiver-story .reveal:not(.is-visible) .reveal-step-3,
 .receiver-story .reveal:not(.is-visible) .reveal-step-4,
 .receiver-story .reveal:not(.is-visible) .reveal-step-5,
-.receiver-story .reveal:not(.is-visible) .reveal-step-photo {
+.receiver-story .reveal:not(.is-visible) .reveal-step-photo,
+.receiver-story .reveal:not(.is-visible) .reveal-step-element {
   opacity: 0;
   transform: translateY(18px);
 }
@@ -3050,7 +3062,8 @@ legend {
 .receiver-story .reveal .reveal-step-3,
 .receiver-story .reveal .reveal-step-4,
 .receiver-story .reveal .reveal-step-5,
-.receiver-story .reveal .reveal-step-photo {
+.receiver-story .reveal .reveal-step-photo,
+.receiver-story .reveal .reveal-step-element {
   transition:
     opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3090,6 +3103,12 @@ legend {
   opacity: 1;
   transform: translateY(0);
   transition-delay: 0.44s;
+}
+
+.receiver-story .reveal.is-visible .reveal-step-element {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.48s;
 }
 
 /* Floating celebratory emojis across receiver experience */
@@ -4494,7 +4513,8 @@ footer {
   .receiver-story .reveal:not(.is-visible) .reveal-step-3,
   .receiver-story .reveal:not(.is-visible) .reveal-step-4,
   .receiver-story .reveal:not(.is-visible) .reveal-step-5,
-  .receiver-story .reveal:not(.is-visible) .reveal-step-photo {
+  .receiver-story .reveal:not(.is-visible) .reveal-step-photo,
+  .receiver-story .reveal:not(.is-visible) .reveal-step-element {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;

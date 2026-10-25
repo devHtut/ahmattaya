@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Sparkles,
   Download,
   X,
   Smartphone,
@@ -108,7 +107,7 @@ export function WebARModal({
       <div className="webar-modal-window" onClick={(e) => e.stopPropagation()}>
         <div className="webar-modal-header">
           <div className="webar-badge">
-            <Sparkles size={14} /> WebAR (Augmented Reality)
+            WebAR (Augmented Reality)
           </div>
           <button
             type="button"
@@ -121,11 +120,10 @@ export function WebARModal({
         </div>
 
         <h3 id="webar-title" className="webar-modal-title">
-          လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် Cake ကြည့်ရှုခြင်း
+          View in your space
         </h3>
         <p className="webar-modal-desc">
-          ဒီကိတ်မုန့် 3D မော်ဒယ်လေးကို သင့်အခန်း၊ စားပွဲ သို့မဟုတ်
-          လက်တွေ့ကမ္ဘာထဲတွင် ကင်မရာဖွင့်၍ အတိုင်းအတာအမှန်အတိုင်း
+          ဒီကိတ်မုန့် 3D model လေးကို အခန်း၊ စားပွဲ ပေါ်တွင် ကင်မရာဖွင့်၍
           ချထားကြည့်ရှုနိုင်ပါသည်။
         </p>
 

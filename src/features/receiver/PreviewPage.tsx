@@ -223,7 +223,6 @@ export function PreviewPage({
               ) : (
                 <div className="cake-wish-banner" role="status">
                   <h3>🎉 ဆုတောင်းပြည့်ပါစေ! ✨</h3>
-                  <p>မွေးနေ့/အမှတ်တရဆုမွန်ကောင်းများ အမြဲပြည့်စုံပါစေ။</p>
                   <button
                     type="button"
                     className="button secondary"
