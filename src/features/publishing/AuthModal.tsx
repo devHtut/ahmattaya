@@ -190,14 +190,14 @@ export function AuthModal({
           </div>
           <div>
             <h2 id="auth-modal-title" className="auth-modal-title">
-              {mode === 'signin' && 'အကောင့်ဝင်ရန်'}
-              {mode === 'signup' && 'အကောင့်သစ်ဖွင့်ရန်'}
-              {mode === 'otp' && 'Email OTP အတည်ပြုရန်'}
-            </h2>
-            <span className="auth-modal-subtitle">
               {mode === 'signin' && 'Sign In'}
               {mode === 'signup' && 'Sign Up'}
-              {mode === 'otp' && 'Confirmation Code'}
+              {mode === 'otp' && 'OTP Verification'}
+            </h2>
+            <span className="auth-modal-subtitle">
+              {mode === 'signin' && 'Access from anywhere'}
+              {mode === 'signup' && 'Create your own card'}
+              {mode === 'otp' && 'Check your email for the code'}
             </span>
           </div>
         </div>
@@ -215,12 +215,12 @@ export function AuthModal({
         {mode === 'signin' && (
           <form className="auth-form" onSubmit={handleSignIn}>
             <p className="share-dialog-desc">
-              သင်၏ Email နှင့် စကားဝှက် (Password) ရိုက်ထည့်၍ အကောင့်ဝင်ရောက်ပါ။
+              သင်၏ Email နှင့် Password ရိုက်ထည့်၍ အကောင့်ဝင်ရောက်ပါ။
             </p>
 
             <label className="auth-field">
               <span className="auth-field-label">
-                <Mail size={14} /> Email လိပ်စာ
+                <Mail size={14} /> Email
               </span>
               <input
                 type="email"
@@ -236,7 +236,7 @@ export function AuthModal({
 
             <label className="auth-field">
               <span className="auth-field-label">
-                <Lock size={14} /> စကားဝှက် (Password)
+                <Lock size={14} /> Password
               </span>
               <div className="auth-password-wrapper">
                 <input
@@ -290,7 +290,7 @@ export function AuthModal({
 
             <label className="auth-field">
               <span className="auth-field-label">
-                <Mail size={14} /> Email လိပ်စာ
+                <Mail size={14} /> Email
               </span>
               <input
                 type="email"
@@ -306,7 +306,7 @@ export function AuthModal({
 
             <label className="auth-field">
               <span className="auth-field-label">
-                <Lock size={14} /> စကားဝှက် (အနည်းဆုံး ၆ လုံး)
+                <Lock size={14} /> Password (At least 6 characters)
               </span>
               <div className="auth-password-wrapper">
                 <input
@@ -340,7 +340,7 @@ export function AuthModal({
               disabled={busy || !email || password.length < 6}
             >
               <UserPlus size={16} />
-              {busy ? 'အကောင့်ဖွင့်နေပါသည်…' : 'Sign Up (အကောင့်ဖွင့်မယ်)'}
+              {busy ? 'အကောင့်ဖွင့်နေပါသည်…' : 'Sign Up'}
             </button>
 
             <div className="auth-switch-footer">

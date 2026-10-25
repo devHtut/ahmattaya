@@ -276,7 +276,7 @@ export function EditorToolbar({
         aria-labelledby="export-heading"
       >
         <div className="share-dialog-header">
-          <h2 id="export-heading">ကတ်ကို ထုတ်ယူရန် (Export & Backup)</h2>
+          <h2 id="export-heading">Export & Backup</h2>
           <button
             className="icon-button"
             aria-label="ပိတ်မယ်"
@@ -286,7 +286,7 @@ export function EditorToolbar({
           </button>
         </div>
         <p className="share-dialog-desc">
-          သင့်ကတ်ကို မိတ္တူအဖြစ် သိမ်းဆည်းနိုင်သလို၊ ပုံ (PNG) သို့မဟုတ် Print/PDF အဖြစ် အလွယ်တကူ ထုတ်ယူနိုင်ပါသည်။
+          ကတ်ကို Copy အနေနဲ့ သိမ်းဆည်းနိုင်သလို၊ ပုံ (PNG) သို့မဟုတ် Print/PDF အဖြစ် အလွယ်တကူ ထုတ်ယူနိုင်ပါသည်။
         </p>
 
         <div className="export-options-grid">
@@ -296,17 +296,17 @@ export function EditorToolbar({
             </div>
             <div className="export-option-info">
               <h3>JSON Project Backup</h3>
-              <p>ကတ်တစ်ခုလုံးရဲ့ စာ၊ ဓာတ်ပုံ၊ အစီအစဉ်အားလုံးကို ဖိုင်အဖြစ် သိမ်းပြီး နောင်တစ်ချိန် အခြား browser/စက်မှာ ပြန်ဖွင့်နိုင်ပါသည်။</p>
+              <p>ကတ်တစ်ခုလုံးရဲ့ စာ၊ ဓာတ်ပုံ၊ အစီအစဉ်အားလုံးကို ဖိုင်အဖြစ် သိမ်းပြီး အခြား browser/device မှာ ပြန်ဖွင့်နိုင်ပါသည်။</p>
               <div className="export-option-actions">
                 <button
                   type="button"
                   className="button primary"
                   onClick={handleExportJson}
                 >
-                  <Download size={14} /> JSON Backup ဒေါင်းလုဒ်ရယူမယ်
+                  <Download size={14} /> JSON Backup
                 </button>
                 <label className="button ghost import-backup-label">
-                  <Upload size={14} /> Backup ဖိုင်မှ ပြန်တင်မယ်
+                  <Upload size={14} /> Import Backup
                   <input
                     type="file"
                     accept=".json"

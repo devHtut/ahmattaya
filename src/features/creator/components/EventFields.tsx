@@ -1024,7 +1024,7 @@ export function EventFields({
                     >
                       <ChevronDown size={16} />
                     </button>
-                    <span className="alarm-digit-label">ရက် (Total Days)</span>
+                    <span className="alarm-digit-label">Total Days</span>
                   </div>
                 )}
               </div>

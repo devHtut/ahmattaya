@@ -91,7 +91,7 @@ export function ColorPaletteFields({
 
       {showCustomPickers && (
         <fieldset style={{ marginTop: '12px' }}>
-          <legend>ကိုယ်ပိုင် အရောင်ရွေးမယ်</legend>
+          <legend>Custom Colors</legend>
           <div className="color-controls">
             {colorLabels.map(({ key, label }) => (
               <label className="color-control" key={key}>
