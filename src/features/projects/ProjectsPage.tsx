@@ -1,9 +1,14 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Copy, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { CloudCheck, CloudUpload, Copy, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
 import { CardPreview } from '../../shared/ui/CardPreview'
 import { DraftStatus } from '../creator/components/DraftStatus'
+import { useCloudIdentity } from '../publishing/useCloudIdentity'
+import { isPermanentAccount } from '../../shared/cloud/account'
+import { AuthModal } from '../publishing/AuthModal'
+import { getCloudClient } from '../../shared/cloud/client'
+import { cloudDraftMessage, saveCloudDraft } from '../../shared/cloud/drafts'
 
 export function ProjectsPage({
   workspace: w,
@@ -12,8 +17,34 @@ export function ProjectsPage({
 }) {
   const [tab, setTab] = useState<'projects' | 'trash'>('projects')
   const [selected, setSelected] = useState<string[]>([])
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [uploadingId, setUploadingId] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const confirmation = useRef<HTMLDialogElement>(null)
   const navigate = useNavigate()
+
+  const identity = useCloudIdentity()
+  const isPermanent = isPermanentAccount(identity.user)
+
+  async function handleCloudUpload(project: ProjectWorkspace['projects'][number]) {
+    if (!isPermanent || !identity.user?.id) {
+      setAuthModalOpen(true)
+      return
+    }
+    setUploadingId(project.id)
+    try {
+      const client = await getCloudClient()
+      const receipt = await saveCloudDraft(client, identity.user.id, structuredClone(project))
+      w.recordCloudSave(project.id, receipt)
+      setToastMessage(`✓ "${project.name}" ကို Cloud ပေါ်သို့ သိမ်းဆည်းပြီးပါပြီ`)
+      setTimeout(() => setToastMessage(null), 3000)
+    } catch (err) {
+      alert(cloudDraftMessage(err))
+    } finally {
+      setUploadingId(null)
+    }
+  }
+
   const isTrash = tab === 'trash'
   const items = w.projects
     .filter((p) => p.deleted === isTrash)
@@ -178,6 +209,39 @@ export function ProjectsPage({
                     >
                       ဆက်ပြင်မယ်
                     </Link>
+                    {(() => {
+                      const isCloudSaved = Boolean(
+                        project.cloud?.savedAt &&
+                        identity.user?.id &&
+                        project.cloud?.ownerId === identity.user.id
+                      )
+                      return (
+                        <button
+                          type="button"
+                          className="icon-button"
+                          aria-label={
+                            isCloudSaved
+                              ? `${project.name} ကို Cloud တွင် Update တင်မည်`
+                              : `${project.name} ကို Cloud ပေါ်သို့ သိမ်းမည်`
+                          }
+                          title={
+                            isCloudSaved
+                              ? `Cloud ပေါ်တွင် သိမ်းပြီးသား (${new Date(project.cloud!.savedAt).toLocaleDateString()}) — Update တင်ရန် နှိပ်ပါ`
+                              : `"${project.name}" ကို Cloud ပေါ်သို့ သိမ်းမည် (Cloud Backup)`
+                          }
+                          disabled={uploadingId === project.id}
+                          onClick={() => void handleCloudUpload(project)}
+                        >
+                          {uploadingId === project.id ? (
+                            <RefreshCw size={15} className="spin" />
+                          ) : isCloudSaved ? (
+                            <CloudCheck size={16} style={{ color: 'var(--success, #16a34a)' }} />
+                          ) : (
+                            <CloudUpload size={16} />
+                          )}
+                        </button>
+                      )
+                    })()}
                     <button
                       className="icon-button"
                       aria-label="မိတ္တူပွားမယ် (Duplicate)"
@@ -207,6 +271,35 @@ export function ProjectsPage({
       {items.length === 0 && (
         <p className="empty-page">ဒီနေရာမှာ ကတ် မရှိသေးပါ။</p>
       )}
+
+      {toastMessage && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 100,
+            background: 'var(--ink, #1e293b)',
+            color: '#ffffff',
+            padding: '10px 18px',
+            borderRadius: '10px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+            fontSize: '13px',
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </main>
   )
 }

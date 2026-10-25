@@ -248,7 +248,7 @@ export function PreviewPage({
               className="button secondary webar-trigger-button"
               onClick={() => setArModalOpen(true)}
             >
-              📱 လက်တွေ့ပတ်ဝန်းကျင်ထဲတွင် Cake ကြည့်မယ် (WebAR)
+              WebAR ဖြင့် ကိတ်မုန့် ကြည့်မယ်
             </button>
           </div>
         </Reveal>
@@ -419,8 +419,8 @@ export function PreviewPage({
             <Reveal>
               <p className="end-mark reveal-step-1">အမှတ်တရ · AhMatTaYa</p>
               <p className="end-line reveal-step-2">
-                ဒီကတ်လေးကို {card.senderName || 'သင့်ချစ်ရသူ'} က သင့်အတွက်သာ
-                လက်နဲ့ဖန်တီးပေးထားတာပါ။
+                ဒီကတ်လေးကို {card.senderName || 'သင့်ချစ်ရသူ'} က ကိုယ်တိုင်
+                ဖန်တီးပေးထားတာပါ။
               </p>
               <div className="end-actions reveal-step-3">
                 <button className="button secondary" onClick={replay}>

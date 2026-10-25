@@ -1,4 +1,3 @@
-import { PublishCard } from './PublishCard'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CloudDownload, CloudUpload, RefreshCw } from 'lucide-react'
@@ -32,7 +31,6 @@ export function CloudDrafts({
   const [items, setItems] = useState<CloudDraftSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [more, setMore] = useState(false)
-  const [publishing, setPublishing] = useState(false)
   const [action, setAction] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
@@ -75,7 +73,7 @@ export function CloudDrafts({
   }
 
   async function refresh(append = false) {
-    if (busy.current || loading || publishing || externalDisabled) return
+    if (busy.current || loading || externalDisabled) return
     busy.current = true
     onBusy?.(true)
     setLoading(true)
@@ -107,7 +105,7 @@ export function CloudDrafts({
     }
   }
   async function save() {
-    if (busy.current || loading || publishing || externalDisabled || mediaIssue)
+    if (busy.current || loading || externalDisabled || mediaIssue)
       return
     busy.current = true
     onBusy?.(true)
@@ -149,7 +147,7 @@ export function CloudDrafts({
     }
   }
   async function restore(id: string) {
-    if (busy.current || loading || publishing || externalDisabled) return
+    if (busy.current || loading || externalDisabled) return
     busy.current = true
     onBusy?.(true)
     setAction(id)
@@ -172,45 +170,40 @@ export function CloudDrafts({
       if (alive.current) setTransfer(null)
     }
   }
-  const disabled = loading || Boolean(action) || publishing || externalDisabled
+  const disabled = loading || Boolean(action) || externalDisabled
   const receipt =
     w.project.cloud?.ownerId === ownerId ? w.project.cloud : undefined
+  const activeCardName = w.project.name || 'အမှတ်တရ ကတ်'
   return (
     <div className="cloud-drafts">
-      {w.hasActiveProject && (
-        <PublishCard
-          key={w.project.id}
-          workspace={w}
-          ownerId={ownerId}
-          disabled={loading || Boolean(action) || externalDisabled}
-          publishBlocked={Boolean(mediaIssue)}
-          onBusy={(value) => {
-            setPublishing(value)
-            onBusy?.(value)
-          }}
-        />
-      )}
-      <h3>ကိုယ့်အတွက် Cloud ကတ်များ</h3>
-      <p className="field-hint">
-        ကိုယ်တိုင် သိမ်းမယ်နှိပ်မှ Cloud ပေါ်တင်ပေးပါတယ်။ ဓာတ်ပုံ၊ စာသား၊
-        နောက်ခံပုံ၊ ကိုယ်ပိုင်သီချင်း၊ အလှဆင်နဲ့ Cake ပါဝင်ပါတယ်။ ဒီမိတ္တူကို
-        ကိုယ်တိုင်ပဲ ပြန်ပြင်နိုင်ပါတယ်။
-      </p>
-      <button
-        className="button primary"
-        disabled={
-          !w.hasActiveProject ||
-          disabled ||
-          Boolean(mediaIssue) ||
-          w.saveStatus === 'blocked'
-        }
-        onClick={() => void save()}
-      >
-        <CloudUpload size={16} />
-        {action === 'save'
-          ? 'Cloud မှာ သိမ်းနေပါတယ်…'
-          : 'ဒီကတ်ကို Cloud မှာ သိမ်းမယ်'}
-      </button>
+      <div className="cloud-backup-card" style={{ marginBottom: '22px' }}>
+        <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 6px', color: 'var(--ink)' }}>
+          Cloud ပေါ် သိမ်းဆည်းရန်
+        </h3>
+        {w.hasActiveProject ? (
+          <>
+            <p className="field-hint" style={{ margin: '0 0 12px', lineHeight: 1.6 }}>
+              လက်ရှိ ဖွင့်ထားသော ကတ် — <strong>"{activeCardName}"</strong> ကို အခြားဖုန်း/ကွန်ပျူတာများမှ ဆက်လက်ဖွင့်ဖောက်ပြင်ဆင်နိုင်ရန် Cloud ပေါ်သို့ တင်ပေးပါမည်။
+            </p>
+            <button
+              className="button primary"
+              disabled={
+                disabled ||
+                Boolean(mediaIssue) ||
+                w.saveStatus === 'blocked'
+              }
+              onClick={() => void save()}
+            >
+              <CloudUpload size={16} />
+              {action === 'save'
+                ? 'Cloud မှာ သိမ်းနေပါတယ်…'
+                : `"${activeCardName}" ကို Cloud မှာ သိမ်းမယ်`}
+            </button>
+          </>
+        ) : (
+          <p className="field-hint">လက်ရှိ ရွေးချယ်ထားသော ကတ် မရှိပါ။</p>
+        )}
+      </div>
       {transfer && transfer.total > 0 && (
         <div className="cloud-transfer" role="status">
           <p>

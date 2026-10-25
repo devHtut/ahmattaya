@@ -224,8 +224,8 @@ export default function CakeScene({
       }
       const hit = state.cake
         ? raycaster
-            .intersectObject(state.cake, true)
-            .find((item) => typeof item.object.userData.candleId === 'string')
+          .intersectObject(state.cake, true)
+          .find((item) => typeof item.object.userData.candleId === 'string')
         : undefined
       const id = hit?.object.userData.candleId as string | undefined
       const candle = latest.current.recipe.candles.find(
@@ -441,7 +441,7 @@ export default function CakeScene({
           state.render()
         }}
       >
-        မြင်ကွင်း ပြန်ညှိမယ်
+        Reset
       </button>
     </div>
   )

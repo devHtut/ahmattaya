@@ -3597,13 +3597,15 @@ legend {
 }
 .share-dialog-header {
   position: sticky;
-  top: 0;
-  z-index: 2;
+  top: -26px;
+  margin: -26px -26px 16px -26px;
+  padding: 18px 26px 14px;
+  z-index: 10;
   background: var(--card);
+  border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
 }
 .share-dialog-header h2 {
   font-size: 18px;
@@ -6091,6 +6093,9 @@ footer {
   to {
     transform: rotate(360deg);
   }
+}
+.spin {
+  animation: spin 1s linear infinite;
 }
 
 /* --------------------------------------------------------------------------
