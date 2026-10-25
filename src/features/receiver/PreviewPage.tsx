@@ -419,12 +419,12 @@ export function PreviewPage({
             <Reveal>
               <p className="end-mark reveal-step-1">အမှတ်တရ · AhMatTaYa</p>
               <p className="end-line reveal-step-2">
-                ဒီကတ်လေးကို {card.senderName || 'သင့်ချစ်ရသူ'} က ကိုယ်တိုင်
+                ဒီကတ်လေးကို {card.senderName || 'သင့်ချစ်ရသူ'}က ကိုယ်တိုင်
                 ဖန်တီးပေးထားတာပါ။
               </p>
               <div className="end-actions reveal-step-3">
                 <button className="button secondary" onClick={replay}>
-                  <RotateCcw size={14} /> ဖိတ်စာ ပြန်ကြည့်မယ်
+                  <RotateCcw size={14} /> ပြန်ကြည့်မယ်
                 </button>
                 <Link className="button primary" to="/create">
                   {published ? 'ကိုယ်ပိုင်ကတ် ဖန်တီးမယ်' : 'ကတ်ကို ပြန်ပြင်မယ်'}

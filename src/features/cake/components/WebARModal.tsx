@@ -5,7 +5,6 @@ import {
   X,
   Smartphone,
   CheckCircle2,
-  AlertCircle,
   Eye,
   QrCode,
 } from 'lucide-react'
@@ -165,7 +164,7 @@ export function WebARModal({
                 <Eye size={18} />
                 {exporting === 'ios'
                   ? '3D မော်ဒယ် ပြင်ဆင်နေပါသည်...'
-                  : '✨ iPhone AR ဖြင့် ကင်မရာဖွင့်ကြည့်မည်'}
+                  : '✨ AR ဖြင့် ကင်မရာဖွင့်ကြည့်မည်'}
               </button>
               <button
                 type="button"
@@ -224,8 +223,8 @@ export function WebARModal({
                     />
                   </div>
                   <p className="webar-qr-caption">
-                    <QrCode size={14} /> iPhone သို့မဟုတ် Android ကင်မရာဖြင့်
-                    scan ဖတ်၍ ဖုန်းပေါ်တွင် AR တိုက်ရိုက် ကြည့်ရှုနိုင်ပါသည်။
+                    <QrCode size={14} /> ဖုန်းကင်မရာဖြင့်
+                    scan ဖတ်၍ AR တိုက်ရိုက် ကြည့်ရှုနိုင်ပါသည်။
                   </p>
                 </div>
               )}
@@ -252,13 +251,13 @@ export function WebARModal({
           )}
         </div>
 
-        <div className="webar-footer-note">
+        {/* <div className="webar-footer-note">
           <AlertCircle size={14} />
           <span>
             Three.js procedural geometry မှ တိုက်ရိုက်ထုတ်ယူထားသော အမှန်တကယ် 3D
             မော်ဒယ် ဖြစ်ပါသည်။
           </span>
-        </div>
+        </div> */}
       </div>
     </div>
   )
