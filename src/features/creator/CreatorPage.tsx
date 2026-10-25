@@ -388,6 +388,7 @@ export function CreatorPage({
                       coupleNames={card.title}
                       colors={card.event?.anniversary?.colors ?? card.appearance.colors}
                       isBirthday={card.occasion === 'birthday'}
+                      appearance={card.appearance}
                     />
                   ) : (
                     <div className="bench-event-empty">

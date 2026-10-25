@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import type { CardConfig } from '../../../shared/models/card'
 import { ColorPaletteFields } from './ColorPaletteFields'
+import { TextStyleFields } from './TextStyleFields'
 import {
   createAnniversaryEvent,
   createBirthdayTimelineItems,
@@ -320,7 +321,8 @@ export function EventFields({
     if (part === 'year') {
       y = num
     } else if (part === 'month') {
-      m = num
+      const monthIdx = ENGLISH_MONTHS.indexOf(value)
+      m = monthIdx !== -1 ? monthIdx + 1 : num
     } else if (part === 'day') {
       d = num
     }
@@ -331,15 +333,6 @@ export function EventFields({
     const yStr = String(y)
     const mStr = String(m).padStart(2, '0')
     const dStr = String(d).padStart(2, '0')
-    handleDateSelect(`${yStr}-${mStr}-${dStr}`)
-  }
-
-  function handleQuickYearOffset(yearsAgo: number) {
-    const today = new Date()
-    today.setFullYear(today.getFullYear() - yearsAgo)
-    const yStr = String(today.getFullYear())
-    const mStr = String(today.getMonth() + 1).padStart(2, '0')
-    const dStr = String(today.getDate()).padStart(2, '0')
     handleDateSelect(`${yStr}-${mStr}-${dStr}`)
   }
 
@@ -783,14 +776,14 @@ export function EventFields({
           {!isBirthday && isAnniversary && (
             <div className="anniversary-date-picker-box">
               <label className="anniversary-date-label">
-                <span>နှစ်ပတ်လည် စတင်ခဲ့သည့် နေ့စွဲ (Start Date)</span>
+                <span>Anniversary Date</span>
               </label>
 
               {/* 3-part Fast Selectors: Day, Month, Year */}
               <div className="date-select-row">
                 {/* Day */}
                 <div className="date-select-col">
-                  <span className="date-col-label">ရက် (Day)</span>
+                  <span className="date-col-label">Day</span>
                   <select
                     className="date-dropdown-select"
                     value={rawDate ? parsedDate.day : ''}
@@ -808,7 +801,7 @@ export function EventFields({
 
                 {/* Month */}
                 <div className="date-select-col month-col">
-                  <span className="date-col-label">လ (Month)</span>
+                  <span className="date-col-label">Month</span>
                   <select
                     className="date-dropdown-select"
                     value={rawDate ? parsedDate.month : ''}
@@ -818,7 +811,7 @@ export function EventFields({
                     {!rawDate && <option value="">ရွေးပါ</option>}
                     {ENGLISH_MONTHS.map((name, i) => (
                       <option key={name} value={i + 1}>
-                        {name} ({i + 1})
+                        {name}
                       </option>
                     ))}
                   </select>
@@ -826,7 +819,7 @@ export function EventFields({
 
                 {/* Year */}
                 <div className="date-select-col">
-                  <span className="date-col-label">ခုနှစ် (Year)</span>
+                  <span className="date-col-label">Year</span>
                   <select
                     className="date-dropdown-select"
                     value={rawDate ? parsedDate.year : ''}
@@ -841,88 +834,7 @@ export function EventFields({
                     ))}
                   </select>
                 </div>
-
-                {/* Native Picker Trigger */}
-                <div className="date-select-col date-native-col">
-                  <span className="date-col-label">ပြက္ခဒိန်</span>
-                  <input
-                    type="date"
-                    aria-label="ပြက္ခဒိန်ဖြင့် ရွေးမည်"
-                    title="ပြက္ခဒိန်ဖြင့် ရွေးမည်"
-                    value={rawDate}
-                    onChange={(e) => handleDateSelect(e.target.value)}
-                    className="native-date-input-btn"
-                  />
-                </div>
               </div>
-
-              {/* Quick Year Jumpers */}
-              <div className="quick-year-pills">
-                <span className="quick-pills-label">အမြန်ရွေးရန်:</span>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(0)}
-                  title="ဒီနေ့ ရက်စွဲထားမည်"
-                >
-                  ဒီနေ့ (Today)
-                </button>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(1)}
-                >
-                  ၁ နှစ်
-                </button>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(2)}
-                >
-                  ၂ နှစ်
-                </button>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(3)}
-                >
-                  ၃ နှစ်
-                </button>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(4)}
-                >
-                  ၄ နှစ်
-                </button>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(5)}
-                >
-                  ၅ နှစ်
-                </button>
-                <button
-                  type="button"
-                  className="quick-year-pill"
-                  onClick={() => handleQuickYearOffset(10)}
-                >
-                  ၁၀ နှစ်
-                </button>
-              </div>
-
-              {/* Date Display in English */}
-              {(rawDate || anniversary.date) && (
-                <div className="english-date-display-badge">
-                  <span className="date-display-icon">📅</span>
-                  <span>Date Display — <strong>{formatEnglishDate(rawDate || anniversary.date)}</strong></span>
-                </div>
-              )}
-
-              <small className="field-hint" style={{ marginTop: '4px' }}>
-                ရက်စွဲ ရွေးချယ်လိုက်ပါက ယနေ့ (Today) အထိ သက်တမ်းကာလ (နှစ်၊ လ၊ ရက်)
-                ကို အလိုအလျောက် တွက်ချက်ပေးပါမည်။
-              </small>
             </div>
           )}
 
@@ -1155,6 +1067,40 @@ export function EventFields({
               legend="Timeline အရောင်တွဲများ"
               resetButtonText="Cover အရောင်အတိုင်းထားမယ်"
               showCustomPickers={true}
+            />
+          </div>
+
+          {/* Timeline Typography Section */}
+          <div className="timeline-typography-section" style={{ marginTop: '14px' }}>
+            <TextStyleFields
+              heading={{
+                ...card.appearance.heading,
+                ...(anniversary.heading ?? {}),
+              }}
+              body={{
+                ...card.appearance.body,
+                ...(anniversary.body ?? {}),
+              }}
+              onChangeHeading={(change) =>
+                updateAnniversary({
+                  heading: { ...(anniversary.heading ?? {}), ...change },
+                })
+              }
+              onChangeBody={(change) =>
+                updateAnniversary({
+                  body: { ...(anniversary.body ?? {}), ...change },
+                })
+              }
+              isCustomized={Boolean(anniversary.heading || anniversary.body)}
+              onResetToDefault={() =>
+                updateAnniversary({
+                  heading: undefined,
+                  body: undefined,
+                })
+              }
+              legend="Timeline စာလုံးပုံစံ ပြင်မယ်"
+              headingLabel="ခေါင်းစဉ်"
+              bodyLabel="စာသား / ဇာတ်လမ်း"
             />
           </div>
 

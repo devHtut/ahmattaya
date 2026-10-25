@@ -2,6 +2,7 @@ import { Clock } from 'lucide-react'
 import type { AnniversaryEvent } from '../../../shared/models/event'
 import type { CardAppearance } from '../../../shared/models/card'
 import { formatEnglishDate } from '../../../shared/lib/anniversary-calc'
+import { resolveFontFamily } from '../../../shared/fonts/fonts-catalog'
 
 function getOrdinalSuffix(n: number): string {
   const mod100 = n % 100
@@ -53,11 +54,13 @@ export function AnniversaryTimeline({
   anniversary,
   colors,
   isBirthday,
+  appearance,
 }: {
   anniversary?: AnniversaryEvent
   coupleNames?: string
   colors?: CardAppearance['colors']
   isBirthday?: boolean
+  appearance?: CardAppearance
 }) {
   if (!anniversary) return null
   if (isBirthday && anniversary.enabled === false) return null
@@ -81,6 +84,34 @@ export function AnniversaryTimeline({
       '--background': effectiveColors.background,
     } as React.CSSProperties)
     : undefined
+
+  const effectiveHeading = {
+    ...appearance?.heading,
+    ...(anniversary.heading ?? {}),
+  }
+  const effectiveBody = {
+    ...appearance?.body,
+    ...(anniversary.body ?? {}),
+  }
+
+  const resolveFont = (fontId?: string) =>
+    fontId ? resolveFontFamily(fontId) || `'${fontId}', 'Noto Sans Myanmar', sans-serif` : undefined
+
+  const headingStyle: React.CSSProperties = {
+    fontFamily: resolveFont(effectiveHeading.font),
+    fontSize: effectiveHeading.size ? `${effectiveHeading.size}px` : undefined,
+    fontWeight: effectiveHeading.bold !== undefined ? (effectiveHeading.bold ? 700 : 400) : undefined,
+    fontStyle: effectiveHeading.italic !== undefined ? (effectiveHeading.italic ? 'italic' : 'normal') : undefined,
+    textAlign: effectiveHeading.align,
+  }
+
+  const bodyStyle: React.CSSProperties = {
+    fontFamily: resolveFont(effectiveBody.font),
+    fontSize: effectiveBody.size ? `${effectiveBody.size}px` : undefined,
+    fontWeight: effectiveBody.bold !== undefined ? (effectiveBody.bold ? 700 : 400) : undefined,
+    fontStyle: effectiveBody.italic !== undefined ? (effectiveBody.italic ? 'italic' : 'normal') : undefined,
+    textAlign: effectiveBody.align,
+  }
 
   return (
     <div className="anniversary-timeline-container" style={containerStyle}>
@@ -125,7 +156,7 @@ export function AnniversaryTimeline({
 
                 <div className="timeline-node-content">
                   <span className="timeline-year-tag">{item.year}</span>
-                  <h4 className="timeline-node-title">{item.title}</h4>
+                  <h4 className="timeline-node-title" style={headingStyle}>{item.title}</h4>
                   {item.photo && (
                     <div className="timeline-photo-wrap">
                       <img
@@ -136,7 +167,7 @@ export function AnniversaryTimeline({
                     </div>
                   )}
                   {item.description && (
-                    <p className="timeline-node-desc">{item.description}</p>
+                    <p className="timeline-node-desc" style={bodyStyle}>{item.description}</p>
                   )}
                 </div>
               </article>

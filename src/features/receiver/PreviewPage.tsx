@@ -406,6 +406,7 @@ export function PreviewPage({
                   coupleNames={card.title}
                   colors={card.event?.anniversary?.colors ?? card.appearance.colors}
                   isBirthday={isBirthdayTimeline}
+                  appearance={card.appearance}
                 />
               </Reveal>
               <ScrollHint target={getNextScene('story-anniversary')} />

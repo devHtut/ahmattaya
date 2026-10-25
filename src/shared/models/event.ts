@@ -28,6 +28,25 @@ export const eventColorsSchema = z.object({
 })
 export type EventColors = z.infer<typeof eventColorsSchema>
 
+export const eventHeadingStyleSchema = z.object({
+  font: z.string().min(1).max(100).optional(),
+  size: z.number().int().min(12).max(64).optional(),
+  bold: z.boolean().optional(),
+  italic: z.boolean().optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+})
+
+export const eventBodyStyleSchema = z.object({
+  font: z.string().min(1).max(100).optional(),
+  size: z.number().int().min(10).max(40).optional(),
+  bold: z.boolean().optional(),
+  italic: z.boolean().optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+})
+
+export type EventHeadingStyle = z.infer<typeof eventHeadingStyleSchema>
+export type EventBodyStyle = z.infer<typeof eventBodyStyleSchema>
+
 export const anniversaryEventSchema = z.object({
   yearsCount: z.number().int().min(0).max(100).default(1),
   durationText: z.string().max(80).optional(),
@@ -40,6 +59,8 @@ export const anniversaryEventSchema = z.object({
   rawDate: z.string().max(40).optional(),
   enabled: z.boolean().optional(),
   colors: eventColorsSchema.optional(),
+  heading: eventHeadingStyleSchema.optional(),
+  body: eventBodyStyleSchema.optional(),
 })
 
 export const eventSchema = z.object({
