@@ -1005,7 +1005,7 @@ export function EventFields({
               </label>
 
               <label>
-                မှတ်တိုင် ခေါင်းစဉ်
+                Timeline ခေါင်းစဉ်
                 <input
                   type="text"
                   maxLength={100}
@@ -1042,7 +1042,7 @@ export function EventFields({
                   className="field-hint"
                   style={{ display: 'block', marginBottom: '6px' }}
                 >
-                  အမှတ်တရ ဓာတ်ပုံ (ရွေးချယ်နိုင်သည်)
+                  အမှတ်တရ ဓာတ်ပုံ
                 </span>
                 {timelinePhoto ? (
                   <div
@@ -1082,7 +1082,7 @@ export function EventFields({
                         padding: '4px 8px',
                       }}
                     >
-                      <X size={13} /> ဖယ်ရှားမယ်
+                      <X size={13} /> Remove
                     </button>
                   </div>
                 ) : (
@@ -1096,7 +1096,7 @@ export function EventFields({
                     }}
                   >
                     <Camera size={14} />
-                    {compressing ? 'ပုံချုံ့နေပါသည်...' : '📷 ဓာတ်ပုံ ထည့်မယ်'}
+                    {compressing ? 'Uploading...' : 'Upload Photo'}
                     <input
                       type="file"
                       accept="image/*"
@@ -1196,7 +1196,7 @@ export function EventFields({
                     {!item.photo && (
                       <label
                         className="icon-button"
-                        title="ဓာတ်ပုံ ထည့်မယ်"
+                        title="Upload Photo"
                         style={{ cursor: 'pointer' }}
                       >
                         <Camera size={14} />
@@ -1216,7 +1216,7 @@ export function EventFields({
                       type="button"
                       className="icon-button"
                       onClick={() => removeTimelineItem(item.id)}
-                      title="ဖျက်မယ်"
+                      title="Delete"
                     >
                       <Trash2 size={14} />
                     </button>

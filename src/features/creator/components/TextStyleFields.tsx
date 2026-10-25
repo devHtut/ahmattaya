@@ -69,10 +69,10 @@ export function TextStyleFields({
               padding: '2px 4px',
             }}
             onClick={onResetToDefault}
-            title="Cover စတိုင်အတိုင်း ပြန်ထားမယ်"
+            title="Cover Style အတိုင်းပြန်ထားမယ်"
           >
             <RotateCcw size={12} />
-            <span>Cover စတိုင်အတိုင်းထားမယ်</span>
+            <span>Cover Style အတိုင်းထားမယ်</span>
           </button>
         )}
       </div>

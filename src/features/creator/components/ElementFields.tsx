@@ -15,7 +15,7 @@ import {
   STICKER_CATEGORIES,
   type StickerItem,
 } from '../../../shared/stickers/stickers-catalog'
-import { Copy, Trash2, Sparkles, Type, X } from 'lucide-react'
+import { Copy, Trash2, Sparkles, Type, X, ChevronUp, ChevronDown } from 'lucide-react'
 
 export function ElementFields({
   card,
@@ -170,6 +170,39 @@ export function ElementFields({
     onSelectElement(null)
   }
 
+  function moveLayer(elementId: string, direction: 'up' | 'down') {
+    const currentIndex = pageElements.findIndex((el) => el.id === elementId)
+    if (currentIndex === -1) return
+
+    const targetIndex = direction === 'up' ? currentIndex + 1 : currentIndex - 1
+    if (targetIndex < 0 || targetIndex >= pageElements.length) return
+
+    const newPageElements = [...pageElements]
+    const temp = newPageElements[currentIndex]
+    newPageElements[currentIndex] = newPageElements[targetIndex]
+    newPageElements[targetIndex] = temp
+
+    let pageIdx = 0
+    const nextAllElements = allElements.map((el) => {
+      if (el.pageId === pageId) {
+        const item = newPageElements[pageIdx]
+        pageIdx += 1
+        return item
+      }
+      return el
+    })
+
+    onChange({
+      ...card,
+      elements: nextAllElements,
+    })
+    onSelectElement(elementId)
+  }
+
+  const selectedIndexInPage = selectedElement
+    ? pageElements.findIndex((el) => el.id === selectedElement.id)
+    : -1
+
   return (
     <div className="elements-editor-section">
       <div className="elements-section-header">
@@ -201,56 +234,88 @@ export function ElementFields({
         </button>
       </div>
 
-      {/* Chips for items currently placed on this page */}
+      {/* Layers list (Photoshop style) for items currently placed on this page */}
       {pageElements.length > 0 && (
         <div
           className="page-elements-list"
-          role="tablist"
-          aria-label="ထည့်ထားသော အရာများ"
+          role="region"
+          aria-label="ထည့်ထားသော အလွှာများ"
         >
-          <span className="elements-list-caption">
-            ထည့်ထားသည့် ပစ္စည်းများ ({pageElements.length}):
-          </span>
-          <div className="elements-chips-wrap">
-            {pageElements.map((el, index) => {
-              const def = ELEMENT_SHAPES.find((s) => s.id === el.shape)
-              const isSelected = selectedElementId === el.id
-              const isSticker = el.shape === 'sticker'
-              const isText = el.shape === 'text'
+          <div className="elements-list-header">
+            <span className="elements-list-caption">
+              ထည့်ထားသည့် အလွှာများ (Layers - {pageElements.length}):
+            </span>
+          </div>
+          <div className="elements-layers-stack">
+            {[...pageElements]
+              .map((el, originalIndex) => ({ el, originalIndex }))
+              .reverse()
+              .map(({ el, originalIndex }) => {
+                const def = ELEMENT_SHAPES.find((s) => s.id === el.shape)
+                const isSelected = selectedElementId === el.id
+                const isSticker = el.shape === 'sticker'
+                const isText = el.shape === 'text'
+                const isTop = originalIndex === pageElements.length - 1
+                const isBottom = originalIndex === 0
 
-              return (
-                <button
-                  key={el.id}
-                  type="button"
-                  className={`element-chip ${isSelected ? 'active' : ''}`}
-                  onClick={() => onSelectElement(isSelected ? null : el.id)}
-                >
-                  {isSticker && el.stickerSrc ? (
-                    <img
-                      src={el.stickerSrc}
-                      alt="Sticker"
-                      style={{
-                        width: 16,
-                        height: 16,
-                        objectFit: 'contain',
-                        marginRight: 4,
-                      }}
-                    />
-                  ) : isText ? (
-                    <span>📝</span>
-                  ) : (
-                    <span>{def?.icon ?? '✨'}</span>
-                  )}
-                  <span>
-                    {isSticker
-                      ? `စတစ်ကာ ${index + 1}`
-                      : isText
-                        ? `စာတို ${index + 1}`
-                        : `${def?.label ?? 'ပစ္စည်း'} ${index + 1}`}
-                  </span>
-                </button>
-              )
-            })}
+                return (
+                  <div
+                    key={el.id}
+                    className={`layer-item-row ${isSelected ? 'active' : ''}`}
+                    onClick={() => onSelectElement(isSelected ? null : el.id)}
+                  >
+                    <div className="layer-item-main">
+                      <div className="layer-item-thumb">
+                        {isSticker && el.stickerSrc ? (
+                          <img src={el.stickerSrc} alt="Sticker" />
+                        ) : isText ? (
+                          <span>📝</span>
+                        ) : (
+                          <span>{def?.icon ?? '✨'}</span>
+                        )}
+                      </div>
+                      <div className="layer-item-info">
+                        <span className="layer-item-title">
+                          {isSticker
+                            ? (el.text || 'Sticker')
+                            : isText
+                              ? (el.text ? `"${el.text.slice(0, 16)}${el.text.length > 16 ? '...' : ''}"` : 'စာတို (Text Box)')
+                              : (def?.label ?? 'ပစ္စည်း')}
+                        </span>
+                        <span className="layer-item-sub">
+                          {isSticker ? 'Sticker' : isText ? 'Text Box' : 'Shape'} • Layer {originalIndex + 1}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="layer-order-actions"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        className="layer-arrow-btn"
+                        disabled={isTop}
+                        onClick={() => moveLayer(el.id, 'up')}
+                        title="အပေါ်သို့ (ရှေ့သို့)"
+                        aria-label="အပေါ်သို့"
+                      >
+                        <ChevronUp size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className="layer-arrow-btn"
+                        disabled={isBottom}
+                        onClick={() => moveLayer(el.id, 'down')}
+                        title="အောက်သို့ (နောက်သို့)"
+                        aria-label="အောက်သို့"
+                      >
+                        <ChevronDown size={13} />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
           </div>
         </div>
       )}
@@ -280,13 +345,33 @@ export function ElementFields({
               )}
               <strong>
                 {selectedElement.shape === 'sticker'
-                  ? 'စတစ်ကာ အပြင်အဆင်'
+                  ? 'Stickers Style'
                   : selectedElement.shape === 'text'
-                    ? 'စာတို (Text Box) အပြင်အဆင်'
-                    : 'အလှဆင်ပစ္စည်း အပြင်အဆင်'}
+                    ? 'Text Box Style'
+                    : 'Stickers Style'}
               </strong>
             </div>
             <div className="inspector-actions">
+              <button
+                type="button"
+                className="icon-button"
+                title="အပေါ်သို့ (ရှေ့သို့)"
+                aria-label="အပေါ်သို့"
+                disabled={selectedIndexInPage === pageElements.length - 1}
+                onClick={() => moveLayer(selectedElement.id, 'up')}
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button
+                type="button"
+                className="icon-button"
+                title="အောက်သို့ (နောက်သို့)"
+                aria-label="အောက်သို့"
+                disabled={selectedIndexInPage === 0}
+                onClick={() => moveLayer(selectedElement.id, 'down')}
+              >
+                <ChevronDown size={14} />
+              </button>
               <button
                 type="button"
                 className="icon-button"
@@ -322,7 +407,7 @@ export function ElementFields({
 
                 <div className="control-row">
                   <label className="control-label" htmlFor="textbox-font-select">
-                    ဖောင့် (Font)
+                    Font
                   </label>
                   <select
                     id="textbox-font-select"
