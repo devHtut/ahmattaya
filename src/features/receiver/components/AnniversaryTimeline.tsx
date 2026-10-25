@@ -1,6 +1,7 @@
 import { Clock } from 'lucide-react'
 import type { AnniversaryEvent } from '../../../shared/models/event'
 import type { CardAppearance } from '../../../shared/models/card'
+import { formatEnglishDate } from '../../../shared/lib/anniversary-calc'
 
 function getOrdinalSuffix(n: number): string {
   const mod100 = n % 100
@@ -30,22 +31,22 @@ function getMilestoneTitle(
 
   if (isBirthday) {
     if (years > 0) {
-      return `Happy ${getOrdinalSuffix(years)} Birthday`
+      return `🎈 Happy ${getOrdinalSuffix(years)} Birthday 🎉`
     }
-    return 'Happy Birthday'
+    return '🎈 Happy Birthday 🎉'
   }
 
   // Anniversary
   if (mode === 'days' && days > 0) {
-    return `Happy ${days} Days Together`
+    return `🥰 Happy ${days} Days Together 💗`
   }
   if (years > 0) {
-    return `Happy ${getOrdinalSuffix(years)} Anniversary`
+    return `🥰 Happy ${getOrdinalSuffix(years)} Anniversary 💗`
   }
   if (months > 0) {
-    return `Happy ${months} Months Anniversary`
+    return `🥰 Happy ${months} Months Anniversary 💗`
   }
-  return 'Happy Anniversary'
+  return '🥰 Happy Anniversary 💗'
 }
 
 export function AnniversaryTimeline({
@@ -65,8 +66,8 @@ export function AnniversaryTimeline({
   const milestoneTitle = getMilestoneTitle(anniversary, isBirthday)
   const hasDateOrYears = Boolean(
     anniversary.date ||
-      (anniversary.yearsValue ?? anniversary.yearsCount ?? 0) > 0 ||
-      anniversary.durationText?.trim(),
+    (anniversary.yearsValue ?? anniversary.yearsCount ?? 0) > 0 ||
+    anniversary.durationText?.trim(),
   )
 
   if (!hasTimeline && !hasDateOrYears) return null
@@ -97,7 +98,9 @@ export function AnniversaryTimeline({
         {anniversary.date && !isBirthday && (
           <p className="anniversary-date-line">
             <Clock size={14} /> Date —{' '}
-            <strong>{anniversary.date}</strong>
+            <strong>
+              {formatEnglishDate(anniversary.rawDate || anniversary.date)}
+            </strong>
           </p>
         )}
       </div>

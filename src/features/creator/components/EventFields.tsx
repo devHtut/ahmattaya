@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Calendar,
   Camera,
@@ -32,7 +32,8 @@ import {
 import { compressPhoto } from '../lib/compress-photo'
 import {
   calcAnniversaryDuration,
-  formatMyanmarDate,
+  formatEnglishDate,
+  ENGLISH_MONTHS,
   toMyanmarDigits,
 } from '../../../shared/lib/anniversary-calc'
 
@@ -263,7 +264,7 @@ export function EventFields({
       updateAnniversary({ rawDate: '', date: '' })
       return
     }
-    const myanmarDate = formatMyanmarDate(isoDate)
+    const englishDate = formatEnglishDate(isoDate)
     const calc = calcAnniversaryDuration(isoDate)
     const currentMode = anniversary.displayMode || 'years-months'
     const newDurationText =
@@ -271,13 +272,75 @@ export function EventFields({
 
     updateAnniversary({
       rawDate: isoDate,
-      date: myanmarDate,
+      date: englishDate,
       yearsValue: calc.years,
       yearsCount: calc.years,
       monthsValue: calc.months,
       daysValue: calc.days,
       durationText: newDurationText,
     })
+  }
+
+  const parsedDate = useMemo(() => {
+    if (rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+      const [y, m, d] = rawDate.split('-').map(Number)
+      return { year: y, month: m, day: d }
+    }
+    const today = new Date()
+    return {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate(),
+    }
+  }, [rawDate])
+
+  const currentYear = new Date().getFullYear()
+  const yearsList = useMemo(() => {
+    const list: number[] = []
+    for (let y = currentYear + 1; y >= 1960; y--) {
+      list.push(y)
+    }
+    return list
+  }, [currentYear])
+
+  const daysInCurrentMonth = useMemo(() => {
+    const y = parsedDate.year
+    const m = parsedDate.month
+    return new Date(y, m, 0).getDate()
+  }, [parsedDate.year, parsedDate.month])
+
+  function handleDropdownChange(part: 'year' | 'month' | 'day', value: string) {
+    const num = parseInt(value, 10)
+    if (isNaN(num)) return
+
+    let y = parsedDate.year
+    let m = parsedDate.month
+    let d = parsedDate.day
+
+    if (part === 'year') {
+      y = num
+    } else if (part === 'month') {
+      m = num
+    } else if (part === 'day') {
+      d = num
+    }
+
+    const maxDays = new Date(y, m, 0).getDate()
+    if (d > maxDays) d = maxDays
+
+    const yStr = String(y)
+    const mStr = String(m).padStart(2, '0')
+    const dStr = String(d).padStart(2, '0')
+    handleDateSelect(`${yStr}-${mStr}-${dStr}`)
+  }
+
+  function handleQuickYearOffset(yearsAgo: number) {
+    const today = new Date()
+    today.setFullYear(today.getFullYear() - yearsAgo)
+    const yStr = String(today.getFullYear())
+    const mStr = String(today.getMonth() + 1).padStart(2, '0')
+    const dStr = String(today.getDate()).padStart(2, '0')
+    handleDateSelect(`${yStr}-${mStr}-${dStr}`)
   }
 
   function handleModeChange(mode: 'years-months' | 'days') {
@@ -718,52 +781,149 @@ export function EventFields({
         <div className="anniversary-form-group">
           {/* 1. Date Picker with Auto-calc (Anniversary only) */}
           {!isBirthday && isAnniversary && (
-            <label>
-              နှစ်ပတ်လည် စတင်ခဲ့သည့် နေ့စွဲ
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '8px',
-                  alignItems: 'center',
-                  marginTop: '6px',
-                }}
-              >
-                <input
-                  type="date"
-                  value={rawDate}
-                  onChange={(e) => handleDateSelect(e.target.value)}
-                  style={{
-                    padding: '9px 12px',
-                    borderRadius: '10px',
-                    border: '1.5px solid var(--line, #e2e8f0)',
-                    background: 'var(--paper, #fff)',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    color: 'var(--ink, #1e293b)',
-                    cursor: 'pointer',
-                    flex: 1,
-                    boxSizing: 'border-box',
-                  }}
-                />
+            <div className="anniversary-date-picker-box">
+              <label className="anniversary-date-label">
+                <span>နှစ်ပတ်လည် စတင်ခဲ့သည့် နေ့စွဲ (Start Date)</span>
+              </label>
+
+              {/* 3-part Fast Selectors: Day, Month, Year */}
+              <div className="date-select-row">
+                {/* Day */}
+                <div className="date-select-col">
+                  <span className="date-col-label">ရက် (Day)</span>
+                  <select
+                    className="date-dropdown-select"
+                    value={rawDate ? parsedDate.day : ''}
+                    onChange={(e) => handleDropdownChange('day', e.target.value)}
+                    aria-label="ရက် ရွေးပါ"
+                  >
+                    {!rawDate && <option value="">ရွေးပါ</option>}
+                    {Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Month */}
+                <div className="date-select-col month-col">
+                  <span className="date-col-label">လ (Month)</span>
+                  <select
+                    className="date-dropdown-select"
+                    value={rawDate ? parsedDate.month : ''}
+                    onChange={(e) => handleDropdownChange('month', e.target.value)}
+                    aria-label="လ ရွေးပါ"
+                  >
+                    {!rawDate && <option value="">ရွေးပါ</option>}
+                    {ENGLISH_MONTHS.map((name, i) => (
+                      <option key={name} value={i + 1}>
+                        {name} ({i + 1})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Year */}
+                <div className="date-select-col">
+                  <span className="date-col-label">ခုနှစ် (Year)</span>
+                  <select
+                    className="date-dropdown-select"
+                    value={rawDate ? parsedDate.year : ''}
+                    onChange={(e) => handleDropdownChange('year', e.target.value)}
+                    aria-label="ခုနှစ် ရွေးပါ"
+                  >
+                    {!rawDate && <option value="">ရွေးပါ</option>}
+                    {yearsList.map((y: number) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Native Picker Trigger */}
+                <div className="date-select-col date-native-col">
+                  <span className="date-col-label">ပြက္ခဒိန်</span>
+                  <input
+                    type="date"
+                    aria-label="ပြက္ခဒိန်ဖြင့် ရွေးမည်"
+                    title="ပြက္ခဒိန်ဖြင့် ရွေးမည်"
+                    value={rawDate}
+                    onChange={(e) => handleDateSelect(e.target.value)}
+                    className="native-date-input-btn"
+                  />
+                </div>
               </div>
-              {anniversary.date && (
-                <small
-                  className="field-hint"
-                  style={{
-                    color: 'var(--accent, #e11d48)',
-                    fontWeight: 600,
-                    display: 'block',
-                    marginTop: '4px',
-                  }}
+
+              {/* Quick Year Jumpers */}
+              <div className="quick-year-pills">
+                <span className="quick-pills-label">အမြန်ရွေးရန်:</span>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(0)}
+                  title="ဒီနေ့ ရက်စွဲထားမည်"
                 >
-                  📅 မြန်မာရက်စွဲပြသမှု — {anniversary.date}
-                </small>
+                  ဒီနေ့ (Today)
+                </button>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(1)}
+                >
+                  ၁ နှစ်
+                </button>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(2)}
+                >
+                  ၂ နှစ်
+                </button>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(3)}
+                >
+                  ၃ နှစ်
+                </button>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(4)}
+                >
+                  ၄ နှစ်
+                </button>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(5)}
+                >
+                  ၅ နှစ်
+                </button>
+                <button
+                  type="button"
+                  className="quick-year-pill"
+                  onClick={() => handleQuickYearOffset(10)}
+                >
+                  ၁၀ နှစ်
+                </button>
+              </div>
+
+              {/* Date Display in English */}
+              {(rawDate || anniversary.date) && (
+                <div className="english-date-display-badge">
+                  <span className="date-display-icon">📅</span>
+                  <span>Date Display — <strong>{formatEnglishDate(rawDate || anniversary.date)}</strong></span>
+                </div>
               )}
-              <small className="field-hint">
+
+              <small className="field-hint" style={{ marginTop: '4px' }}>
                 ရက်စွဲ ရွေးချယ်လိုက်ပါက ယနေ့ (Today) အထိ သက်တမ်းကာလ (နှစ်၊ လ၊ ရက်)
                 ကို အလိုအလျောက် တွက်ချက်ပေးပါမည်။
               </small>
-            </label>
+            </div>
           )}
 
           {/* 2. Alarm Digital Counter UI */}

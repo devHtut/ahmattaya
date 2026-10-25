@@ -19,6 +19,53 @@ export const MYANMAR_MONTHS = [
   'ဒီဇင်ဘာလ',
 ]
 
+export const ENGLISH_MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
+export function parseMyanmarDateToEnglish(str: string): string {
+  if (!str) return ''
+  const myanmarToAscii = (s: string) =>
+    s.replace(/[၀-၉]/g, (d) => String('၀၁၂၃၄၅၆၇၈၉'.indexOf(d)))
+  const match = str.match(/^([၀-၉\d]+)\s*ခုနှစ်[၊,\s]+(.+?)\s+([၀-၉\d]+)\s*ရက်$/)
+  if (match) {
+    const year = myanmarToAscii(match[1])
+    const monthText = match[2].trim()
+    const day = myanmarToAscii(match[3])
+    const monthIdx = MYANMAR_MONTHS.findIndex(
+      (m) => monthText.includes(m.replace('လ', '')) || m.includes(monthText),
+    )
+    if (monthIdx !== -1) {
+      return `${parseInt(day, 10)} ${ENGLISH_MONTHS[monthIdx]} ${year}`
+    }
+  }
+  return str
+}
+
+export function formatEnglishDate(dateStr: string): string {
+  if (!dateStr) return ''
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [yearStr, monthStr, dayStr] = dateStr.split('-')
+    const year = parseInt(yearStr, 10)
+    const month = parseInt(monthStr, 10)
+    const day = parseInt(dayStr, 10)
+    const monthName = ENGLISH_MONTHS[month - 1] ?? ''
+    return `${day} ${monthName} ${year}`
+  }
+  return parseMyanmarDateToEnglish(dateStr)
+}
+
 export function formatMyanmarDate(isoDate: string): string {
   if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return isoDate
   const [yearStr, monthStr, dayStr] = isoDate.split('-')
