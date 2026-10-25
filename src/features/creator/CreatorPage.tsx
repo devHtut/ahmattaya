@@ -74,7 +74,7 @@ function getSteps(occasion: Occasion): StepDefinition[] {
         : 'ပွဲအစီအစဉ်'
 
   const eventHint = isBirthday
-    ? 'မွေးနေ့အသက်နှင့် လွန်ခဲ့သောနှစ်များက မွေးနေ့အမှတ်တရပုံရိပ် Timeline ကို ပြင်ဆင်ပါ။'
+    ? 'ယခုမွေးနေ့နှင့် လွန်ခဲ့သောနှစ်များက မွေးနေ့အမှတ်တရပုံရိပ် Timeline ကို ပြင်ဆင်ပါ။'
     : isAnniversary
       ? 'နှစ်ပတ်လည် မင်္ဂလာသက်တမ်းနှင့် အတူဖြတ်သန်းခဲ့သော အမှတ်တရ Timeline ကို ပြင်ဆင်ပါ။'
       : isWedding

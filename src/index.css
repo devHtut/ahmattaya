@@ -5185,9 +5185,9 @@ footer {
 .anniversary-milestone-highlight {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   margin-top: 14px;
-  padding: 8px 18px;
+  padding: 8px 22px;
   background: color-mix(
     in srgb,
     var(--accent, #c05621) 12%,
@@ -5196,6 +5196,13 @@ footer {
   border: 1px solid color-mix(in srgb, var(--accent, #c05621) 35%, transparent);
   border-radius: 999px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.milestone-english-title {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: var(--accent, #c05621);
+  letter-spacing: 0.01em;
 }
 
 .years-number {

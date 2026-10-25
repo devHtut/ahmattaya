@@ -2,9 +2,54 @@ import { Clock } from 'lucide-react'
 import type { AnniversaryEvent } from '../../../shared/models/event'
 import type { CardAppearance } from '../../../shared/models/card'
 
+function getOrdinalSuffix(n: number): string {
+  const mod100 = n % 100
+  if (mod100 >= 11 && mod100 <= 13) {
+    return `${n}th`
+  }
+  switch (n % 10) {
+    case 1:
+      return `${n}st`
+    case 2:
+      return `${n}nd`
+    case 3:
+      return `${n}rd`
+    default:
+      return `${n}th`
+  }
+}
+
+function getMilestoneTitle(
+  anniversary: AnniversaryEvent,
+  isBirthday?: boolean,
+): string {
+  const years = anniversary.yearsValue ?? anniversary.yearsCount ?? 0
+  const months = anniversary.monthsValue ?? 0
+  const days = anniversary.daysValue ?? 0
+  const mode = anniversary.displayMode || 'years-months'
+
+  if (isBirthday) {
+    if (years > 0) {
+      return `Happy ${getOrdinalSuffix(years)} Birthday`
+    }
+    return 'Happy Birthday'
+  }
+
+  // Anniversary
+  if (mode === 'days' && days > 0) {
+    return `Happy ${days} Days Together`
+  }
+  if (years > 0) {
+    return `Happy ${getOrdinalSuffix(years)} Anniversary`
+  }
+  if (months > 0) {
+    return `Happy ${months} Months Anniversary`
+  }
+  return 'Happy Anniversary'
+}
+
 export function AnniversaryTimeline({
   anniversary,
-  coupleNames,
   colors,
   isBirthday,
 }: {
@@ -17,12 +62,12 @@ export function AnniversaryTimeline({
   if (isBirthday && anniversary.enabled === false) return null
 
   const hasTimeline = anniversary.timeline && anniversary.timeline.length > 0
-  const durationLabel = anniversary.durationText?.trim()
-    ? anniversary.durationText
-    : anniversary.yearsCount
-      ? `${anniversary.yearsCount} နှစ်ပြည့်`
-      : null
-  const hasDateOrYears = Boolean(anniversary.date || durationLabel)
+  const milestoneTitle = getMilestoneTitle(anniversary, isBirthday)
+  const hasDateOrYears = Boolean(
+    anniversary.date ||
+      (anniversary.yearsValue ?? anniversary.yearsCount ?? 0) > 0 ||
+      anniversary.durationText?.trim(),
+  )
 
   if (!hasTimeline && !hasDateOrYears) return null
 
@@ -40,14 +85,10 @@ export function AnniversaryTimeline({
         <span className="anniversary-badge">
           {isBirthday ? ' မွေးနေ့မှာ ပျော်ရွှင်ပါစေ' : ' အတူရှိနေပေးလို့ ကျေးဇူးတင်ပါတယ်'}
         </span>
-        {coupleNames && <h3 className="anniversary-couple">{coupleNames}</h3>}
 
-        {durationLabel ? (
+        {milestoneTitle ? (
           <div className="anniversary-milestone-highlight">
-            <span className="years-number">{durationLabel}</span>
-            <span className="years-text">
-              {isBirthday ? 'မွေးနေ့အမှတ်တရ မှတ်တိုင်' : 'ချစ်သက်တမ်း မှတ်တိုင်'}
-            </span>
+            <span className="milestone-english-title">{milestoneTitle}</span>
           </div>
         ) : null}
 
