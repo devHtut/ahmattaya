@@ -183,6 +183,8 @@ export function EventFields({
   const isBirthday = card.occasion === 'birthday'
   const isBirthdayTimelineEnabled =
     isBirthday && Boolean(card.event?.anniversary?.enabled)
+  const isAnniversaryTimelineEnabled =
+    isAnniversary && card.event?.anniversary?.enabled !== false
 
   // Auto-migrate any anniversary leftover samples or non-year duration in birthday cards
   useEffect(() => {
@@ -520,7 +522,7 @@ export function EventFields({
                   )}
                 </div>
                 <small className="field-hint">
-                  Google Maps မှ နေရာလင့်ခ် ထည့်ပေးထားပါက ဖိတ်ကြားခံရသူ
+                  Google Maps မှ Link ထည့်ပေးထားပါက ဖိတ်ကြားခံရသူ
                   တိုက်ရိုက်လမ်းညွှန် ကြည့်ရှုနိုင်ပါမည်။
                 </small>
               </label>
@@ -770,7 +772,71 @@ export function EventFields({
         </div>
       )}
 
-      {(isAnniversary || isBirthdayTimelineEnabled) && (
+      {isAnniversary && (
+        <div
+          className="anniversary-timeline-toggle-card"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+          }}
+        >
+          <div className="toggle-info">
+            <strong
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '14px',
+                color: 'var(--ink, #1e293b)',
+              }}
+            >
+              နှစ်ပတ်လည် အမှတ်တရ Timeline ထည့်သွင်းမည်
+            </strong>
+            <p
+              style={{
+                margin: '4px 0 0',
+                fontSize: '12px',
+                color: 'var(--ink-soft, #64748b)',
+                lineHeight: 1.5,
+              }}
+            >
+              နှစ်ပတ်လည်သက်တမ်းနှင့် အတူဖြတ်သန်းခဲ့သော အမှတ်တရ Timeline ကို
+              ပြသလိုပါက ဖွင့်ပေးပါ။
+            </p>
+          </div>
+          <label
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={isAnniversaryTimelineEnabled}
+              onChange={(e) => {
+                updateAnniversary({ enabled: e.target.checked })
+              }}
+              style={{
+                width: '18px',
+                height: '18px',
+                accentColor: 'var(--accent, #e11d48)',
+                cursor: 'pointer',
+              }}
+            />
+          </label>
+        </div>
+      )}
+      {isAnniversary && !isAnniversaryTimelineEnabled && (
+        <p className="field-hint" style={{ marginTop: '-4px', marginBottom: '16px' }}>
+          💡 Timeline မထည့်လိုပါက ပိတ်ထားနိုင်ပါသည်။ ပြင်ဆင်ထားသော အချက်အလက်များ မပျောက်ပျက်ဘဲ ဆက်လက် သိမ်းဆည်းထားပေးပါသည်။
+        </p>
+      )}
+
+      {((isAnniversary && isAnniversaryTimelineEnabled) || isBirthdayTimelineEnabled) && (
         <div className="anniversary-form-group">
           {/* 1. Date Picker with Auto-calc (Anniversary only) */}
           {!isBirthday && isAnniversary && (

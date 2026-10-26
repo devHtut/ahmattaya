@@ -88,6 +88,7 @@ export function createWeddingEvent(): WeddingEvent {
 
 export function createAnniversaryEvent(): AnniversaryEvent {
   return {
+    enabled: true,
     yearsCount: 1,
     date: '၂၀၂၆ ခုနှစ်၊ ဒီဇင်ဘာလ',
     timeline: [

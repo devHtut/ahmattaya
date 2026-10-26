@@ -68,7 +68,9 @@ export function PreviewPage({
   const isAnniversary = card.occasion === 'anniversary'
   const isBirthdayTimeline =
     card.occasion === 'birthday' && Boolean(card.event?.anniversary?.enabled)
-  const hasTimeline = isAnniversary || isBirthdayTimeline
+  const isAnniversaryTimeline =
+    isAnniversary && card.event?.anniversary?.enabled !== false
+  const hasTimeline = isAnniversaryTimeline || isBirthdayTimeline
 
   const cakePlacement = card.cake.placement || 'end'
   const hasValidPagePlacement =

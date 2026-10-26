@@ -59,6 +59,11 @@ test('anniversaryEventSchema validates valid anniversary details and timeline', 
     ],
   }
   assert.equal(anniversaryEventSchema.safeParse(validCustom).success, true)
+  assert.equal(anniversary.enabled, true)
+  assert.equal(
+    anniversaryEventSchema.safeParse({ ...anniversary, enabled: false }).success,
+    true,
+  )
 
   // Enforces max timeline items limit
   const tooManyItems = Array.from({ length: 25 }, (_, i) => ({

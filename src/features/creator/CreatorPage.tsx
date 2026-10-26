@@ -74,7 +74,7 @@ function getSteps(occasion: Occasion): StepDefinition[] {
   const eventHint = isBirthday
     ? 'ယခုမွေးနေ့နှင့် လွန်ခဲ့သောနှစ်များက မွေးနေ့အမှတ်တရပုံရိပ် Timeline ကို ပြင်ဆင်ပါ။'
     : isAnniversary
-      ? 'နှစ်ပတ်လည် မင်္ဂလာသက်တမ်းနှင့် အတူဖြတ်သန်းခဲ့သော အမှတ်တရ Timeline ကို ပြင်ဆင်ပါ။'
+      ? 'နှစ်ပတ်လည်သက်တမ်းနှင့် အတူဖြတ်သန်းခဲ့သော အမှတ်တရ Timeline ကို ပြင်ဆင်ပါ။'
       : isWedding
         ? 'မင်္ဂလာရက်၊ ခန်းမ၊ Google Maps နှင့် RSVP ဧည့်စာရင်း အချက်အလက်များ။'
         : 'ပွဲရက်စွဲ၊ အစီအစဉ်နှင့် အမှတ်တရ အချက်အလက်များ။'
@@ -272,7 +272,8 @@ export function CreatorPage({
                 },
                 ...(card.occasion === 'wedding-invitation'
                   ? [{ id: 'event' as CanvasView, label: 'မင်္ဂလာပွဲ' }]
-                  : card.occasion === 'anniversary' ||
+                  : (card.occasion === 'anniversary' &&
+                      card.event?.anniversary?.enabled !== false) ||
                     (card.occasion === 'birthday' &&
                       card.event?.anniversary?.enabled)
                     ? [
@@ -372,7 +373,8 @@ export function CreatorPage({
                       cardId={workspace?.project.id}
                       coupleNames={card.title}
                     />
-                  ) : card.occasion === 'anniversary' ||
+                  ) : (card.occasion === 'anniversary' &&
+                      card.event?.anniversary?.enabled !== false) ||
                     (card.occasion === 'birthday' &&
                       card.event?.anniversary?.enabled) ? (
                     <AnniversaryTimeline
@@ -385,9 +387,11 @@ export function CreatorPage({
                   ) : (
                     <div className="bench-event-empty">
                       <p>
-                        မင်္ဂလာဖိတ်စာ၊ နှစ်ပတ်လည် သို့မဟုတ် မွေးနေ့မှတ်တမ်း
-                        ဖွင့်ထားသော ကတ်များတွင်သာ အစီအစဉ် အထူးကဏ္ဍများ
-                        ပါဝင်ပါသည်။
+                        {card.occasion === 'anniversary'
+                          ? 'နှစ်ပတ်လည် အမှတ်တရ Timeline ကို ပိတ်ထားပါသည်။ ပြန်လည်ထည့်သွင်းလိုပါက ညာဘက်ရှိ “နှစ်ပတ်လည် အမှတ်တရ Timeline ထည့်သွင်းမည်” ကို ဖွင့်ပေးပါ။'
+                          : card.occasion === 'birthday'
+                            ? 'မွေးနေ့ အမှတ်တရ Timeline ကို ပိတ်ထားပါသည်။ ပြန်လည်ထည့်သွင်းလိုပါက ညာဘက်ရှိ “မွေးနေ့ အမှတ်တရ Timeline ထည့်သွင်းမည်” ကို ဖွင့်ပေးပါ။'
+                            : 'မင်္ဂလာဖိတ်စာ၊ နှစ်ပတ်လည် သို့မဟုတ် မွေးနေ့မှတ်တမ်း ဖွင့်ထားသော ကတ်များတွင်သာ အစီအစဉ် အထူးကဏ္ဍများ ပါဝင်ပါသည်။'}
                       </p>
                     </div>
                   )}

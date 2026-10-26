@@ -177,7 +177,7 @@ export function WeddingEventCard({
           ) : (
             <form onSubmit={handleSubmitRsvp} className="rsvp-form">
               <label className="rsvp-field">
-                <span>သင့်အမည် / ဧည့်သည်တော်အမည် *</span>
+                <span>ဧည့်သည်အမည် *</span>
                 <input
                   type="text"
                   required

@@ -5402,7 +5402,8 @@ footer {
   font-weight: 800;
   color: var(--accent);
 }
-.birthday-timeline-toggle-card {
+.birthday-timeline-toggle-card,
+.anniversary-timeline-toggle-card {
   background: var(--paper-soft);
   border: 1px solid var(--line);
   border-radius: var(--radius-m);
@@ -5410,7 +5411,8 @@ footer {
   margin-bottom: 16px;
   transition: border-color 0.15s ease;
 }
-.birthday-timeline-toggle-card:hover {
+.birthday-timeline-toggle-card:hover,
+.anniversary-timeline-toggle-card:hover {
   border-color: var(--accent);
 }
 
