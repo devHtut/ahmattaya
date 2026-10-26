@@ -40,6 +40,7 @@ export function WordsFields({
         <textarea
           rows={5}
           maxLength={2000}
+          placeholder="မွေးနေ့ဆုတောင်း သို့မဟုတ် ရင်ထဲက စကားလေးတွေကို ဒီနေရာမှာ ရေးသားနိုင်ပါတယ်..."
           value={card.message}
           onChange={(e) => update({ message: e.target.value })}
         />

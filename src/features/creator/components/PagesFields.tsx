@@ -238,6 +238,9 @@ export function PagesFields({
                 onChange={(e) => updatePage({ message: e.target.value })}
               />
             </label>
+            <p className="field-hint">
+              💡 စာမထည့်လိုပါက အလွတ်ထားနိုင်ပါသည် (ဓာတ်ပုံသီးသန့် စာမျက်နှာအဖြစ် ပြုလုပ်နိုင်သည်)
+            </p>
           </div>
 
           <div className="page-colors-section" style={{ marginTop: '14px' }}>

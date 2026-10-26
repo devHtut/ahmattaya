@@ -128,16 +128,34 @@ export function CardPreview({
                 A LITTLE MOMENT, JUST FOR YOU
               </span>
             )}
-            <h2 className="reveal-step-3" style={textStyle(effectiveHeading)}>
-              {page ? page.title || 'စာမျက်နှာအသစ်' : card.title}
-            </h2>
-            <p
-              className="card-message reveal-step-4"
-              style={textStyle(effectiveBody)}
-            >
-              {(page ? page.message : card.message) ||
-                'ရင်ထဲက စကားလေးတွေကို ဒီနေရာမှာ ရေးသားနိုင်ပါတယ်။'}
-            </p>
+            {isCover ? (
+              card.title?.trim() ? (
+                <h2 className="reveal-step-3" style={textStyle(effectiveHeading)}>
+                  {card.title}
+                </h2>
+              ) : null
+            ) : page?.title?.trim() ? (
+              <h2 className="reveal-step-3" style={textStyle(effectiveHeading)}>
+                {page.title}
+              </h2>
+            ) : null}
+            {isCover ? (
+              card.message?.trim() ? (
+                <p
+                  className="card-message reveal-step-4"
+                  style={textStyle(effectiveBody)}
+                >
+                  {card.message}
+                </p>
+              ) : null
+            ) : page?.message?.trim() ? (
+              <p
+                className="card-message reveal-step-4"
+                style={textStyle(effectiveBody)}
+              >
+                {page.message}
+              </p>
+            ) : null}
             {isCover && (
               <div className="signature reveal-step-5">
                 ချစ်ခြင်းများစွာဖြင့် ·{' '}

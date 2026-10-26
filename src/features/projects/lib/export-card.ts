@@ -112,9 +112,11 @@ export async function downloadCardImage(
   ctx.textAlign = heading.align === 'center' ? 'center' : 'left'
   const textX = heading.align === 'center' ? width / 2 : 80
 
-  ctx.font = `bold ${Math.round(heading.size * 1.5)}px "Noto Sans Myanmar", sans-serif`
-  const mainTitle = page ? page.title || 'စာမျက်နှာ' : card.title
-  ctx.fillText(mainTitle, textX, 130)
+  const mainTitle = (page ? page.title?.trim() : card.title?.trim()) || ''
+  if (mainTitle) {
+    ctx.font = `bold ${Math.round(heading.size * 1.5)}px "Noto Sans Myanmar", sans-serif`
+    ctx.fillText(mainTitle, textX, 130)
+  }
 
   // Subtext / Receiver
   if (isCover && card.receiverName) {
@@ -124,14 +126,16 @@ export async function downloadCardImage(
   }
 
   // Body message
-  ctx.fillStyle = colors.text
-  ctx.font = `${Math.round(body.size * 1.4)}px "Noto Sans Myanmar", sans-serif`
-  const message = (page ? page.message : card.message) || ''
-  const lines = message.split('\n').slice(0, 8)
-  let y = 240
-  for (const line of lines) {
-    ctx.fillText(line, textX, y)
-    y += Math.round(body.size * 2)
+  const message = (page ? page.message?.trim() : card.message?.trim()) || ''
+  if (message) {
+    ctx.fillStyle = colors.text
+    ctx.font = `${Math.round(body.size * 1.4)}px "Noto Sans Myanmar", sans-serif`
+    const lines = message.split('\n').slice(0, 8)
+    let y = mainTitle ? 240 : 160
+    for (const line of lines) {
+      ctx.fillText(line, textX, y)
+      y += Math.round(body.size * 2)
+    }
   }
 
   // Sender footer
