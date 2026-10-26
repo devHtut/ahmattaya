@@ -63,6 +63,7 @@ function TemplatePreview({
               opening={card.opening}
               receiverName=""
               senderName=""
+              occasion={template.occasion}
             />
           ) : view === 'cake' ? (
             <CakeIllustration recipe={card.cake} />

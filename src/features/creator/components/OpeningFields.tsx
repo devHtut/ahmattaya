@@ -76,6 +76,30 @@ export function OpeningFields({
         </select>
       </label>
 
+      {/* Top Kicker */}
+      <div className="opening-section-box">
+        <label>
+          အဖွင့်ခေါင်းစည်း (Top Kicker)
+          <input
+            maxLength={80}
+            placeholder={
+              card.occasion === 'wedding-invitation'
+                ? 'WEDDING INVITATION'
+                : card.occasion === 'wedding-wish'
+                  ? 'WEDDING WISHES'
+                  : card.occasion === 'anniversary'
+                    ? 'HAPPY ANNIVERSARY'
+                    : 'A LITTLE SURPRISE FOR YOU'
+            }
+            value={card.opening.kicker ?? ''}
+            onChange={(e) => update({ kicker: e.target.value })}
+          />
+        </label>
+        <p className="field-hint" style={{ marginTop: '4px' }}>
+          💡 စာအိတ်/လက်ဆောင်ဘူး အပေါ်ဆုံးတွင် ပေါ်မည့် စာသားဖြစ်ပါသည်။ မထည့်လိုပါက အလွတ်ထားနိုင်ပါသည်။
+        </p>
+      </div>
+
       {/* Title & Font */}
       <div className="opening-section-box">
         <label>

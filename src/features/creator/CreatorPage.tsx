@@ -362,6 +362,7 @@ export function CreatorPage({
                   opening={card.opening}
                   receiverName={card.receiverName}
                   senderName={card.senderName}
+                  occasion={card.occasion}
                 />
               ) : view === 'cake' ? (
                 <CakePreview recipe={card.cake} editor={cakeEditor} />

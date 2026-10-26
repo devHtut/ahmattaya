@@ -60,7 +60,67 @@ export const openingSchema = z.object({
 
 export type OpeningConfig = z.infer<typeof openingSchema>
 
-export function createOpening(): OpeningConfig {
+export function createOpening(occasion?: string): OpeningConfig {
+  if (occasion === 'wedding-invitation') {
+    return {
+      style: 'envelope',
+      background: '#fff1f2',
+      color: '#fbcfe8',
+      sealColor: '#e11d48',
+      textColor: '#881337',
+      emoji: '💍',
+      kicker: 'WEDDING INVITATION',
+      showKicker: true,
+      title: 'မင်္ဂလာဖိတ်ကြားလွှာ',
+      message: 'မင်္ဂလာလက်ထပ်ပွဲသို့ ကြွရောက်ချီးမြှင့်ပေးပါရန် လေးစားစွာ ဖိတ်ကြားအပ်ပါသည်။',
+      buttonText: 'ဖိတ်စာဖွင့်ကြည့်မယ်',
+      titleFont: '',
+      messageFont: '',
+      buttonFont: '',
+      animation: 'gentle',
+      musicOnOpen: true,
+    }
+  }
+  if (occasion === 'wedding-wish') {
+    return {
+      style: 'gift',
+      background: '#fffbeb',
+      color: '#fde68a',
+      sealColor: '#d97706',
+      textColor: '#78350f',
+      emoji: '🕊️',
+      kicker: 'WEDDING WISHES',
+      showKicker: true,
+      title: 'မင်္ဂလာဆုမွန်ကောင်း',
+      message: 'မောင်နှံနှစ်ဦး ရိုးမြေကျ ချစ်ခြင်းများစွာဖြင့် လက်တွဲနိုင်ပါစေ။',
+      buttonText: 'ဖွင့်ကြည့်မယ်',
+      titleFont: '',
+      messageFont: '',
+      buttonFont: '',
+      animation: 'gentle',
+      musicOnOpen: true,
+    }
+  }
+  if (occasion === 'anniversary') {
+    return {
+      style: 'heart',
+      background: '#fdf2f8',
+      color: '#fbcfe8',
+      sealColor: '#db2777',
+      textColor: '#831843',
+      emoji: '💖',
+      kicker: 'HAPPY ANNIVERSARY',
+      showKicker: true,
+      title: 'နှစ်ပတ်လည် အမှတ်တရ',
+      message: 'အတူတူ ဖြတ်သန်းခဲ့တဲ့ အမှတ်တရ အချိန်လေးများစွာအတွက်။',
+      buttonText: 'ဖွင့်ကြည့်မယ်',
+      titleFont: '',
+      messageFont: '',
+      buttonFont: '',
+      animation: 'gentle',
+      musicOnOpen: true,
+    }
+  }
   return {
     style: 'envelope',
     background: '#f4effb',

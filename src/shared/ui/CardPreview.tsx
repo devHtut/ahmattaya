@@ -109,7 +109,11 @@ export function CardPreview({
             )}
             {isCover && (
               <span className="copy-for">
-                {card.receiverName || 'ချစ်ရသူလေး'} အတွက်
+                {card.occasion === 'wedding-invitation'
+                  ? card.receiverName
+                    ? `${card.receiverName} ထံသို့`
+                    : 'ဖိတ်ကြားအပ်ပါသော ဧည့်သည်တော် ထံသို့'
+                  : `${card.receiverName || 'ချစ်ရသူလေး'} အတွက်`}
               </span>
             )}
             {!isCover && (
@@ -125,7 +129,13 @@ export function CardPreview({
                 className="eyebrow reveal-step-2"
                 style={{ color: colors.accent }}
               >
-                A LITTLE MOMENT, JUST FOR YOU
+                {card.occasion === 'wedding-invitation'
+                  ? 'WEDDING INVITATION'
+                  : card.occasion === 'wedding-wish'
+                    ? 'WEDDING WISHES'
+                    : card.occasion === 'anniversary'
+                      ? 'HAPPY ANNIVERSARY'
+                      : 'A LITTLE MOMENT, JUST FOR YOU'}
               </span>
             )}
             {isCover ? (
@@ -158,8 +168,15 @@ export function CardPreview({
             ) : null}
             {isCover && (
               <div className="signature reveal-step-5">
-                ချစ်ခြင်းများစွာဖြင့် ·{' '}
-                <strong>{card.senderName || 'သင့်အမည်'}</strong>
+                {card.occasion === 'wedding-invitation'
+                  ? 'လေးစားစွာဖြင့် · '
+                  : 'ချစ်ခြင်းများစွာဖြင့် · '}
+                <strong>
+                  {card.senderName ||
+                    (card.occasion === 'wedding-invitation'
+                      ? 'ဖိတ်ကြားသူများ'
+                      : 'သင့်အမည်')}
+                </strong>
               </div>
             )}
           </div>

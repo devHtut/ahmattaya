@@ -52,7 +52,7 @@ export function createCard(occasion: Occasion): CardConfig {
     title: titles[occasion],
     message: '',
     cake: createCake(),
-    opening: createOpening(),
+    opening: createOpening(occasion),
     music: createMusic(),
     event:
       occasion === 'wedding-invitation'
@@ -81,10 +81,15 @@ export function changeOccasion(
     nextEvent.anniversary = createAnniversaryEvent()
   }
 
+  const oldDefaultOpening = createOpening(card.occasion)
+  const isUntouchedOpening =
+    JSON.stringify(card.opening) === JSON.stringify(oldDefaultOpening)
+
   return {
     ...card,
     occasion,
     event: nextEvent,
     title: card.title === titles[card.occasion] ? titles[occasion] : card.title,
+    opening: isUntouchedOpening ? createOpening(occasion) : card.opening,
   }
 }

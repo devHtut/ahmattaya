@@ -6,6 +6,7 @@ export function OpeningInvitation({
   opening,
   receiverName,
   senderName,
+  occasion,
   withMusic = false,
   musicEnabled = true,
   onMusicToggle,
@@ -15,6 +16,7 @@ export function OpeningInvitation({
   opening: OpeningConfig
   receiverName: string
   senderName: string
+  occasion?: string
   withMusic?: boolean
   musicEnabled?: boolean
   onMusicToggle?: (enabled: boolean) => void
@@ -62,7 +64,15 @@ export function OpeningInvitation({
     ? { fontFamily: resolveFontFamily(opening.buttonFont) }
     : {}
 
-  const kickerText = (opening.kicker ?? 'A LITTLE SURPRISE FOR YOU').trim()
+  const isWedding = occasion === 'wedding-invitation'
+  const defaultKicker = isWedding
+    ? 'WEDDING INVITATION'
+    : occasion === 'wedding-wish'
+      ? 'WEDDING WISHES'
+      : occasion === 'anniversary'
+        ? 'HAPPY ANNIVERSARY'
+        : 'A LITTLE SURPRISE FOR YOU'
+  const kickerText = (opening.kicker ?? defaultKicker).trim()
 
   return (
     <section
@@ -70,10 +80,16 @@ export function OpeningInvitation({
       style={style}
       aria-label="အဖွင့်ဖိတ်စာ"
     >
-      {opening.showKicker !== false && kickerText && (
+      {opening.showKicker !== false && kickerText ? (
         <span className="opening-kicker">{kickerText}</span>
-      )}
-      <p className="opening-recipient">{receiverName || 'ချစ်ရသူလေး'} အတွက်</p>
+      ) : null}
+      <p className="opening-recipient">
+        {isWedding
+          ? receiverName
+            ? `${receiverName} ထံသို့`
+            : 'ဖိတ်ကြားအပ်ပါသော ဧည့်သည်တော် ထံသို့'
+          : `${receiverName || 'ချစ်ရသူလေး'} အတွက်`}
+      </p>
       <div className="opening-art" aria-hidden="true">
         <div className="opening-note">{opening.emoji}</div>
         <div className="opening-pocket" />
@@ -170,7 +186,9 @@ export function OpeningInvitation({
         {opening.message}
       </p>
       <p className="opening-sender">
-        ချစ်ခြင်းများစွာဖြင့် · {senderName || 'သင့်အမည်'}
+        {isWedding
+          ? `လေးစားစွာဖြင့် · ${senderName || 'ဖိတ်ကြားသူများ'}`
+          : `ချစ်ခြင်းများစွာဖြင့် · ${senderName || 'သင့်အမည်'}`}
       </p>
       <button
         className="opening-button"

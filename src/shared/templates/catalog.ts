@@ -14,6 +14,9 @@ type Starter = {
     style: 'gift' | 'envelope'
     emoji: CardConfig['opening']['emoji']
     title: string
+    kicker?: string
+    message?: string
+    buttonText?: string
   }
   pages: { title: string; message: string; paper: 'blank' | 'lined' }[]
   track: Exclude<CardConfig['music']['trackId'], 'custom'>
@@ -138,7 +141,10 @@ export const templateCatalog: readonly Starter[] = [
     opening: {
       style: 'envelope',
       emoji: '💍',
+      kicker: 'WEDDING INVITATION',
       title: 'မင်္ဂလာပွဲလေးကို လာခဲ့ပါနော်',
+      message: 'မင်္ဂလာလက်ထပ်ပွဲသို့ ကြွရောက်ချီးမြှင့်ပေးပါရန် လေးစားစွာ ဖိတ်ကြားအပ်ပါသည်။',
+      buttonText: 'ဖိတ်စာဖွင့်ကြည့်မယ်',
     },
     pages: [
       {

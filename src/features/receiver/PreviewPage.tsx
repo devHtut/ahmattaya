@@ -297,6 +297,7 @@ export function PreviewPage({
             opening={card.opening}
             receiverName={card.receiverName}
             senderName={card.senderName}
+            occasion={card.occasion}
             withMusic={Boolean(track && card.opening.musicOnOpen)}
             musicEnabled={musicEnabled}
             onMusicToggle={setMusicEnabled}
@@ -336,7 +337,11 @@ export function PreviewPage({
                 ref={contentsHeading}
                 tabIndex={-1}
               >
-                {card.receiverName || 'ချစ်ရသူလေး'} အတွက် အမှတ်တရလေး
+                {isWedding
+                  ? card.receiverName
+                    ? `${card.receiverName} ထံသို့ မင်္ဂလာဖိတ်ကြားလွှာ`
+                    : 'မင်္ဂလာဖိတ်ကြားလွှာ'
+                  : `${card.receiverName || 'ချစ်ရသူလေး'} အတွက် အမှတ်တရလေး`}
               </h1>
               <div className="story-card">
                 <CardPreview card={card} />
@@ -420,8 +425,9 @@ export function PreviewPage({
             <Reveal>
               <p className="end-mark reveal-step-1">အမှတ်တရ · AhMatTaYa</p>
               <p className="end-line reveal-step-2">
-                ဒီကတ်လေးကို {card.senderName || 'သင့်ချစ်ရသူ'}က ကိုယ်တိုင်
-                ဖန်တီးပေးထားတာပါ။
+                {isWedding
+                  ? `မင်္ဂလာပွဲသို့ ကြွရောက်ချီးမြှင့်ပေးပါရန် ${card.senderName ? `${card.senderName}မှ ` : ''}လေးစားစွာ ဖိတ်ကြားအပ်ပါသည်။`
+                  : `ဒီကတ်လေးကို ${card.senderName || 'သင့်ချစ်ရသူ'}က ကိုယ်တိုင် ဖန်တီးပေးထားတာပါ။`}
               </p>
               <div className="end-actions reveal-step-3">
                 <button className="button secondary" onClick={replay}>
