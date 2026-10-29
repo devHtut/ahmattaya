@@ -15,7 +15,7 @@ export interface StickerCategory {
 export const STICKER_CATEGORIES: StickerCategory[] = [
   {
     "id": "gold_wax_seals_08",
-    "name": "မင်္ဂလာတံဆိပ်များ (Wax Seals)",
+    "name": "Wax Seals",
     "icon": "💍",
     "stickers": [
       {
@@ -62,7 +62,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "love_collage_stickers_16",
-    "name": "အချစ်နှင့် နှစ်ပတ်လည်",
+    "name": "Love & Anniversary",
     "icon": "💖",
     "stickers": [
       {
@@ -149,7 +149,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "pink_party_stickers_15",
-    "name": "မွေးနေ့ပါတီ (Party)",
+    "name": "Birthday Party",
     "icon": "🎉",
     "stickers": [
       {
@@ -231,7 +231,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "floral_stickers_12",
-    "name": "ပန်းပွင့်နှင့် သစ်ရွက် (Floral)",
+    "name": "Floral & Botanical",
     "icon": "🌸",
     "stickers": [
       {
@@ -298,7 +298,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "party_animals_10",
-    "name": "ပါတီတိရစ္ဆာန်များ (Animals)",
+    "name": "Party Animals",
     "icon": "🐾",
     "stickers": [
       {
@@ -355,7 +355,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "cat_stickers_12",
-    "name": "ချစ်စရာကြောင်လေးများ",
+    "name": "Cute Cats",
     "icon": "🐱",
     "stickers": [
       {
@@ -422,7 +422,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "button_stickers_28",
-    "name": "ရင်ထိုးတံဆိပ် (Button Pins)",
+    "name": "Button Pins",
     "icon": "🔘",
     "stickers": [
       {
@@ -569,7 +569,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "christmas_stickers_14",
-    "name": "ခရစ္စမတ် (Christmas)",
+    "name": "Christmas",
     "icon": "🎄",
     "stickers": [
       {
@@ -863,7 +863,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "autumn_ghost_stickers_15",
-    "name": "ဆောင်းဦး သရဲလေးများ",
+    "name": "Autumn Ghosts",
     "icon": "👻",
     "stickers": [
       {
@@ -945,7 +945,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "seasonal_stickers_20",
-    "name": "ရာသီဥတုနှင့် သဘာဝ",
+    "name": "Weather & Nature",
     "icon": "🍂",
     "stickers": [
       {
@@ -1052,7 +1052,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "food_labels_09",
-    "name": "အစားအစာ Labels",
+    "name": "Food Labels",
     "icon": "🏷️",
     "stickers": [
       {
@@ -1104,7 +1104,7 @@ export const STICKER_CATEGORIES: StickerCategory[] = [
   },
   {
     "id": "kitchen_stickers_09",
-    "name": "မီးဖိုချောင်နှင့် မုန့်ဖုတ်",
+    "name": "Kitchen & Baking",
     "icon": "🍳",
     "stickers": [
       {

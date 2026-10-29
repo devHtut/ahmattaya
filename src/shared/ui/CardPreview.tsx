@@ -74,6 +74,16 @@ export function CardPreview({
           background: `linear-gradient(135deg, ${colors.surface}, ${colors.background})`,
           color: colors.text,
         }}
+        onPointerDown={(e) => {
+          if (
+            e.target === e.currentTarget ||
+            (e.target as HTMLElement).classList.contains('page-background') ||
+            Boolean((e.target as HTMLElement).closest('.card-copy'))
+          ) {
+            onSelectPhoto?.(null)
+            onSelectElement?.(null)
+          }
+        }}
       >
         {background && backgroundUrl && (
           <div className="page-background" aria-hidden="true">
@@ -187,17 +197,6 @@ export function CardPreview({
             အမှတ်တရ · AhMatTaYa
           </span>
         </div>
-        <div className="elements-canvas-wrapper reveal-step-element">
-          <ElementCanvas
-            elements={elements}
-            selectedId={selectedElementId}
-            onSelect={(id) => {
-              if (id) onSelectPhoto?.(null)
-              onSelectElement?.(id)
-            }}
-            onCommit={onCommitElement}
-          />
-        </div>
         <div className="photo-canvas-wrapper reveal-step-photo">
           <PhotoCanvas
             photos={photos}
@@ -207,6 +206,17 @@ export function CardPreview({
               onSelectPhoto?.(id)
             }}
             onCommit={onCommitPhoto}
+          />
+        </div>
+        <div className="elements-canvas-wrapper reveal-step-element">
+          <ElementCanvas
+            elements={elements}
+            selectedId={selectedElementId}
+            onSelect={(id) => {
+              if (id) onSelectPhoto?.(null)
+              onSelectElement?.(id)
+            }}
+            onCommit={onCommitElement}
           />
         </div>
       </article>

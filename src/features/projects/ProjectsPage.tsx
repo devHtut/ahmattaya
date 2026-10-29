@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CloudCheck, CloudUpload, Copy, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react'
 import type { ProjectWorkspace } from '../creator/hooks/useCreatorDraft'
@@ -9,6 +9,7 @@ import { isPermanentAccount } from '../../shared/cloud/account'
 import { AuthModal } from '../publishing/AuthModal'
 import { getCloudClient } from '../../shared/cloud/client'
 import { cloudDraftMessage, saveCloudDraft } from '../../shared/cloud/drafts'
+import { ConfirmDialog } from '../../shared/ui/ConfirmDialog'
 
 export function ProjectsPage({
   workspace: w,
@@ -20,7 +21,7 @@ export function ProjectsPage({
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [uploadingId, setUploadingId] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const confirmation = useRef<HTMLDialogElement>(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const navigate = useNavigate()
 
   const identity = useCloudIdentity()
@@ -115,47 +116,28 @@ export function ProjectsPage({
             <button
               className="button danger"
               disabled={selectedIds.length === 0}
-              onClick={() => confirmation.current?.showModal()}
+              onClick={() => setDeleteConfirmOpen(true)}
             >
               <Trash2 size={16} /> အပြီးတိုင်ဖျက်မယ်
             </button>
           </div>
         </div>
       )}
-      <dialog
-        ref={confirmation}
-        className="share-dialog"
-        aria-labelledby="delete-heading"
-        aria-describedby="delete-description"
-      >
-        <h2 id="delete-heading">
-          ရွေးထားတဲ့ ကတ် {selectedIds.length} ခုကို အပြီးတိုင်ဖျက်မလား။
-        </h2>
-        <p id="delete-description">
-          ဒီ browser ထဲက ရွေးထားတဲ့ကတ်တွေကို ပြန်ယူလို့ မရတော့ပါ။ Cloud
-          မိတ္တူနဲ့ မျှဝေထားတဲ့ link တွေကို မဖျက်ပါ။
-        </p>
-        <div className="share-dialog-actions">
-          <button
-            className="button secondary"
-            autoFocus
-            onClick={() => confirmation.current?.close()}
-          >
-            မဖျက်တော့ပါ
-          </button>
-          <button
-            className="button danger"
-            disabled={selectedIds.length === 0}
-            onClick={() => {
-              w.deletePermanently(selectedIds)
-              setSelected([])
-              confirmation.current?.close()
-            }}
-          >
-            အပြီးတိုင်ဖျက်မယ်
-          </button>
-        </div>
-      </dialog>
+      <ConfirmDialog
+        isOpen={deleteConfirmOpen}
+        title={`ရွေးထားတဲ့ ကတ် ${selectedIds.length} ခုကို အပြီးတိုင်ဖျက်မလား။`}
+        description="ဒီ browser ထဲက ရွေးထားတဲ့ကတ်တွေကို ပြန်ယူလို့ မရတော့ပါ။ Cloud မိတ္တူနဲ့ မျှဝေထားတဲ့ link တွေကို မဖျက်ပါ။"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        icon="trash"
+        onConfirm={() => {
+          w.deletePermanently(selectedIds)
+          setSelected([])
+          setDeleteConfirmOpen(false)
+        }}
+        onClose={() => setDeleteConfirmOpen(false)}
+      />
       <div className="shelf-grid">
         {items.map((project) => (
           <article className="shelf-card" key={project.id}>

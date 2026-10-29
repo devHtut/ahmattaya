@@ -8,6 +8,7 @@ import {
   Copy,
   Download,
   ExternalLink,
+  Pencil,
   Plus,
   RotateCcw,
   Trash2,
@@ -17,6 +18,7 @@ import {
 import type { CardConfig } from '../../../shared/models/card'
 import { ColorPaletteFields } from './ColorPaletteFields'
 import { TextStyleFields } from './TextStyleFields'
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog'
 import {
   createAnniversaryEvent,
   createBirthdayTimelineItems,
@@ -68,6 +70,50 @@ export function EventFields({
   )
   const [compressing, setCompressing] = useState(false)
 
+  // Confirm dialogs state
+  const [clearRsvpsConfirmOpen, setClearRsvpsConfirmOpen] = useState(false)
+  const [rsvpToDelete, setRsvpToDelete] = useState<string | null>(null)
+  const [timelineItemToDelete, setTimelineItemToDelete] = useState<string | null>(null)
+
+  // Timeline item edit state
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
+  const [editYear, setEditYear] = useState('')
+  const [editTitle, setEditTitle] = useState('')
+  const [editDesc, setEditDesc] = useState('')
+
+  function startEditingItem(item: TimelineItem) {
+    setEditingItemId(item.id)
+    setEditYear(item.year)
+    setEditTitle(item.title)
+    setEditDesc(item.description ?? '')
+  }
+
+  function cancelEditing() {
+    setEditingItemId(null)
+    setEditYear('')
+    setEditTitle('')
+    setEditDesc('')
+  }
+
+  function saveEditingItem() {
+    if (!editingItemId) return
+    if (!editTitle.trim()) return
+
+    updateAnniversary({
+      timeline: anniversary.timeline.map((item) =>
+        item.id === editingItemId
+          ? {
+              ...item,
+              year: editYear.trim() || 'အမှတ်တရ',
+              title: editTitle.trim(),
+              description: editDesc.trim(),
+            }
+          : item,
+      ),
+    })
+    cancelEditing()
+  }
+
   const wedding = card.event?.wedding ?? createWeddingEvent()
   const anniversary = card.event?.anniversary ?? createAnniversaryEvent()
 
@@ -110,6 +156,9 @@ export function EventFields({
   }
 
   function removeTimelineItem(id: string) {
+    if (editingItemId === id) {
+      cancelEditing()
+    }
     updateAnniversary({
       timeline: anniversary.timeline.filter((item) => item.id !== id),
     })
@@ -145,10 +194,9 @@ export function EventFields({
   }
 
   function handleClearAllRsvps() {
-    if (!window.confirm('ဧည့်သည်စာရင်း အားလုံးကို ဖျက်ပစ်မှာ သေချာပါသလား?'))
-      return
     clearRsvpResponses(projectId)
     setRsvps([])
+    setClearRsvpsConfirmOpen(false)
   }
 
   function handleDownloadCsv() {
@@ -623,7 +671,7 @@ export function EventFields({
                   <button
                     type="button"
                     className="button ghost"
-                    onClick={handleClearAllRsvps}
+                    onClick={() => setClearRsvpsConfirmOpen(true)}
                     style={{
                       marginLeft: 'auto',
                       color: 'var(--error, #ef4444)',
@@ -674,7 +722,7 @@ export function EventFields({
                         <button
                           type="button"
                           className="icon-button"
-                          onClick={() => handleDeleteRsvp(r.id)}
+                          onClick={() => setRsvpToDelete(r.id)}
                           title="ဖျက်မယ်"
                         >
                           <Trash2 size={13} />
@@ -1323,98 +1371,366 @@ export function EventFields({
             </div>
 
             <ul className="timeline-builder-list" style={{ marginTop: '16px' }}>
-              {anniversary.timeline.map((item, idx) => (
-                <li key={item.id} className="timeline-builder-item">
-                  <div className="timeline-builder-dot">{idx + 1}</div>
-                  <div className="timeline-builder-content">
-                    <span className="timeline-builder-year">{item.year}</span>
-                    <strong>{item.title}</strong>
-                    {item.photo && (
+              {anniversary.timeline.map((item, idx) => {
+                const isEditing = editingItemId === item.id
+                if (isEditing) {
+                  return (
+                    <li
+                      key={item.id}
+                      className="timeline-builder-item"
+                      style={{
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
+                        gap: '12px',
+                        background: 'var(--card, #ffffff)',
+                        border: '1.5px solid var(--accent, #6366f1)',
+                        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.08)',
+                      }}
+                    >
                       <div
-                        className="timeline-builder-photo-preview"
                         style={{
-                          position: 'relative',
-                          display: 'inline-block',
-                          margin: '6px 0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
                         }}
                       >
-                        <img
-                          src={item.photo}
-                          alt={item.title}
+                        <div className="timeline-builder-dot">{idx + 1}</div>
+                        <strong style={{ fontSize: '14px' }}>
+                          Edit Timeline Item
+                        </strong>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px',
+                        }}
+                      >
+                        <label>
+                          အချိန်ကာလ / ခုနှစ်
+                          <input
+                            type="text"
+                            maxLength={40}
+                            placeholder={
+                              isBirthday
+                                ? 'ဥပမာ — ၁ နှစ်ပြည့် သို့မဟုတ် အသက် ၁၈ နှစ်'
+                                : 'ဥပမာ — ၂၀၂၁ ခုနှစ် သို့မဟုတ် စတင်တွေ့ဆုံချိန်'
+                            }
+                            value={editYear}
+                            onChange={(e) => setEditYear(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                saveEditingItem()
+                              } else if (e.key === 'Escape') {
+                                cancelEditing()
+                              }
+                            }}
+                          />
+                        </label>
+
+                        <label>
+                          Timeline ခေါင်းစဉ်
+                          <input
+                            type="text"
+                            maxLength={100}
+                            placeholder={
+                              isBirthday
+                                ? 'ဥပမာ — ပထမဆုံး မွေးနေ့ပွဲ အမှတ်တရ'
+                                : 'ဥပမာ — ပထမဆုံး ခရီးအတူသွားခြင်း'
+                            }
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                saveEditingItem()
+                              } else if (e.key === 'Escape') {
+                                cancelEditing()
+                              }
+                            }}
+                          />
+                        </label>
+
+                        <label>
+                          အမှတ်တရ စာသားများ
+                          <textarea
+                            maxLength={400}
+                            rows={3}
+                            placeholder={
+                              isBirthday
+                                ? 'ဒီမွေးနေ့မှာ ချစ်ခင်ရသူတွေနဲ့ ပျော်ရွှင်စွာ ဖြတ်သန်းခဲ့ရတဲ့ အမှတ်တရလေးတွေကို ရေးသားပါ…'
+                                : 'ဒီအချိန်ကာလရဲ့ အမှတ်တရလေးတွေကို ရေးသားပါ…'
+                            }
+                            value={editDesc}
+                            onChange={(e) => setEditDesc(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Escape') {
+                                cancelEditing()
+                              }
+                            }}
+                          />
+                        </label>
+
+                        <div className="timeline-photo-input-section">
+                          <span
+                            className="field-hint"
+                            style={{ display: 'block', marginBottom: '6px' }}
+                          >
+                            အမှတ်တရ ဓာတ်ပုံ
+                          </span>
+                          {item.photo ? (
+                            <div
+                              className="timeline-form-photo-preview"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                background: 'var(--paper-soft, #f7fafc)',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--line, #e2e8f0)',
+                              }}
+                            >
+                              <img
+                                src={item.photo}
+                                alt={item.title}
+                                style={{
+                                  width: '48px',
+                                  height: '48px',
+                                  borderRadius: '6px',
+                                  objectFit: 'cover',
+                                }}
+                              />
+                              <span
+                                style={{
+                                  fontSize: '12px',
+                                  color: 'var(--ink-soft)',
+                                }}
+                              >
+                                ဓာတ်ပုံ ထည့်သွင်းထားသည်
+                              </span>
+                              <button
+                                type="button"
+                                className="button ghost"
+                                onClick={() => handleItemPhotoRemove(item.id)}
+                                style={{
+                                  marginLeft: 'auto',
+                                  color: 'var(--error, #ef4444)',
+                                  padding: '4px 8px',
+                                }}
+                              >
+                                <X size={13} /> Remove
+                              </button>
+                            </div>
+                          ) : (
+                            <label
+                              className="button secondary"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                cursor: compressing ? 'wait' : 'pointer',
+                              }}
+                            >
+                              <Camera size={14} />
+                              {compressing ? 'Uploading...' : 'Upload Photo'}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={compressing}
+                                style={{ display: 'none' }}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) void handleItemPhotoUpload(item.id, file)
+                                  e.target.value = ''
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
+
+                        <div
                           style={{
-                            width: '64px',
-                            height: '64px',
-                            objectFit: 'cover',
-                            borderRadius: '8px',
-                            border: '1px solid var(--line, #e2e8f0)',
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="icon-button"
-                          onClick={() => handleItemPhotoRemove(item.id)}
-                          title="ဓာတ်ပုံ ဖြုတ်မယ်"
-                          style={{
-                            position: 'absolute',
-                            top: '-6px',
-                            right: '-6px',
-                            width: '20px',
-                            height: '20px',
-                            background: 'var(--card, #fff)',
-                            border: '1px solid var(--line, #cbd5e0)',
-                            borderRadius: '50%',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                            padding: 0,
+                            display: 'flex',
+                            gap: '8px',
+                            marginTop: '4px',
                           }}
                         >
-                          <X size={11} />
-                        </button>
+                          <button
+                            type="button"
+                            className="button primary"
+                            disabled={!editTitle.trim()}
+                            onClick={saveEditingItem}
+                            style={{ padding: '6px 16px', fontSize: '13px' }}
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            className="button secondary"
+                            onClick={cancelEditing}
+                            style={{ padding: '6px 16px', fontSize: '13px' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-                    )}
-                    {item.description && <p>{item.description}</p>}
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px',
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    {!item.photo && (
-                      <label
-                        className="icon-button"
-                        title="Upload Photo"
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <Camera size={14} />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          style={{ display: 'none' }}
-                          onChange={(e) => {
-                            const file = e.target.files?.[0]
-                            if (file) void handleItemPhotoUpload(item.id, file)
-                            e.target.value = ''
+                    </li>
+                  )
+                }
+
+                return (
+                  <li key={item.id} className="timeline-builder-item">
+                    <div className="timeline-builder-dot">{idx + 1}</div>
+                    <div className="timeline-builder-content">
+                      <span className="timeline-builder-year">{item.year}</span>
+                      <strong>{item.title}</strong>
+                      {item.photo && (
+                        <div
+                          className="timeline-builder-photo-preview"
+                          style={{
+                            position: 'relative',
+                            display: 'inline-block',
+                            margin: '6px 0',
                           }}
-                        />
-                      </label>
-                    )}
-                    <button
-                      type="button"
-                      className="icon-button"
-                      onClick={() => removeTimelineItem(item.id)}
-                      title="Delete"
+                        >
+                          <img
+                            src={item.photo}
+                            alt={item.title}
+                            style={{
+                              width: '64px',
+                              height: '64px',
+                              objectFit: 'cover',
+                              borderRadius: '8px',
+                              border: '1px solid var(--line, #e2e8f0)',
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="icon-button"
+                            onClick={() => handleItemPhotoRemove(item.id)}
+                            title="ဓာတ်ပုံ ဖြုတ်မယ်"
+                            style={{
+                              position: 'absolute',
+                              top: '-6px',
+                              right: '-6px',
+                              width: '20px',
+                              height: '20px',
+                              background: 'var(--card, #fff)',
+                              border: '1px solid var(--line, #cbd5e0)',
+                              borderRadius: '50%',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                              padding: 0,
+                            }}
+                          >
+                            <X size={11} />
+                          </button>
+                        </div>
+                      )}
+                      {item.description && <p>{item.description}</p>}
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        marginLeft: 'auto',
+                      }}
                     >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </li>
-              ))}
+                      <button
+                        type="button"
+                        className="icon-button"
+                        onClick={() => startEditingItem(item)}
+                        title="Edit"
+                        aria-label="Edit"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      {!item.photo && (
+                        <label
+                          className="icon-button"
+                          title="Upload Photo"
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <Camera size={14} />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) void handleItemPhotoUpload(item.id, file)
+                              e.target.value = ''
+                            }}
+                          />
+                        </label>
+                      )}
+                      <button
+                        type="button"
+                        className="icon-button"
+                        onClick={() => setTimelineItemToDelete(item.id)}
+                        title="Delete"
+                        aria-label="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           </fieldset>
         </div>
       )}
+
+      {/* Confirm Dialogs */}
+      <ConfirmDialog
+        isOpen={clearRsvpsConfirmOpen}
+        title="ဧည့်သည်စာရင်း အားလုံးကို ဖျက်မလား?"
+        description="လက်ခံရရှိထားသော RSVP ဧည့်သည်စာရင်း အားလုံးကို ဖျက်ပစ်ပါမည်။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍ မရနိုင်ပါ။"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        icon="trash"
+        onConfirm={handleClearAllRsvps}
+        onClose={() => setClearRsvpsConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={Boolean(rsvpToDelete)}
+        title="ဧည့်သည်မှတ်တမ်း ဖျက်မလား?"
+        description="ရွေးချယ်ထားသော ဧည့်သည်မှတ်တမ်းကို စာရင်းမှ ဖျက်ပစ်ပါမည်။"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        icon="trash"
+        onConfirm={() => {
+          if (rsvpToDelete) {
+            handleDeleteRsvp(rsvpToDelete)
+            setRsvpToDelete(null)
+          }
+        }}
+        onClose={() => setRsvpToDelete(null)}
+      />
+
+      <ConfirmDialog
+        isOpen={Boolean(timelineItemToDelete)}
+        title="Timeline အမှတ်တရကို ဖျက်မလား?"
+        description="ဤ Timeline အမှတ်တရနှင့် ဓာတ်ပုံကို ဖျက်ပစ်ပါမည်။"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        icon="trash"
+        onConfirm={() => {
+          if (timelineItemToDelete) {
+            removeTimelineItem(timelineItemToDelete)
+            setTimelineItemToDelete(null)
+          }
+        }}
+        onClose={() => setTimelineItemToDelete(null)}
+      />
     </div>
   )
 }

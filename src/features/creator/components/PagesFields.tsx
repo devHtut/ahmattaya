@@ -18,6 +18,7 @@ import { compressPhoto } from '../lib/compress-photo'
 import { defaultPhotoFrame } from '../../../shared/lib/photo-geometry'
 import { PhotoProperties } from './PhotoProperties'
 import { removePage } from '../lib/pages'
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog'
 
 export function PagesFields({
   card,
@@ -42,6 +43,7 @@ export function PagesFields({
   const [feedback, setFeedback] = useState('')
   const [draggingOver, setDraggingOver] = useState(false)
   const [mediaTab, setMediaTab] = useState<'photos' | 'background'>('photos')
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const latest = useRef(card)
   const mounted = useRef(false)
   const uploading = useRef(false)
@@ -148,21 +150,33 @@ export function PagesFields({
           </span>
         </div>
         {!isCover && (
-          <button
-            type="button"
-            disabled={busy}
-            className="active-page-delete-btn"
-            title="ဒီစာမျက်နှာကို ဖျက်မယ်"
-            onClick={() => {
-              if (window.confirm('ဒီစာမျက်နှာနဲ့ သူ့ပုံတွေကို ဖျက်မလား?')) {
+          <>
+            <button
+              type="button"
+              disabled={busy}
+              className="active-page-delete-btn"
+              title="ဒီစာမျက်နှာကို ဖျက်မယ်"
+              onClick={() => setDeleteConfirmOpen(true)}
+            >
+              <Trash2 size={13} />
+              <span>ဖျက်မယ်</span>
+            </button>
+            <ConfirmDialog
+              isOpen={deleteConfirmOpen}
+              title="စာမျက်နှာကို ဖျက်မလား?"
+              description="ဒီစာမျက်နှာနဲ့ သူ့ထဲက ဓာတ်ပုံအားလုံးကို ဖျက်ပစ်ပါမည်။ ပြန်လည်ရယူနိုင်မည် မဟုတ်ပါ။"
+              confirmText="Delete"
+              cancelText="Cancel"
+              variant="danger"
+              icon="trash"
+              onConfirm={() => {
                 onChange(removePage(card, pageId))
                 onSelectPage('cover')
-              }
-            }}
-          >
-            <Trash2 size={13} />
-            <span>ဖျက်မယ်</span>
-          </button>
+                setDeleteConfirmOpen(false)
+              }}
+              onClose={() => setDeleteConfirmOpen(false)}
+            />
+          </>
         )}
       </div>
 

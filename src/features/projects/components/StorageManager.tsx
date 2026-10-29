@@ -16,12 +16,14 @@ import {
   getStorageSummary,
   type StorageSummary,
 } from '../../../shared/media/storage-manager.ts'
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog.tsx'
 
 export function StorageManager({ projects }: { projects: Project[] }) {
   const [summary, setSummary] = useState<StorageSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [cleaning, setCleaning] = useState(false)
   const [cleanFeedback, setCleanFeedback] = useState<string | null>(null)
+  const [cleanupConfirmOpen, setCleanupConfirmOpen] = useState(false)
 
   function refresh() {
     setLoading(true)
@@ -46,11 +48,7 @@ export function StorageManager({ projects }: { projects: Project[] }) {
 
   async function handleCleanup() {
     if (!summary || summary.unreferenced.totalBytes <= 0) return
-    const confirmed = window.confirm(
-      `အသုံးမပြုတော့သော မီဒီယာဖိုင် ${summary.unreferenced.imageCount + summary.unreferenced.audioCount} ခု (${formatBytes(summary.unreferenced.totalBytes)}) ကို သန့်ရှင်းပစ်မှာ သေချာပါသလား?\n\n(လက်ရှိကတ်များနှင့် အမှိုက်ပုံးထဲရှိ ကတ်များ၏ ဖိုင်များကို လုံးဝဖျက်မည်မဟုတ်ပါ)`,
-    )
-    if (!confirmed) return
-
+    setCleanupConfirmOpen(false)
     setCleaning(true)
     setCleanFeedback(null)
     try {
@@ -219,7 +217,7 @@ export function StorageManager({ projects }: { projects: Project[] }) {
                   <button
                     type="button"
                     className="button primary cleanup-action-button"
-                    onClick={handleCleanup}
+                    onClick={() => setCleanupConfirmOpen(true)}
                     disabled={cleaning}
                   >
                     <Trash2 size={15} />{' '}
@@ -228,6 +226,18 @@ export function StorageManager({ projects }: { projects: Project[] }) {
                       : `အသုံးမပြုတော့သည့် ဖိုင်များ သန့်ရှင်းမည် (${formatBytes(summary.unreferenced.totalBytes)})`}
                   </button>
                 </div>
+
+                <ConfirmDialog
+                  isOpen={cleanupConfirmOpen}
+                  title="အသုံးမပြုတော့သော မီဒီယာဖိုင်များ ရှင်းလင်းမလား?"
+                  description={`အသုံးမပြုတော့သော မီဒီယာဖိုင် ${summary.unreferenced.imageCount + summary.unreferenced.audioCount} ခု (${formatBytes(summary.unreferenced.totalBytes)}) ကို သန့်ရှင်းပစ်ပါမည်။ (လက်ရှိကတ်များနှင့် အမှိုက်ပုံးထဲရှိ ကတ်များ၏ ဖိုင်များကို လုံးဝဖျက်မည်မဟုတ်ပါ)`}
+                  confirmText="Delete"
+                  cancelText="Cancel"
+                  variant="danger"
+                  icon="trash"
+                  onConfirm={handleCleanup}
+                  onClose={() => setCleanupConfirmOpen(false)}
+                />
               </div>
             ) : (
               <div className="storage-optimal-state">

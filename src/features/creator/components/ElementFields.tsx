@@ -15,7 +15,7 @@ import {
   STICKER_CATEGORIES,
   type StickerItem,
 } from '../../../shared/stickers/stickers-catalog'
-import { Copy, Trash2, Sparkles, Type, X, ChevronUp, ChevronDown } from 'lucide-react'
+import { Copy, Trash2, Sparkles, Type, X, ChevronUp, ChevronDown, Check } from 'lucide-react'
 
 export function ElementFields({
   card,
@@ -31,7 +31,7 @@ export function ElementFields({
   onSelectElement: (id: string | null) => void
 }) {
   const [stickerModalOpen, setStickerModalOpen] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
+  const [justAddedStickerId, setJustAddedStickerId] = useState<string | null>(null)
   const [selectedCatId, setSelectedCatId] = useState<string>(
     STICKER_CATEGORIES[0]?.id ?? '',
   )
@@ -520,6 +520,63 @@ export function ElementFields({
               />
             </div>
 
+            {/* Position X / Y Controls */}
+            <div className="control-row">
+              <span className="control-label">
+                ဘယ် / ညာ နေရာ (X: {Math.round(selectedElement.frame.x)}%)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={selectedElement.frame.x}
+                onChange={(e) =>
+                  updateSelected({
+                    frame: { x: Number(e.target.value) },
+                  })
+                }
+              />
+            </div>
+
+            <div className="control-row">
+              <span className="control-label">
+                အထက် / အောက် နေရာ (Y: {Math.round(selectedElement.frame.y)}%)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={selectedElement.frame.y}
+                onChange={(e) =>
+                  updateSelected({
+                    frame: { y: Number(e.target.value) },
+                  })
+                }
+              />
+            </div>
+
+            <div className="control-row">
+              <span className="control-label">အလယ်တည့်တည့် ထားမယ်</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="button secondary"
+                  style={{ flex: 1, padding: '4px 10px', fontSize: '12px' }}
+                  onClick={() => updateSelected({ frame: { x: 50 } })}
+                >
+                  အလျား အလယ်
+                </button>
+                <button
+                  type="button"
+                  className="button secondary"
+                  style={{ flex: 1, padding: '4px 10px', fontSize: '12px' }}
+                  onClick={() => updateSelected({ frame: { y: 50 } })}
+                >
+                  ဒေါင်လိုက် အလယ်
+                </button>
+              </div>
+            </div>
+
             {/* Rotation Controls */}
             <div className="control-row">
               <span className="control-label">
@@ -621,31 +678,38 @@ export function ElementFields({
               role="group"
               aria-label={`${currentCategory.name} Stickers`}
             >
-              {currentCategory.stickers.map((stk) => (
-                <button
-                  key={stk.id}
-                  type="button"
-                  className="sticker-library-card"
-                  title={`${stk.name} ထည့်မယ်`}
-                  onClick={() => {
-                    addSticker(stk)
-                    setToastMessage(`✓ "${stk.name}" စတစ်ကာ ထည့်ပြီးပါပြီ ✨`)
-                    setTimeout(() => setToastMessage(''), 2200)
-                  }}
-                >
-                  <div className="sticker-img-box">
-                    <img src={stk.src} alt={stk.name} loading="lazy" />
-                  </div>
-                  <span className="sticker-name-label">{stk.name}</span>
-                </button>
-              ))}
+              {currentCategory.stickers.map((stk) => {
+                const isJustAdded = justAddedStickerId === stk.id
+                return (
+                  <button
+                    key={stk.id}
+                    type="button"
+                    className={`sticker-library-card ${isJustAdded ? 'is-added' : ''}`}
+                    title={`${stk.name} ထည့်မယ်`}
+                    onClick={() => {
+                      addSticker(stk)
+                      setJustAddedStickerId(stk.id)
+                      setTimeout(() => {
+                        setJustAddedStickerId((prev) => (prev === stk.id ? null : prev))
+                      }, 1200)
+                    }}
+                  >
+                    <div className="sticker-img-box">
+                      <img src={stk.src} alt={stk.name} loading="lazy" />
+                      {isJustAdded && (
+                        <div className="sticker-added-overlay" aria-label="Added">
+                          <Check size={28} strokeWidth={3} />
+                        </div>
+                      )}
+                    </div>
+                    <span className="sticker-name-label">{stk.name}</span>
+                  </button>
+                )
+              })}
             </div>
 
             <div className="stickers-library-footer">
               <div className="stickers-toast-area">
-                {toastMessage && (
-                  <span className="sticker-toast-msg">{toastMessage}</span>
-                )}
                 <span className="stickers-help-note">
                   💡 စတစ်ကာများကို တစ်ခုထက်မက ဆက်လက်ရွေးချယ်နိုင်ပါသည်။
                 </span>
@@ -655,7 +719,7 @@ export function ElementFields({
                 className="button primary"
                 onClick={() => setStickerModalOpen(false)}
               >
-                ပြီးပါပြီ (Done)
+                Done
               </button>
             </div>
           </div>

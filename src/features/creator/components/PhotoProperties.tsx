@@ -1,6 +1,9 @@
+import { useState } from 'react'
+import { ChevronDown, ChevronUp, Image as ImageIcon, Trash2 } from 'lucide-react'
 import type { CardConfig, PhotoFrame } from '../../../shared/models/card'
 import { constrainFrame } from '../../../shared/lib/photo-geometry'
 import { moveItem } from '../lib/pages'
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog'
 
 export function PhotoProperties({
   card,
@@ -13,9 +16,13 @@ export function PhotoProperties({
   onChange: (card: CardConfig) => void
   onSelect: (id: string | null) => void
 }) {
-  const photo = card.photos.find((item) => item.id === photoId)!
-  const pagePhotos = card.photos.filter((item) => item.pageId === photo.pageId)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const photo = card.photos.find((item) => item.id === photoId)
+  const pagePhotos = card.photos.filter((item) => item.pageId === photo?.pageId)
   const index = pagePhotos.findIndex((item) => item.id === photoId)
+
+  if (!photo) return null
+
   const update = (change: Partial<PhotoFrame>) =>
     onChange({
       ...card,
@@ -25,6 +32,7 @@ export function PhotoProperties({
           : item,
       ),
     })
+
   function layer(direction: -1 | 1) {
     const target = pagePhotos[index + direction]
     if (!target) return
@@ -37,15 +45,80 @@ export function PhotoProperties({
       ),
     })
   }
+
+  function handleDeletePhoto() {
+    onChange({
+      ...card,
+      photos: card.photos.filter((item) => item.id !== photoId),
+    })
+    onSelect(null)
+    setDeleteConfirmOpen(false)
+  }
+
   return (
-    <fieldset className="photo-properties">
-      <legend>ရွေးထားတဲ့ပုံ ပြင်မယ်</legend>
+    <div className="element-inspector-card photo-properties">
+      <div className="element-inspector-header">
+        <div className="inspector-title-group">
+          {photo.src ? (
+            <img
+              src={photo.src}
+              alt="Selected"
+              style={{
+                width: 24,
+                height: 24,
+                objectFit: 'cover',
+                borderRadius: '4px',
+                border: '1px solid var(--line, #e2e8f0)',
+                marginRight: 6,
+              }}
+            />
+          ) : (
+            <span className="inspector-icon" style={{ display: 'inline-flex', alignItems: 'center', marginRight: 6 }}>
+              <ImageIcon size={18} />
+            </span>
+          )}
+          <strong>ရွေးထားတဲ့ပုံ ပြင်မယ်</strong>
+        </div>
+        <div className="inspector-actions">
+          <button
+            type="button"
+            className="icon-button"
+            title="ရှေ့တင်မယ် (အပေါ်သို့)"
+            aria-label="ရှေ့တင်မယ်"
+            disabled={index === pagePhotos.length - 1}
+            onClick={() => layer(1)}
+          >
+            <ChevronUp size={14} />
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            title="နောက်ပို့မယ် (အောက်သို့)"
+            aria-label="နောက်ပို့မယ်"
+            disabled={index === 0}
+            onClick={() => layer(-1)}
+          >
+            <ChevronDown size={14} />
+          </button>
+          <button
+            type="button"
+            className="icon-button danger"
+            title="ပုံဖျက်မယ်"
+            aria-label="ပုံဖျက်မယ်"
+            onClick={() => setDeleteConfirmOpen(true)}
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </div>
+
       <div className="fields">
         <label>
           ပုံ စာတန်း
           <input
             maxLength={120}
             value={photo.caption}
+            placeholder="ပုံအောက်မှာ ပြသမယ့် စာတို ရေးပါ..."
             onChange={(e) =>
               onChange({
                 ...card,
@@ -110,30 +183,22 @@ export function PhotoProperties({
           />{' '}
           Shadow ထည့်မယ်
         </label>
-        <div className="item-actions">
-          <button disabled={index === 0} onClick={() => layer(-1)}>
-            နောက်ပို့မယ်
-          </button>
+        <div className="item-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
-            disabled={index === pagePhotos.length - 1}
-            onClick={() => layer(1)}
+            type="button"
+            className="button secondary"
+            style={{ flex: 1, padding: '6px 12px', fontSize: '12px' }}
+            onClick={() => update({ x: 50, y: 50, rotation: 0 })}
           >
-            ရှေ့တင်မယ်
-          </button>
-          <button onClick={() => update({ x: 50, y: 50, rotation: 0 })}>
             အလယ်တည့်မယ်
           </button>
           <button
-            className="danger"
-            onClick={() => {
-              onChange({
-                ...card,
-                photos: card.photos.filter((item) => item.id !== photoId),
-              })
-              onSelect(null)
-            }}
+            type="button"
+            className="button danger"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', fontSize: '12px' }}
+            onClick={() => setDeleteConfirmOpen(true)}
           >
-            ပုံဖျက်မယ်
+            <Trash2 size={13} /> ပုံဖျက်မယ်
           </button>
         </div>
         <p className="field-hint">
@@ -141,6 +206,18 @@ export function PhotoProperties({
           ပုံစာရင်းမှာ နှိပ်ပြီး ဖုံးနေတဲ့ပုံကို ရွေးနိုင်ပါတယ်။
         </p>
       </div>
-    </fieldset>
+
+      <ConfirmDialog
+        isOpen={deleteConfirmOpen}
+        title="ဓာတ်ပုံကို ဖျက်မလား?"
+        description="ရွေးချယ်ထားသော ဓာတ်ပုံကို ဖျက်ပစ်ပါမည်။"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        icon="trash"
+        onConfirm={handleDeletePhoto}
+        onClose={() => setDeleteConfirmOpen(false)}
+      />
+    </div>
   )
 }

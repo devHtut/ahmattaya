@@ -434,6 +434,21 @@ legend {
   margin-right: 2px;
   border-right: 1px solid var(--line);
   flex-shrink: 0;
+  text-decoration: none;
+}
+.atelier-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+  filter: drop-shadow(0 1px 2px rgba(120, 60, 40, 0.1));
+}
+.atelier-brand:hover .atelier-logo-img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 5px rgba(120, 60, 40, 0.18));
 }
 .brand-seal {
   width: 34px;
@@ -1341,7 +1356,7 @@ legend {
   pointer-events: none;
 }
 .photo-canvas-layer.is-editable {
-  pointer-events: auto;
+  pointer-events: none;
 }
 .canvas-photo {
   position: absolute;
@@ -1351,6 +1366,7 @@ legend {
   display: flex;
   flex-direction: column;
   color: #34313b;
+  pointer-events: none;
 }
 .canvas-photo.has-shadow {
   box-shadow: 0.5cqw 1.4cqw 2.7cqw #201b4038;
@@ -1377,6 +1393,7 @@ legend {
   overflow-wrap: anywhere;
 }
 .is-editable .canvas-photo {
+  pointer-events: auto;
   touch-action: none;
   cursor: grab;
   user-select: none;
@@ -3655,6 +3672,100 @@ legend {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+}
+
+/* --------------------------------------------------------------------------
+   Confirmation Modal Dialog
+   -------------------------------------------------------------------------- */
+
+.confirm-dialog {
+  max-width: 440px;
+  width: calc(100% - 32px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-l, 18px);
+  color: var(--ink, #1a202c);
+  background: var(--card, #ffffff);
+  box-shadow: 0 24px 60px rgba(40, 28, 14, 0.25);
+  overflow: hidden;
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(40, 28, 14, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.confirm-dialog-body {
+  padding: 24px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.confirm-dialog-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.confirm-dialog-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.confirm-dialog-icon.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+
+.confirm-dialog-icon.warning {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fef3c7;
+}
+
+.confirm-dialog-icon.primary {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+}
+
+.confirm-dialog-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.confirm-dialog-title {
+  margin: 2px 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink, #1a202c);
+  line-height: 1.4;
+}
+
+.confirm-dialog-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft, #4a5568);
+  line-height: 1.6;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  background: var(--paper-soft, #faf7f2);
+  border-top: 1px solid var(--line, #e2e8f0);
 }
 
 /* --------------------------------------------------------------------------
@@ -6462,7 +6573,7 @@ footer {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 4;
 }
 .element-canvas-layer {
   position: absolute;
@@ -6470,7 +6581,7 @@ footer {
   pointer-events: none;
 }
 .element-canvas-layer.is-editable {
-  pointer-events: auto;
+  pointer-events: none;
 }
 .element-frame {
   position: absolute;
@@ -6478,8 +6589,10 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 .is-editable .element-frame {
+  pointer-events: auto;
   touch-action: none;
   cursor: grab;
 }
@@ -6644,6 +6757,7 @@ footer {
 }
 .element-rotate-handle,
 .element-resize-handle {
+  pointer-events: auto;
   position: absolute;
   width: 26px;
   height: 26px;
@@ -7264,11 +7378,17 @@ footer {
   border-radius: var(--radius-m);
   cursor: pointer;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 .sticker-library-card:hover {
   transform: translateY(-3px) scale(1.05);
   border-color: #a855f7;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.sticker-library-card.is-added {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
+  transform: scale(0.97);
 }
 .sticker-img-box {
   width: 64px;
@@ -7276,6 +7396,37 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+.sticker-added-overlay {
+  position: absolute;
+  inset: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(22, 163, 74, 0.9);
+  border-radius: var(--radius-s, 8px);
+  color: #ffffff;
+  animation: stickerCheckPop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+  pointer-events: none;
+}
+@keyframes stickerCheckPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .sticker-img-box img {
   max-width: 100%;

@@ -140,14 +140,12 @@ export function EditorToolbar({
 
   return (
     <header className="atelier-bar">
-      <Link to="/" className="atelier-brand" aria-label="AhMatTaYa">
-        <span className="brand-seal" aria-hidden="true">
-          A
-        </span>
-        <span className="brand-word">
-          အမှတ်တရ
-          <small>Atelier</small>
-        </span>
+      <Link to="/" className="atelier-brand" aria-label="အမှတ်တရ - AhMatTaYa">
+        <img
+          src="/logo.png"
+          alt="အမှတ်တရ"
+          className="atelier-logo-img"
+        />
       </Link>
 
       <div

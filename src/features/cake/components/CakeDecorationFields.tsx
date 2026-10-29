@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   candleDesigns,
   MAX_CANDLES,
@@ -7,6 +8,7 @@ import {
 import type { CakeEditorSession } from '../lib/useCakeEditor'
 import { constrainPoint } from '../lib/surface'
 import { CakeTopPad } from './CakeTopPad'
+import { ConfirmDialog } from '../../../shared/ui/ConfirmDialog'
 
 export function CakeDecorationFields({
   recipe,
@@ -15,6 +17,7 @@ export function CakeDecorationFields({
   recipe: CakeRecipe
   editor: CakeEditorSession
 }) {
+  const [clearStrokesConfirmOpen, setClearStrokesConfirmOpen] = useState(false)
   const selected = recipe.candles.find(
     (item) => item.id === editor.tools.selectedId,
   )
@@ -98,12 +101,7 @@ export function CakeDecorationFields({
             </button>
             <button
               disabled={!recipe.strokes.length}
-              onClick={() => {
-                if (
-                  window.confirm('ဆွဲထားတဲ့ Cream လမ်းကြောင်းအားလုံး ဖျက်မလား?')
-                )
-                  editor.changeRecipe({ ...recipe, strokes: [] })
-              }}
+              onClick={() => setClearStrokesConfirmOpen(true)}
             >
               Cream အကုန်ဖျက်မယ်
             </button>
@@ -112,6 +110,21 @@ export function CakeDecorationFields({
             လမ်းကြောင်း {recipe.strokes.length} / {MAX_CREAM_STROKES} ·
             အပေါ်ဆုံးအလွှာပေါ်မှာ ဆွဲပါ။
           </p>
+
+          <ConfirmDialog
+            isOpen={clearStrokesConfirmOpen}
+            title="ဆွဲထားတဲ့ Cream လမ်းကြောင်းများ ဖျက်မလား?"
+            description="ကိတ်မုန့်ပေါ်တွင် လက်ဖြင့်ဆွဲထားသော Cream လိုင်းအားလုံးကို ဖျက်ပစ်ပါမည်။"
+            confirmText="Delete"
+            cancelText="Cancel"
+            variant="danger"
+            icon="trash"
+            onConfirm={() => {
+              editor.changeRecipe({ ...recipe, strokes: [] })
+              setClearStrokesConfirmOpen(false)
+            }}
+            onClose={() => setClearStrokesConfirmOpen(false)}
+          />
         </div>
       )}
       {editor.tools.mode === 'candles' && (

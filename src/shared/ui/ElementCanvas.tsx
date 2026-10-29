@@ -48,6 +48,9 @@ export function ElementCanvas({
       return
     }
     const rect = layer.current.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) {
+      return
+    }
     const current =
       live && live.id === el.id ? live.frame : el.frame
     const cx = rect.left + (current.x / 100) * rect.width
@@ -116,6 +119,19 @@ export function ElementCanvas({
     gesture.current = null
     setLive(null)
     onCommit?.(current.id, finalFrame)
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+
+  function handleLostCapture(event: PointerEvent<HTMLElement>) {
+    const current = gesture.current
+    if (current && current.pointerId === event.pointerId) {
+      const finalFrame = frameAt(event, current)
+      gesture.current = null
+      setLive(null)
+      onCommit?.(current.id, finalFrame)
+    }
   }
 
   return (
@@ -139,7 +155,7 @@ export function ElementCanvas({
           aspectRatio: `${1 / frame.ratio}`,
           transform: `translate(-50%, -50%) rotate(${frame.rotation}deg)`,
           opacity: frame.opacity,
-          zIndex: selected ? 20 : 10,
+          zIndex: selected ? 30 : 10,
         }
 
         return (
@@ -147,14 +163,15 @@ export function ElementCanvas({
             key={el.id}
             className={`element-frame ${selected ? 'is-selected' : ''}`}
             style={style}
+            tabIndex={editable ? 0 : undefined}
             onPointerDown={(e) => {
               if (!editable) return
               start(e, el, 'move')
             }}
             onPointerMove={move}
             onPointerUp={end}
-            onPointerCancel={end}
-            onLostPointerCapture={end}
+            onPointerCancel={handleLostCapture}
+            onLostPointerCapture={handleLostCapture}
           >
             {el.shape === 'text' ? (
               <div
@@ -202,8 +219,8 @@ export function ElementCanvas({
                   }}
                   onPointerMove={move}
                   onPointerUp={end}
-                  onPointerCancel={end}
-                  onLostPointerCapture={end}
+                  onPointerCancel={handleLostCapture}
+                  onLostPointerCapture={handleLostCapture}
                 >
                   ↻
                 </button>
@@ -218,8 +235,8 @@ export function ElementCanvas({
                   }}
                   onPointerMove={move}
                   onPointerUp={end}
-                  onPointerCancel={end}
-                  onLostPointerCapture={end}
+                  onPointerCancel={handleLostCapture}
+                  onLostPointerCapture={handleLostCapture}
                 >
                   ↘
                 </button>
